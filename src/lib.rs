@@ -20,7 +20,6 @@
 //! - `nmea` (default) — all 14 NMEA sentence types
 //! - `ais` (default) — AIS message decoding
 //! - `dbs`, `dbt`, `dpt`, … — individual sentence types
-//! - `serde` — Serialize/Deserialize on all public types (planned)
 
 mod error;
 mod frame;

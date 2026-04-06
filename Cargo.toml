@@ -15,13 +15,11 @@ categories = ["parser-implementations", "encoding", "science::geo"]
 exclude = ["/tests/"]
 
 [dependencies]
-serde = { version = "1", features = ["derive"], optional = true }
 
 [features]
 default = ["nmea", "ais"]
 nmea = ["dbs", "dbt", "dpt", "gga", "gll", "gns", "hdg", "hdm", "hdt", "mwd", "mwv", "rmc", "vhw", "vtg"]
 ais = []
-serde = ["dep:serde"]
 
 # Individual NMEA sentence types
 dbs = []

@@ -5,7 +5,7 @@ Bidirectional NMEA 0183 parser/encoder with AIS message decoding, written in Rus
 - **14 NMEA sentence types** — parse and encode with checksum
 - **7 AIS message types** — decode Class A/B position reports and static data
 - **Shared frame layer** — handles `$` (NMEA) and `!` (AIS) framing, IEC 61162-450 tag blocks
-- **Zero mandatory dependencies** — `serde` optional
+- **Zero dependencies**
 - **No `nom`, no proc-macro** — `FieldReader`/`FieldWriter` helpers for clean sequential parsing
 
 ## Quick start
@@ -108,7 +108,7 @@ raw line ──→ parse_frame() ──→ NmeaFrame { prefix, talker, sentence_
 | AIS lat/lon precision | `f32` (11m error) | `f64` |
 | AIS sentinels | 91/181/511 leak to caller | Filtered to `None` at decode |
 | Tag blocks | Manual stripping | Built into frame layer |
-| Dependencies | `nom` (AIS) | `serde` (optional) |
+| Dependencies | `nom` (AIS) | Zero |
 
 ## Features
 
@@ -122,7 +122,7 @@ nmea-kit = "0.1"
 | `nmea` | yes | All 14 NMEA sentence types |
 | `ais` | yes | AIS message decoding |
 | `dbs`, `dbt`, `dpt`, `gga`, `gll`, `gns`, `hdg`, `hdm`, `hdt`, `mwd`, `mwv`, `rmc`, `vhw`, `vtg` | via `nmea` | Individual sentence types |
-| `serde` | no | `Serialize`/`Deserialize` on all public types (planned) |
+
 
 Cherry-pick only the sentences you need (no AIS, minimal code):
 
