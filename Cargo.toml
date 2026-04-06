@@ -1,0 +1,44 @@
+[package]
+name = "nmea-kit"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.85.0"
+description = "Bidirectional NMEA 0183 parser and encoder with AIS decoding"
+license = "MIT OR Apache-2.0"
+authors = ["Antoine MOUTIERS"]
+readme = "README.md"
+repository = "https://github.com/amoutiers/nmea-kit"
+homepage = "https://github.com/amoutiers/nmea-kit"
+documentation = "https://docs.rs/nmea-kit"
+keywords = ["nmea", "ais", "gps", "marine", "navigation"]
+categories = ["parser-implementations", "encoding", "science::geo"]
+exclude = ["/tests/"]
+
+[dependencies]
+serde = { version = "1", features = ["derive"], optional = true }
+
+[features]
+default = ["nmea", "ais"]
+nmea = ["dbs", "dbt", "dpt", "gga", "gll", "gns", "hdg", "hdm", "hdt", "mwd", "mwv", "rmc", "vhw", "vtg"]
+ais = []
+serde = ["dep:serde"]
+
+# Individual NMEA sentence types
+dbs = []
+dbt = []
+dpt = []
+gga = []
+gll = []
+gns = []
+hdg = []
+hdm = []
+hdt = []
+mwd = []
+mwv = []
+rmc = []
+vhw = []
+vtg = []
+
+[lints.clippy]
+unwrap_used = "warn"
+cognitive_complexity = "warn"
