@@ -68,8 +68,7 @@ pub fn parse_frame(line: &str) -> Result<NmeaFrame<'_>, FrameError> {
 
     // Validate checksum if present
     if let Some(cs_str) = checksum_str {
-        let expected =
-            u8::from_str_radix(cs_str, 16).map_err(|_| FrameError::MalformedChecksum)?;
+        let expected = u8::from_str_radix(cs_str, 16).map_err(|_| FrameError::MalformedChecksum)?;
         let computed = body.bytes().fold(0u8, |acc, b| acc ^ b);
         if expected != computed {
             return Err(FrameError::BadChecksum { expected, computed });
@@ -161,8 +160,10 @@ mod tests {
 
     #[test]
     fn ais_multi_fragment_signalk() {
-        let frame1 = parse_frame("!AIVDM,2,1,0,A,53brRt4000010SG700iE@LE8@Tp4000000000153P615t0Ht0SCkjH4jC1C,0*25")
-            .expect("AIS fragment 1");
+        let frame1 = parse_frame(
+            "!AIVDM,2,1,0,A,53brRt4000010SG700iE@LE8@Tp4000000000153P615t0Ht0SCkjH4jC1C,0*25",
+        )
+        .expect("AIS fragment 1");
         assert_eq!(frame1.prefix, '!');
         assert_eq!(frame1.sentence_type, "VDM");
         assert_eq!(frame1.fields[1], "1"); // fragment number
@@ -170,8 +171,8 @@ mod tests {
 
     #[test]
     fn apb_fixture_signalk() {
-        let frame = parse_frame("$GPAPB,A,A,0.10,R,N,V,V,011,M,DEST,011,M,011,M*3C")
-            .expect("valid APB");
+        let frame =
+            parse_frame("$GPAPB,A,A,0.10,R,N,V,V,011,M,DEST,011,M,011,M*3C").expect("valid APB");
         assert_eq!(frame.sentence_type, "APB");
         assert_eq!(frame.fields[9], "DEST");
     }
@@ -214,7 +215,12 @@ mod tests {
 
     #[test]
     fn encode_simple_sentence() {
-        let result = encode_frame('$', "WI", "MWD", &["270.0", "T", "268.5", "M", "12.4", "N", "6.4", "M"]);
+        let result = encode_frame(
+            '$',
+            "WI",
+            "MWD",
+            &["270.0", "T", "268.5", "M", "12.4", "N", "6.4", "M"],
+        );
         assert!(result.starts_with("$WIMWD,270.0,T,268.5,M,12.4,N,6.4,M*"));
         assert!(result.ends_with("\r\n"));
         // Verify checksum is valid by re-parsing
@@ -224,7 +230,12 @@ mod tests {
 
     #[test]
     fn encode_with_empty_fields() {
-        let result = encode_frame('$', "GP", "APB", &["", "", "", "", "", "", "", "", "", "", "", "", "", ""]);
+        let result = encode_frame(
+            '$',
+            "GP",
+            "APB",
+            &["", "", "", "", "", "", "", "", "", "", "", "", "", ""],
+        );
         let frame = parse_frame(result.trim()).expect("should re-parse");
         assert_eq!(frame.sentence_type, "APB");
         assert!(frame.fields.iter().all(|f| f.is_empty()));
@@ -267,8 +278,7 @@ mod tests {
 
     #[test]
     fn hdg_fixtures_signalk() {
-        let frame =
-            parse_frame("$INHDG,180,5,W,10,W*6D").expect("valid HDG");
+        let frame = parse_frame("$INHDG,180,5,W,10,W*6D").expect("valid HDG");
         assert_eq!(frame.sentence_type, "HDG");
         assert_eq!(frame.fields[0], "180");
         assert_eq!(frame.fields[1], "5");
@@ -346,7 +356,9 @@ mod tests {
 
     #[test]
     fn parse_standard_nmea_sentence() {
-        let frame = parse_frame("$GPRMC,175957.917,A,3857.1234,N,07705.1234,W,0.0,0.0,010100,,,A*77").expect("valid frame");
+        let frame =
+            parse_frame("$GPRMC,175957.917,A,3857.1234,N,07705.1234,W,0.0,0.0,010100,,,A*77")
+                .expect("valid frame");
         assert_eq!(frame.prefix, '$');
         assert_eq!(frame.talker, "GP");
         assert_eq!(frame.sentence_type, "RMC");
@@ -383,7 +395,12 @@ mod tests {
     fn roundtrip_parse_encode_parse() {
         let original = "$WIMWD,270.0,T,268.5,M,12.4,N,6.4,M*63";
         let frame1 = parse_frame(original).expect("parse original");
-        let encoded = encode_frame(frame1.prefix, frame1.talker, frame1.sentence_type, &frame1.fields);
+        let encoded = encode_frame(
+            frame1.prefix,
+            frame1.talker,
+            frame1.sentence_type,
+            &frame1.fields,
+        );
         let frame2 = parse_frame(encoded.trim()).expect("parse re-encoded");
         assert_eq!(frame1.talker, frame2.talker);
         assert_eq!(frame1.sentence_type, frame2.sentence_type);

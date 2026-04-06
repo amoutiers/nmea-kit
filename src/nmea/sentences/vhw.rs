@@ -28,7 +28,12 @@ impl Vhw {
         r.skip();
         let speed_kmh = r.f32();
         r.skip(); // K
-        Some(Self { heading_true, heading_mag, speed_kts, speed_kmh })
+        Some(Self {
+            heading_true,
+            heading_mag,
+            speed_kts,
+            speed_kmh,
+        })
     }
 
     pub fn encode(&self) -> Vec<String> {

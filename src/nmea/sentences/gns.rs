@@ -88,8 +88,7 @@ mod tests {
     #[test]
     fn gns_empty_signalk() {
         // SignalK fixture: all fields empty except nav_status
-        let frame = parse_frame("$GPGNS,,,,,,,,,,,,,S*32")
-            .expect("valid empty GNS frame");
+        let frame = parse_frame("$GPGNS,,,,,,,,,,,,,S*32").expect("valid empty GNS frame");
         let gns = Gns::parse(&frame.fields).expect("parse empty GNS");
         assert!(gns.time.is_none());
         assert!(gns.lat.is_none());
@@ -100,8 +99,9 @@ mod tests {
 
     #[test]
     fn gns_full_signalk() {
-        let frame = parse_frame("$GPGNS,111648.00,0235.0379,S,04422.1450,W,ANN,12,0.8,8.5,-22.3,,,S*5D")
-            .expect("valid GNS frame");
+        let frame =
+            parse_frame("$GPGNS,111648.00,0235.0379,S,04422.1450,W,ANN,12,0.8,8.5,-22.3,,,S*5D")
+                .expect("valid GNS frame");
         let gns = Gns::parse(&frame.fields).expect("parse GNS");
         assert_eq!(gns.time, Some("111648.00".to_string()));
         assert!((gns.lat.expect("lat") - 235.0379).abs() < 0.001);
@@ -115,8 +115,10 @@ mod tests {
     #[test]
     fn gns_multi_constellation_pynmeagps() {
         // pynmeagps fixture: GN talker, mode "AANN" (4-constellation)
-        let frame = parse_frame("$GNGNS,103607.00,5327.03942,N,00214.42462,W,AANN,06,5.88,56.0,48.5,,,V*34")
-            .expect("valid GN GNS frame");
+        let frame = parse_frame(
+            "$GNGNS,103607.00,5327.03942,N,00214.42462,W,AANN,06,5.88,56.0,48.5,,,V*34",
+        )
+        .expect("valid GN GNS frame");
         let gns = Gns::parse(&frame.fields).expect("parse GN GNS");
         assert_eq!(gns.mode, Some("AANN".to_string()));
         assert_eq!(gns.num_sats, Some(6));

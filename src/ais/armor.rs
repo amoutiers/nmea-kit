@@ -75,8 +75,8 @@ pub fn extract_string(bits: &[u8], offset: usize, num_chars: usize) -> Option<St
             1..=26 => (b'A' + val - 1) as char,
             27..=31 => (b'[' + val - 27) as char, // [\]^_
             32 => ' ',
-            33..=57 => (b'!' + val - 33) as char,  // !"#$%&'()*+,-./0123456789
-            58..=63 => (b':' + val - 58) as char,  // :;<=>?
+            33..=57 => (b'!' + val - 33) as char, // !"#$%&'()*+,-./0123456789
+            58..=63 => (b':' + val - 58) as char, // :;<=>?
             _ => '?',
         };
         s.push(ch);
@@ -94,7 +94,7 @@ mod tests {
     fn decode_simple() {
         // '0' = ASCII 48, val = 0 → 000000
         // '1' = ASCII 49, val = 1 → 000001
-        let bits = decode_armor("01", 0).unwrap();
+        let bits = decode_armor("01", 0).expect("valid");
         assert_eq!(bits.len(), 12);
         assert_eq!(&bits[..6], &[0, 0, 0, 0, 0, 0]);
         assert_eq!(&bits[6..12], &[0, 0, 0, 0, 0, 1]);
@@ -102,7 +102,7 @@ mod tests {
 
     #[test]
     fn decode_with_fill_bits() {
-        let bits = decode_armor("0", 2).unwrap();
+        let bits = decode_armor("0", 2).expect("valid");
         assert_eq!(bits.len(), 4); // 6 - 2 = 4
     }
 
@@ -129,13 +129,13 @@ mod tests {
 
     #[test]
     fn extract_unsigned() {
-        let bits = decode_armor("15RTgt0PAso;90TKcjM8h6g208CQ", 0).unwrap();
+        let bits = decode_armor("15RTgt0PAso;90TKcjM8h6g208CQ", 0).expect("valid");
         // Message type is first 6 bits
-        let msg_type = extract_u32(&bits, 0, 6).unwrap();
+        let msg_type = extract_u32(&bits, 0, 6).expect("valid");
         assert_eq!(msg_type, 1); // Type 1 position report
 
         // MMSI is bits 8-37 (30 bits)
-        let mmsi = extract_u32(&bits, 8, 30).unwrap();
+        let mmsi = extract_u32(&bits, 8, 30).expect("valid");
         assert!(mmsi > 0);
     }
 
@@ -147,7 +147,7 @@ mod tests {
 
     #[test]
     fn decode_empty_payload() {
-        let bits = decode_armor("", 0).unwrap();
+        let bits = decode_armor("", 0).expect("valid");
         assert!(bits.is_empty());
     }
 
@@ -159,7 +159,7 @@ mod tests {
 
     #[test]
     fn decode_single_character() {
-        let bits = decode_armor("0", 0).unwrap();
+        let bits = decode_armor("0", 0).expect("valid");
         assert_eq!(bits.len(), 6);
         assert_eq!(&bits, &[0, 0, 0, 0, 0, 0]);
     }

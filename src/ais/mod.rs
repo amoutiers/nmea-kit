@@ -12,7 +12,7 @@
 //! let mut parser = AisParser::new();
 //!
 //! // Single-fragment message
-//! let frame = parse_frame("!AIVDM,1,1,,A,13aEOK?P00PD2wVMdLDRhgvL289?,0*26").unwrap();
+//! let frame = parse_frame("!AIVDM,1,1,,A,13aEOK?P00PD2wVMdLDRhgvL289?,0*26").expect("valid");
 //! if let Some(msg) = parser.decode(&frame) {
 //!     match msg {
 //!         AisMessage::Position(pos) => println!("MMSI: {}, lat: {:?}", pos.mmsi, pos.latitude),
@@ -110,15 +110,16 @@ mod tests {
     #[test]
     fn ignores_nmea_sentences() {
         let mut parser = AisParser::new();
-        let frame = parse_frame("$GPRMC,175957.917,A,3857.1234,N,07705.1234,W,0.0,0.0,010100,,,A*77").expect("valid");
+        let frame =
+            parse_frame("$GPRMC,175957.917,A,3857.1234,N,07705.1234,W,0.0,0.0,010100,,,A*77")
+                .expect("valid");
         assert!(parser.decode(&frame).is_none());
     }
 
     #[test]
     fn sentinel_values_filtered() {
         let mut parser = AisParser::new();
-        let frame =
-            parse_frame("!AIVDM,1,1,,A,13aEOK?P00PD2wVMdLDRhgvL289?,0*26").expect("valid");
+        let frame = parse_frame("!AIVDM,1,1,,A,13aEOK?P00PD2wVMdLDRhgvL289?,0*26").expect("valid");
         let msg = parser.decode(&frame).expect("decoded");
         if let AisMessage::Position(pos) = msg {
             assert!(pos.heading.is_none() || pos.heading.expect("heading") < 360);
@@ -128,8 +129,7 @@ mod tests {
     #[test]
     fn type_18_class_b() {
         let mut parser = AisParser::new();
-        let frame =
-            parse_frame("!AIVDM,1,1,,A,B6CdCm0t3`tba35f@V9faHi7kP06,0*58").expect("valid");
+        let frame = parse_frame("!AIVDM,1,1,,A,B6CdCm0t3`tba35f@V9faHi7kP06,0*58").expect("valid");
         let msg = parser.decode(&frame);
         // This might be a type 18 or might not decode depending on exact payload
         // At minimum it shouldn't panic
@@ -142,10 +142,9 @@ mod tests {
     fn type_19_class_b_extended() {
         let mut parser = AisParser::new();
         // GPSD fixture: Type 19 Class B+ extended position report
-        let frame = parse_frame(
-            "!AIVDM,1,1,,B,C5N3SRgPEnJGEBT>NhWAwwo862PaLELTBJ:V00000000S0D:R220,0*0B",
-        )
-        .expect("valid type 19 frame");
+        let frame =
+            parse_frame("!AIVDM,1,1,,B,C5N3SRgPEnJGEBT>NhWAwwo862PaLELTBJ:V00000000S0D:R220,0*0B")
+                .expect("valid type 19 frame");
         let msg = parser.decode(&frame).expect("decode type 19");
         if let AisMessage::Position(pos) = msg {
             assert_eq!(pos.msg_type, 19);
@@ -161,8 +160,7 @@ mod tests {
     #[test]
     fn type_1_position_report() {
         let mut parser = AisParser::new();
-        let frame =
-            parse_frame("!AIVDM,1,1,,A,13aEOK?P00PD2wVMdLDRhgvL289?,0*26").expect("valid");
+        let frame = parse_frame("!AIVDM,1,1,,A,13aEOK?P00PD2wVMdLDRhgvL289?,0*26").expect("valid");
         let msg = parser.decode(&frame).expect("decoded");
         if let AisMessage::Position(pos) = msg {
             assert_eq!(pos.msg_type, 1);
@@ -171,8 +169,8 @@ mod tests {
             assert!(pos.longitude.is_some());
             assert_eq!(pos.ais_class, AisClass::A);
             // Verify f64 precision
-            let lat = pos.latitude.unwrap();
-            let lon = pos.longitude.unwrap();
+            let lat = pos.latitude.expect("valid");
+            let lon = pos.longitude.expect("valid");
             assert!((-90.0..=90.0).contains(&lat));
             assert!((-180.0..=180.0).contains(&lon));
         } else {
@@ -208,7 +206,10 @@ mod tests {
         let mut parser = AisParser::new();
 
         // GPSD sample.aivdm Type 5 fixture
-        let f1 = parse_frame("!AIVDM,2,1,1,A,55?MbV02;H;s<HtKR20EHE:0@T4@Dn2222222216L961O5Gf0NSQEp6ClRp8,0*1C").expect("valid frag1");
+        let f1 = parse_frame(
+            "!AIVDM,2,1,1,A,55?MbV02;H;s<HtKR20EHE:0@T4@Dn2222222216L961O5Gf0NSQEp6ClRp8,0*1C",
+        )
+        .expect("valid frag1");
         assert!(parser.decode(&f1).is_none()); // incomplete
 
         let f2 = parse_frame("!AIVDM,2,2,1,A,88888888880,2*25").expect("valid frag2");
@@ -226,7 +227,10 @@ mod tests {
     fn reset_clears_pending_fragments() {
         let mut parser = AisParser::new();
         // Send fragment 1 of 2
-        let f1 = parse_frame("!AIVDM,2,1,1,A,55?MbV02;H;s<HtKR20EHE:0@T4@Dn2222222216L961O5Gf0NSQEp6ClRp8,0*1C").expect("valid");
+        let f1 = parse_frame(
+            "!AIVDM,2,1,1,A,55?MbV02;H;s<HtKR20EHE:0@T4@Dn2222222216L961O5Gf0NSQEp6ClRp8,0*1C",
+        )
+        .expect("valid");
         assert!(parser.decode(&f1).is_none());
         // Reset clears the pending fragment
         parser.reset();
@@ -239,10 +243,7 @@ mod tests {
     fn unknown_message_type() {
         let mut parser = AisParser::new();
         // Type 8 binary broadcast — should return Unknown
-        let frame = parse_frame(
-            "!AIVDM,1,1,,A,85Mv070j2d>=<e<<=PQhhg`59P00,0*26",
-        )
-        .expect("valid");
+        let frame = parse_frame("!AIVDM,1,1,,A,85Mv070j2d>=<e<<=PQhhg`59P00,0*26").expect("valid");
         let msg = parser.decode(&frame);
         if let Some(AisMessage::Unknown { msg_type }) = msg {
             assert_eq!(msg_type, 8);

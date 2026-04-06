@@ -100,18 +100,10 @@ pub(crate) fn decode_cog(raw: u32) -> Option<f32> {
 
 /// Decode true heading in degrees. 511 = not available.
 pub(crate) fn decode_heading(raw: u32) -> Option<u16> {
-    if raw == 511 {
-        None
-    } else {
-        Some(raw as u16)
-    }
+    if raw == 511 { None } else { Some(raw as u16) }
 }
 
 /// Decode rate of turn. -128 = not available.
 pub(crate) fn decode_rot(raw: i32) -> Option<f32> {
-    if raw == -128 {
-        None
-    } else {
-        Some(raw as f32)
-    }
+    if raw == -128 { None } else { Some(raw as f32) }
 }

@@ -1,4 +1,4 @@
-use nmea_kit::{encode_frame, parse_frame, FrameError};
+use nmea_kit::{FrameError, encode_frame, parse_frame};
 
 #[test]
 fn ais_multi_fragment_fixture_signalk() {
@@ -111,9 +111,11 @@ fn hdt_fixture_gpsd() {
 
 #[test]
 fn no_checksum_sentence_accepted() {
-    let result =
-        parse_frame("$GPRMC,175957.917,A,3857.1234,N,07705.1234,W,0.0,0.0,010100,,,A");
-    assert!(result.is_ok(), "sentence without checksum should be accepted");
+    let result = parse_frame("$GPRMC,175957.917,A,3857.1234,N,07705.1234,W,0.0,0.0,010100,,,A");
+    assert!(
+        result.is_ok(),
+        "sentence without checksum should be accepted"
+    );
     let frame = result.expect("valid frame");
     assert_eq!(frame.sentence_type, "RMC");
     assert_eq!(frame.fields[0], "175957.917");
@@ -121,8 +123,8 @@ fn no_checksum_sentence_accepted() {
 
 #[test]
 fn parse_valid_ais_sentence() {
-    let frame = parse_frame("!AIVDM,1,1,,A,13u@Dt002s000000000000000000,0*60")
-        .expect("valid AIS sentence");
+    let frame =
+        parse_frame("!AIVDM,1,1,,A,13u@Dt002s000000000000000000,0*60").expect("valid AIS sentence");
     assert_eq!(frame.prefix, '!');
     assert_eq!(frame.talker, "AI");
     assert_eq!(frame.sentence_type, "VDM");
@@ -132,9 +134,8 @@ fn parse_valid_ais_sentence() {
 
 #[test]
 fn parse_valid_nmea_sentence() {
-    let frame =
-        parse_frame("$GPRMC,175957.917,A,3857.1234,N,07705.1234,W,0.0,0.0,010100,,,A*77")
-            .expect("valid NMEA sentence");
+    let frame = parse_frame("$GPRMC,175957.917,A,3857.1234,N,07705.1234,W,0.0,0.0,010100,,,A*77")
+        .expect("valid NMEA sentence");
     assert_eq!(frame.prefix, '$');
     assert_eq!(frame.talker, "GP");
     assert_eq!(frame.sentence_type, "RMC");
@@ -169,8 +170,7 @@ fn roundtrip_preserves_empty_fields() {
 
 #[test]
 fn wind_fixture_signalk() {
-    let frame =
-        parse_frame("$WIMWD,270.0,T,268.5,M,12.4,N,6.4,M*63").expect("SignalK MWD fixture");
+    let frame = parse_frame("$WIMWD,270.0,T,268.5,M,12.4,N,6.4,M*63").expect("SignalK MWD fixture");
     assert_eq!(frame.talker, "WI");
     assert_eq!(frame.sentence_type, "MWD");
     assert_eq!(frame.fields[0], "270.0");

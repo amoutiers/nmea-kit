@@ -134,15 +134,19 @@ mod tests {
 
         // Fragment 1 of 2
         let r1 = c.process(&[
-            "2", "1", "0", "A",
-            "53brRt4000010SG700iE@LE8@Tp4000000000153P615t0Ht0SCkjH4jC1C", "0",
+            "2",
+            "1",
+            "0",
+            "A",
+            "53brRt4000010SG700iE@LE8@Tp4000000000153P615t0Ht0SCkjH4jC1C",
+            "0",
         ]);
         assert!(r1.is_none());
 
         // Fragment 2 of 2
         let r2 = c.process(&["2", "2", "0", "A", "`0000000001", "2"]);
         assert!(r2.is_some());
-        let p = r2.unwrap();
+        let p = r2.expect("valid");
         assert!(p.payload.starts_with("53brRt"));
         assert!(p.payload.ends_with("`0000000001"));
         assert_eq!(p.fill_bits, 2);
@@ -166,7 +170,7 @@ mod tests {
         let mut c = FragmentCollector::new();
         let result = c.process(&["1", "1", "", "A", "13u@Dt002s000000000000000000", "0"]);
         assert!(result.is_some());
-        let p = result.unwrap();
+        let p = result.expect("valid");
         assert_eq!(p.payload, "13u@Dt002s000000000000000000");
         assert_eq!(p.fill_bits, 0);
         assert_eq!(p.channel, 'A');

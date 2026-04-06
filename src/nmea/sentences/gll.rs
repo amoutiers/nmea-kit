@@ -64,8 +64,7 @@ mod tests {
     #[test]
     fn gll_empty_signalk() {
         // SignalK fixture: all fields empty
-        let frame = parse_frame("$GPGLL,,,,,,,*7C")
-            .expect("valid empty GLL frame");
+        let frame = parse_frame("$GPGLL,,,,,,,*7C").expect("valid empty GLL frame");
         let gll = Gll::parse(&frame.fields).expect("parse empty GLL");
         assert!(gll.lat.is_none());
         assert!(gll.ns.is_none());
@@ -75,8 +74,8 @@ mod tests {
 
     #[test]
     fn gll_full_signalk() {
-        let frame = parse_frame("$GPGLL,5958.613,N,02325.928,E,121022,A,D*40")
-            .expect("valid GLL frame");
+        let frame =
+            parse_frame("$GPGLL,5958.613,N,02325.928,E,121022,A,D*40").expect("valid GLL frame");
         let gll = Gll::parse(&frame.fields).expect("parse GLL");
         assert!((gll.lat.expect("lat") - 5958.613).abs() < 0.001);
         assert_eq!(gll.ns, Some('N'));

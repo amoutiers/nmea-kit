@@ -31,7 +31,13 @@ impl Vtg {
         let speed_kmh = r.f32();
         r.skip();
         let mode = r.char();
-        Some(Self { course_true, course_mag, speed_kts, speed_kmh, mode })
+        Some(Self {
+            course_true,
+            course_mag,
+            speed_kts,
+            speed_kmh,
+            mode,
+        })
     }
 
     pub fn encode(&self) -> Vec<String> {
@@ -89,7 +95,13 @@ mod tests {
 
     #[test]
     fn vtg_roundtrip() {
-        let v = Vtg { course_true: Some(0.0), course_mag: Some(359.3), speed_kts: Some(5.0), speed_kmh: Some(9.26), mode: Some('A') };
+        let v = Vtg {
+            course_true: Some(0.0),
+            course_mag: Some(359.3),
+            speed_kts: Some(5.0),
+            speed_kmh: Some(9.26),
+            mode: Some('A'),
+        };
         let s = v.to_sentence("GP");
         let f = parse_frame(s.trim()).expect("re-parse VTG frame");
         let v2 = Vtg::parse(&f.fields).expect("re-parse VTG");

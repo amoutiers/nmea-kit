@@ -6,9 +6,8 @@ use nmea_kit::parse_frame;
 #[test]
 fn ignores_nmea_dollar_frames() {
     let mut parser = AisParser::new();
-    let frame =
-        parse_frame("$GPRMC,175957.917,A,3857.1234,N,07705.1234,W,0.0,0.0,010100,,,A*77")
-            .expect("valid NMEA sentence");
+    let frame = parse_frame("$GPRMC,175957.917,A,3857.1234,N,07705.1234,W,0.0,0.0,010100,,,A*77")
+        .expect("valid NMEA sentence");
     assert!(
         parser.decode(&frame).is_none(),
         "parser should ignore $ NMEA frames"
@@ -18,11 +17,9 @@ fn ignores_nmea_dollar_frames() {
 #[test]
 fn sentinel_filtering_lat_lon_valid_range_signalk() {
     let mut parser = AisParser::new();
-    let frame = parse_frame("!AIVDM,1,1,,A,13aEOK?P00PD2wVMdLDRhgvL289?,0*26")
-        .expect("valid Type 1 frame");
-    let msg = parser
-        .decode(&frame)
-        .expect("Type 1 should decode");
+    let frame =
+        parse_frame("!AIVDM,1,1,,A,13aEOK?P00PD2wVMdLDRhgvL289?,0*26").expect("valid Type 1 frame");
+    let msg = parser.decode(&frame).expect("Type 1 should decode");
 
     if let AisMessage::Position(pos) = msg {
         // Latitude must be in valid range or None (sentinel filtered)
@@ -63,8 +60,8 @@ fn type_18_class_b_position() {
 #[test]
 fn type_1_single_fragment_class_a_signalk() {
     let mut parser = AisParser::new();
-    let frame = parse_frame("!AIVDM,1,1,,A,13aEOK?P00PD2wVMdLDRhgvL289?,0*26")
-        .expect("valid Type 1 frame");
+    let frame =
+        parse_frame("!AIVDM,1,1,,A,13aEOK?P00PD2wVMdLDRhgvL289?,0*26").expect("valid Type 1 frame");
     let msg = parser
         .decode(&frame)
         .expect("Type 1 should decode to a message");
@@ -77,10 +74,7 @@ fn type_1_single_fragment_class_a_signalk() {
 
             let lat = pos.latitude.expect("latitude present");
             let lon = pos.longitude.expect("longitude present");
-            assert!(
-                (-90.0..=90.0).contains(&lat),
-                "latitude {lat} out of range"
-            );
+            assert!((-90.0..=90.0).contains(&lat), "latitude {lat} out of range");
             assert!(
                 (-180.0..=180.0).contains(&lon),
                 "longitude {lon} out of range"
@@ -105,8 +99,7 @@ fn type_5_multi_fragment_static_voyage_gpsd() {
     );
 
     // Fragment 2: should complete the message
-    let f2 =
-        parse_frame("!AIVDM,2,2,1,A,88888888880,2*25").expect("valid Type 5 fragment 2");
+    let f2 = parse_frame("!AIVDM,2,2,1,A,88888888880,2*25").expect("valid Type 5 fragment 2");
     let msg = parser
         .decode(&f2)
         .expect("fragment 2 should complete Type 5");
@@ -127,8 +120,8 @@ fn type_5_multi_fragment_static_voyage_gpsd() {
 #[test]
 fn type_8_unknown_message_signalk() {
     let mut parser = AisParser::new();
-    let frame = parse_frame("!AIVDM,1,1,,A,85Mv070j2d>=<e<<=PQhhg`59P00,0*26")
-        .expect("valid Type 8 frame");
+    let frame =
+        parse_frame("!AIVDM,1,1,,A,85Mv070j2d>=<e<<=PQhhg`59P00,0*26").expect("valid Type 8 frame");
     let msg = parser.decode(&frame);
 
     match msg {

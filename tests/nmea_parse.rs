@@ -1,6 +1,6 @@
 #![cfg(feature = "nmea")]
 
-use nmea_kit::{parse_frame, NmeaSentence};
+use nmea_kit::{NmeaSentence, parse_frame};
 
 #[cfg(feature = "dpt")]
 #[test]
@@ -39,7 +39,10 @@ fn parse_mwd_wind_direction_signalk() {
         NmeaSentence::Mwd(mwd) => {
             assert!(mwd.wind_dir_true.is_none(), "true dir should be empty");
             let mag = mwd.wind_dir_mag.expect("magnetic direction present");
-            assert!((mag - 46.0).abs() < 0.1, "wind_dir_mag should be ~46.0, got {mag}");
+            assert!(
+                (mag - 46.0).abs() < 0.1,
+                "wind_dir_mag should be ~46.0, got {mag}"
+            );
         }
         other => panic!("expected Mwd, got {other:?}"),
     }
@@ -48,8 +51,9 @@ fn parse_mwd_wind_direction_signalk() {
 #[cfg(feature = "rmc")]
 #[test]
 fn parse_rmc_position_signalk() {
-    let frame = parse_frame("$GPRMC,085412.000,A,5222.3198,N,00454.5784,E,0.58,251.34,030414,,,A*65")
-        .expect("valid RMC fixture");
+    let frame =
+        parse_frame("$GPRMC,085412.000,A,5222.3198,N,00454.5784,E,0.58,251.34,030414,,,A*65")
+            .expect("valid RMC fixture");
     let sentence = NmeaSentence::parse(&frame);
     match sentence {
         NmeaSentence::Rmc(rmc) => {
@@ -65,7 +69,10 @@ fn parse_unknown_sentence_type() {
     let frame = parse_frame("$GPXYZ,1,2,3").expect("valid unknown sentence");
     let sentence = NmeaSentence::parse(&frame);
     match sentence {
-        NmeaSentence::Unknown { sentence_type, fields } => {
+        NmeaSentence::Unknown {
+            sentence_type,
+            fields,
+        } => {
             assert_eq!(sentence_type, "XYZ");
             assert_eq!(fields, vec!["1", "2", "3"]);
         }

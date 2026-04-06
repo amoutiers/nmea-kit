@@ -75,7 +75,11 @@ mod tests {
 
     #[test]
     fn dpt_roundtrip() {
-        let d = Dpt { depth: Some(4.1), offset: Some(1.0), rangescale: None };
+        let d = Dpt {
+            depth: Some(4.1),
+            offset: Some(1.0),
+            rangescale: None,
+        };
         let s = d.to_sentence("II");
         let f = parse_frame(s.trim()).expect("re-parse DPT frame");
         let d2 = Dpt::parse(&f.fields).expect("re-parse DPT");

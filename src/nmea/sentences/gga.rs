@@ -92,8 +92,7 @@ mod tests {
     #[test]
     fn gga_empty_signalk() {
         // SignalK fixture: all fields empty
-        let frame = parse_frame("$GPGGA,,,,,,,,,,,,,,*56")
-            .expect("valid empty GGA frame");
+        let frame = parse_frame("$GPGGA,,,,,,,,,,,,,,*56").expect("valid empty GGA frame");
         let gga = Gga::parse(&frame.fields).expect("parse empty GGA");
         assert!(gga.time.is_none());
         assert!(gga.lat.is_none());
@@ -118,8 +117,9 @@ mod tests {
     #[test]
     fn gga_multi_constellation_pynmeagps() {
         // pynmeagps fixture: GN talker
-        let frame = parse_frame("$GNGGA,103607.00,5327.03942,N,00214.42462,W,1,06,5.88,56.0,M,48.5,M,,*64")
-            .expect("valid GN GGA frame");
+        let frame =
+            parse_frame("$GNGGA,103607.00,5327.03942,N,00214.42462,W,1,06,5.88,56.0,M,48.5,M,,*64")
+                .expect("valid GN GGA frame");
         let gga = Gga::parse(&frame.fields).expect("parse GN GGA");
         assert_eq!(gga.time, Some("103607.00".to_string()));
         assert_eq!(gga.quality, Some(1));

@@ -94,8 +94,9 @@ mod tests {
 
     #[test]
     fn rmc_full_signalk() {
-        let frame = parse_frame("$GPRMC,085412.000,A,5222.3198,N,00454.5784,E,0.58,251.34,030414,,,A*65")
-            .expect("valid RMC frame");
+        let frame =
+            parse_frame("$GPRMC,085412.000,A,5222.3198,N,00454.5784,E,0.58,251.34,030414,,,A*65")
+                .expect("valid RMC frame");
         let rmc = Rmc::parse(&frame.fields).expect("parse RMC");
         assert_eq!(rmc.time, Some("085412.000".to_string()));
         assert_eq!(rmc.status, Some('A'));
@@ -125,8 +126,9 @@ mod tests {
     #[test]
     fn rmc_multi_constellation_pynmeagps() {
         // pynmeagps fixture: GN talker (multi-constellation), has pos_mode V
-        let frame = parse_frame("$GNRMC,103607.00,A,5327.03942,N,10214.42462,W,0.046,,060321,,,A,V*0E")
-            .expect("valid GN RMC frame");
+        let frame =
+            parse_frame("$GNRMC,103607.00,A,5327.03942,N,10214.42462,W,0.046,,060321,,,A,V*0E")
+                .expect("valid GN RMC frame");
         let rmc = Rmc::parse(&frame.fields).expect("parse GN RMC");
         assert_eq!(rmc.time, Some("103607.00".to_string()));
         assert_eq!(rmc.status, Some('A'));

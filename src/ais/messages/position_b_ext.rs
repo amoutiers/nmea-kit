@@ -4,7 +4,7 @@ use crate::ais::armor::{extract_i32, extract_u32};
 
 use super::common::AisClass;
 use super::position_a::{
-    decode_cog, decode_heading, decode_latitude, decode_longitude, decode_sog, PositionReport,
+    PositionReport, decode_cog, decode_heading, decode_latitude, decode_longitude, decode_sog,
 };
 
 impl PositionReport {

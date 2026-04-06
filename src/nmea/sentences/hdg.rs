@@ -105,8 +105,7 @@ mod tests {
 
     #[test]
     fn hdg_pynmeagps() {
-        let frame =
-            parse_frame("$IIHDG,70.6,,,,W*2F").expect("valid pynmeagps HDG frame");
+        let frame = parse_frame("$IIHDG,70.6,,,,W*2F").expect("valid pynmeagps HDG frame");
         let hdg = Hdg::parse(&frame.fields).expect("parse HDG");
         assert!((hdg.heading_mag.expect("hdg") - 70.6).abs() < 0.1);
         assert!(hdg.deviation.is_none());

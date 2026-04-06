@@ -21,7 +21,11 @@ impl Dbt {
         let depth_meters = r.f32();
         r.skip();
         let depth_fathoms = r.f32();
-        Some(Self { depth_feet, depth_meters, depth_fathoms })
+        Some(Self {
+            depth_feet,
+            depth_meters,
+            depth_fathoms,
+        })
     }
 
     pub fn encode(&self) -> Vec<String> {
