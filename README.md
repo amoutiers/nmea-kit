@@ -3,7 +3,7 @@
 Bidirectional NMEA 0183 parser/encoder with AIS message decoding, written in Rust.
 
 - **14 NMEA sentence types** — parse and encode with checksum
-- **5 AIS message types** — decode Class A/B position reports and static data
+- **7 AIS message types** — decode Class A/B position reports and static data
 - **Shared frame layer** — handles `$` (NMEA) and `!` (AIS) framing, IEC 61162-450 tag blocks
 - **Zero mandatory dependencies** — `serde` optional
 - **No `nom`, no proc-macro** — `FieldReader`/`FieldWriter` helpers for clean sequential parsing

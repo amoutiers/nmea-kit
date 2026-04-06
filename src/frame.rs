@@ -12,7 +12,7 @@ use crate::FrameError;
 pub struct NmeaFrame<'a> {
     /// Sentence prefix: `$` for NMEA, `!` for AIS.
     pub prefix: char,
-    /// Talker identifier (2 characters, e.g. "GP", "WI", "AI").
+    /// Talker identifier (typically 2 characters, e.g. "GP", "WI", "AI").
     pub talker: &'a str,
     /// Sentence type (3 characters, e.g. "RMC", "MWD", "VDM").
     pub sentence_type: &'a str,
@@ -69,7 +69,7 @@ pub fn parse_frame(line: &str) -> Result<NmeaFrame<'_>, FrameError> {
     // Validate checksum if present
     if let Some(cs_str) = checksum_str {
         let expected =
-            u8::from_str_radix(cs_str, 16).map_err(|_| FrameError::MissingChecksum)?;
+            u8::from_str_radix(cs_str, 16).map_err(|_| FrameError::MalformedChecksum)?;
         let computed = body.bytes().fold(0u8, |acc, b| acc ^ b);
         if expected != computed {
             return Err(FrameError::BadChecksum { expected, computed });

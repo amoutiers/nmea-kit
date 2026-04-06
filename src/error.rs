@@ -5,8 +5,8 @@ pub enum FrameError {
     Empty,
     /// First character is not `$` or `!`.
     InvalidPrefix(char),
-    /// No `*` delimiter found before checksum.
-    MissingChecksum,
+    /// Checksum field is not valid hexadecimal.
+    MalformedChecksum,
     /// Checksum mismatch.
     BadChecksum {
         expected: u8,
@@ -23,7 +23,7 @@ impl core::fmt::Display for FrameError {
         match self {
             Self::Empty => write!(f, "empty input"),
             Self::InvalidPrefix(c) => write!(f, "invalid prefix '{c}', expected '$' or '!'"),
-            Self::MissingChecksum => write!(f, "missing '*' checksum delimiter"),
+            Self::MalformedChecksum => write!(f, "checksum is not valid hexadecimal"),
             Self::BadChecksum { expected, computed } => {
                 write!(f, "checksum mismatch: expected {expected:02X}, computed {computed:02X}")
             }

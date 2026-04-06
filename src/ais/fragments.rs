@@ -173,8 +173,25 @@ mod tests {
     }
 
     #[test]
+    fn total_count_mismatch_discards() {
+        let mut c = FragmentCollector::new();
+        // Fragment 1 says total=2
+        let _ = c.process(&["2", "1", "0", "A", "AAAA", "0"]);
+        // Fragment 2 says total=3 — mismatch
+        let r = c.process(&["3", "2", "0", "A", "BBBB", "0"]);
+        assert!(r.is_none());
+        assert!(c.slots[0].is_none());
+    }
+
+    #[test]
     fn too_few_fields() {
         let mut c = FragmentCollector::new();
         assert!(c.process(&["1", "1"]).is_none());
+    }
+
+    #[test]
+    fn zero_total_rejected() {
+        let mut c = FragmentCollector::new();
+        assert!(c.process(&["0", "1", "", "A", "payload", "0"]).is_none());
     }
 }

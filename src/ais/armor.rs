@@ -138,4 +138,29 @@ mod tests {
         let mmsi = extract_u32(&bits, 8, 30).unwrap();
         assert!(mmsi > 0);
     }
+
+    #[test]
+    fn extract_unsigned_out_of_bounds() {
+        let bits = vec![0, 1, 0];
+        assert_eq!(extract_u32(&bits, 0, 4), None); // only 3 bits available
+    }
+
+    #[test]
+    fn decode_empty_payload() {
+        let bits = decode_armor("", 0).unwrap();
+        assert!(bits.is_empty());
+    }
+
+    #[test]
+    fn decode_invalid_character() {
+        // '~' (0x7E) is outside the valid AIS character range (0x30-0x77)
+        assert!(decode_armor("~", 0).is_none());
+    }
+
+    #[test]
+    fn decode_single_character() {
+        let bits = decode_armor("0", 0).unwrap();
+        assert_eq!(bits.len(), 6);
+        assert_eq!(&bits, &[0, 0, 0, 0, 0, 0]);
+    }
 }

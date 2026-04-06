@@ -1,6 +1,8 @@
 use crate::nmea::field::{FieldReader, FieldWriter};
 
 /// VTG — Track Made Good and Ground Speed.
+///
+/// Wire: `courseT,T,courseM,M,speedKts,N,speedKmh,K,mode`
 #[derive(Debug, Clone, PartialEq)]
 pub struct Vtg {
     /// Course over ground true in degrees.

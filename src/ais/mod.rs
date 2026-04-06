@@ -60,6 +60,13 @@ impl AisParser {
         }
     }
 
+    /// Clear all in-progress fragment buffers.
+    ///
+    /// Useful when switching data sources or recovering from a corrupted stream.
+    pub fn reset(&mut self) {
+        self.collector = FragmentCollector::new();
+    }
+
     /// Decode an AIS frame. Returns `Some(AisMessage)` for complete messages,
     /// `None` for incomplete fragments, parse errors, or non-AIS frames.
     pub fn decode(&mut self, frame: &NmeaFrame<'_>) -> Option<AisMessage> {
@@ -184,8 +191,8 @@ mod tests {
             match report {
                 StaticDataReport::PartA { mmsi, vessel_name } => {
                     assert!(mmsi > 0);
-                    // Vessel name may be trimmed of trailing @ and spaces
-                    assert!(!vessel_name.is_empty() || true); // name might be all padding
+                    // Vessel name may be all padding (@) — trimmed to empty
+                    let _ = vessel_name;
                 }
                 StaticDataReport::PartB { mmsi, .. } => {
                     assert!(mmsi > 0);
@@ -213,6 +220,19 @@ mod tests {
         } else {
             panic!("expected StaticVoyage, got {msg:?}");
         }
+    }
+
+    #[test]
+    fn reset_clears_pending_fragments() {
+        let mut parser = AisParser::new();
+        // Send fragment 1 of 2
+        let f1 = parse_frame("!AIVDM,2,1,1,A,55?MbV02;H;s<HtKR20EHE:0@T4@Dn2222222216L961O5Gf0NSQEp6ClRp8,0*1C").expect("valid");
+        assert!(parser.decode(&f1).is_none());
+        // Reset clears the pending fragment
+        parser.reset();
+        // Fragment 2 alone should not produce a message
+        let f2 = parse_frame("!AIVDM,2,2,1,A,88888888880,2*25").expect("valid");
+        assert!(parser.decode(&f2).is_none());
     }
 
     #[test]

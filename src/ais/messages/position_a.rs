@@ -16,6 +16,7 @@ pub struct PositionReport {
     pub longitude: Option<f64>,
     pub latitude: Option<f64>,
     pub cog: Option<f32>,
+    /// True heading in degrees (integer, 0-359). AIS has no fractional resolution for heading.
     pub heading: Option<u16>,
     pub timestamp: Option<u8>,
     pub ais_class: AisClass,
@@ -97,7 +98,7 @@ pub(crate) fn decode_cog(raw: u32) -> Option<f32> {
     }
 }
 
-/// Decode true heading. 511 = not available.
+/// Decode true heading in degrees. 511 = not available.
 pub(crate) fn decode_heading(raw: u32) -> Option<u16> {
     if raw == 511 {
         None

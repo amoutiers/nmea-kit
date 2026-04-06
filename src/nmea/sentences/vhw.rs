@@ -1,6 +1,8 @@
 use crate::nmea::field::{FieldReader, FieldWriter};
 
 /// VHW — Water Speed and Heading.
+///
+/// Wire: `headingT,T,headingM,M,speedKts,N,speedKmh,K`
 #[derive(Debug, Clone, PartialEq)]
 pub struct Vhw {
     /// Heading true in degrees.
@@ -25,6 +27,7 @@ impl Vhw {
         let speed_kts = r.f32();
         r.skip();
         let speed_kmh = r.f32();
+        r.skip(); // K
         Some(Self { heading_true, heading_mag, speed_kts, speed_kmh })
     }
 
