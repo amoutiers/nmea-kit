@@ -6,12 +6,16 @@ mod dbs;
 mod dbt;
 #[cfg(feature = "dpt")]
 mod dpt;
+#[cfg(feature = "gbs")]
+mod gbs;
 #[cfg(feature = "gga")]
 mod gga;
 #[cfg(feature = "gll")]
 mod gll;
 #[cfg(feature = "gns")]
 mod gns;
+#[cfg(feature = "gst")]
+mod gst;
 #[cfg(feature = "hdg")]
 mod hdg;
 #[cfg(feature = "hdm")]
@@ -39,12 +43,16 @@ pub use dbs::*;
 pub use dbt::*;
 #[cfg(feature = "dpt")]
 pub use dpt::*;
+#[cfg(feature = "gbs")]
+pub use gbs::*;
 #[cfg(feature = "gga")]
 pub use gga::*;
 #[cfg(feature = "gll")]
 pub use gll::*;
 #[cfg(feature = "gns")]
 pub use gns::*;
+#[cfg(feature = "gst")]
+pub use gst::*;
 #[cfg(feature = "hdg")]
 pub use hdg::*;
 #[cfg(feature = "hdm")]

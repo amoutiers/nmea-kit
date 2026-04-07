@@ -4,12 +4,6 @@ use nmea_kit::nmea::sentences::Rot;
 use nmea_kit::{NmeaSentence, parse_frame};
 
 #[test]
-fn dispatch() {
-    let frame = parse_frame("$HEROT,0.0,A*2B").expect("valid");
-    assert!(matches!(NmeaSentence::parse(&frame), NmeaSentence::Rot(_)));
-}
-
-#[test]
 fn decode_encode() {
     let frame = parse_frame("$HEROT,0.0,A*2B").expect("valid");
     let rot = Rot::parse(&frame.fields).expect("parse");
@@ -17,6 +11,12 @@ fn decode_encode() {
     let frame2 = parse_frame(sentence.trim()).expect("re-parse");
     let rot2 = Rot::parse(&frame2.fields).expect("parse");
     assert_eq!(rot, rot2);
+}
+
+#[test]
+fn dispatch() {
+    let frame = parse_frame("$HEROT,0.0,A*2B").expect("valid");
+    assert!(matches!(NmeaSentence::parse(&frame), NmeaSentence::Rot(_)));
 }
 
 #[test]

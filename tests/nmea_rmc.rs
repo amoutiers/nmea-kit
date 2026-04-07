@@ -4,14 +4,6 @@ use nmea_kit::nmea::sentences::Rmc;
 use nmea_kit::{NmeaSentence, parse_frame};
 
 #[test]
-fn dispatch() {
-    let frame =
-        parse_frame("$GPRMC,085412.000,A,5222.3198,N,00454.5784,E,0.58,251.34,030414,,,A*65")
-            .expect("valid");
-    assert!(matches!(NmeaSentence::parse(&frame), NmeaSentence::Rmc(_)));
-}
-
-#[test]
 fn decode_encode() {
     let frame =
         parse_frame("$GPRMC,085412.000,A,5222.3198,N,00454.5784,E,0.58,251.34,030414,,,A*65")
@@ -21,6 +13,14 @@ fn decode_encode() {
     let frame2 = parse_frame(sentence.trim()).expect("re-parse");
     let rmc2 = Rmc::parse(&frame2.fields).expect("parse");
     assert_eq!(rmc, rmc2);
+}
+
+#[test]
+fn dispatch() {
+    let frame =
+        parse_frame("$GPRMC,085412.000,A,5222.3198,N,00454.5784,E,0.58,251.34,030414,,,A*65")
+            .expect("valid");
+    assert!(matches!(NmeaSentence::parse(&frame), NmeaSentence::Rmc(_)));
 }
 
 #[test]

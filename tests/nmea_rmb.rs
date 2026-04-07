@@ -4,14 +4,6 @@ use nmea_kit::nmea::sentences::Rmb;
 use nmea_kit::{NmeaSentence, parse_frame};
 
 #[test]
-fn dispatch() {
-    let frame =
-        parse_frame("$ECRMB,A,0.000,L,001,002,4653.550,N,07115.984,W,2.505,334.205,0.000,V*04")
-            .expect("valid");
-    assert!(matches!(NmeaSentence::parse(&frame), NmeaSentence::Rmb(_)));
-}
-
-#[test]
 fn decode_encode() {
     let frame =
         parse_frame("$ECRMB,A,0.000,L,001,002,4653.550,N,07115.984,W,2.505,334.205,0.000,V*04")
@@ -21,6 +13,14 @@ fn decode_encode() {
     let frame2 = parse_frame(sentence.trim()).expect("re-parse");
     let rmb2 = Rmb::parse(&frame2.fields).expect("parse");
     assert_eq!(rmb, rmb2);
+}
+
+#[test]
+fn dispatch() {
+    let frame =
+        parse_frame("$ECRMB,A,0.000,L,001,002,4653.550,N,07115.984,W,2.505,334.205,0.000,V*04")
+            .expect("valid");
+    assert!(matches!(NmeaSentence::parse(&frame), NmeaSentence::Rmb(_)));
 }
 
 #[test]

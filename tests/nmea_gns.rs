@@ -4,14 +4,6 @@ use nmea_kit::nmea::sentences::Gns;
 use nmea_kit::{NmeaSentence, parse_frame};
 
 #[test]
-fn dispatch() {
-    let frame =
-        parse_frame("$GPGNS,111648.00,0235.0379,S,04422.1450,W,ANN,12,0.8,8.5,-22.3,,,S*5D")
-            .expect("valid");
-    assert!(matches!(NmeaSentence::parse(&frame), NmeaSentence::Gns(_)));
-}
-
-#[test]
 fn decode_encode() {
     let frame =
         parse_frame("$GPGNS,111648.00,0235.0379,S,04422.1450,W,ANN,12,0.8,8.5,-22.3,,,S*5D")
@@ -21,6 +13,14 @@ fn decode_encode() {
     let frame2 = parse_frame(sentence.trim()).expect("re-parse");
     let gns2 = Gns::parse(&frame2.fields).expect("parse");
     assert_eq!(gns, gns2);
+}
+
+#[test]
+fn dispatch() {
+    let frame =
+        parse_frame("$GPGNS,111648.00,0235.0379,S,04422.1450,W,ANN,12,0.8,8.5,-22.3,,,S*5D")
+            .expect("valid");
+    assert!(matches!(NmeaSentence::parse(&frame), NmeaSentence::Gns(_)));
 }
 
 #[test]

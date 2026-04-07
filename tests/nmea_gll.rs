@@ -4,12 +4,6 @@ use nmea_kit::nmea::sentences::Gll;
 use nmea_kit::{NmeaSentence, parse_frame};
 
 #[test]
-fn dispatch() {
-    let frame = parse_frame("$GPGLL,5958.613,N,02325.928,E,121022,A,D*40").expect("valid");
-    assert!(matches!(NmeaSentence::parse(&frame), NmeaSentence::Gll(_)));
-}
-
-#[test]
 fn decode_encode() {
     let frame = parse_frame("$GPGLL,5958.613,N,02325.928,E,121022,A,D*40").expect("valid");
     let gll = Gll::parse(&frame.fields).expect("parse");
@@ -17,6 +11,12 @@ fn decode_encode() {
     let frame2 = parse_frame(sentence.trim()).expect("re-parse");
     let gll2 = Gll::parse(&frame2.fields).expect("parse");
     assert_eq!(gll, gll2);
+}
+
+#[test]
+fn dispatch() {
+    let frame = parse_frame("$GPGLL,5958.613,N,02325.928,E,121022,A,D*40").expect("valid");
+    assert!(matches!(NmeaSentence::parse(&frame), NmeaSentence::Gll(_)));
 }
 
 #[test]

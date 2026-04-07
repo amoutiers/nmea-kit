@@ -18,6 +18,11 @@ pub enum NmeaSentence {
     // Position
     #[cfg(feature = "rmc")]
     Rmc(sentences::Rmc),
+    // Satellites
+    #[cfg(feature = "gbs")]
+    Gbs(sentences::Gbs),
+    #[cfg(feature = "gst")]
+    Gst(sentences::Gst),
     #[cfg(feature = "gga")]
     Gga(sentences::Gga),
     #[cfg(feature = "gll")]
@@ -80,6 +85,11 @@ impl NmeaSentence {
             // Position
             #[cfg(feature = "rmc")]
             "RMC" => try_parse!(sentences::Rmc::parse, Rmc),
+            // Satellites
+            #[cfg(feature = "gbs")]
+            "GBS" => try_parse!(sentences::Gbs::parse, Gbs),
+            #[cfg(feature = "gst")]
+            "GST" => try_parse!(sentences::Gst::parse, Gst),
             #[cfg(feature = "gga")]
             "GGA" => try_parse!(sentences::Gga::parse, Gga),
             #[cfg(feature = "gll")]

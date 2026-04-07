@@ -4,15 +4,6 @@ use nmea_kit::nmea::sentences::Gga;
 use nmea_kit::{NmeaSentence, parse_frame};
 
 #[test]
-fn dispatch() {
-    let frame = parse_frame(
-        "$GPGGA,172814.0,3723.46587704,N,12202.26957864,W,2,6,1.2,18.893,M,-25.669,M,2.0,0031*4F",
-    )
-    .expect("valid");
-    assert!(matches!(NmeaSentence::parse(&frame), NmeaSentence::Gga(_)));
-}
-
-#[test]
 fn decode_encode() {
     let frame = parse_frame(
         "$GPGGA,172814.0,3723.46587704,N,12202.26957864,W,2,6,1.2,18.893,M,-25.669,M,2.0,0031*4F",
@@ -23,6 +14,15 @@ fn decode_encode() {
     let frame2 = parse_frame(sentence.trim()).expect("re-parse");
     let gga2 = Gga::parse(&frame2.fields).expect("parse");
     assert_eq!(gga, gga2);
+}
+
+#[test]
+fn dispatch() {
+    let frame = parse_frame(
+        "$GPGGA,172814.0,3723.46587704,N,12202.26957864,W,2,6,1.2,18.893,M,-25.669,M,2.0,0031*4F",
+    )
+    .expect("valid");
+    assert!(matches!(NmeaSentence::parse(&frame), NmeaSentence::Gga(_)));
 }
 
 #[test]

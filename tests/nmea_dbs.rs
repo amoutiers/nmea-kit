@@ -4,12 +4,6 @@ use nmea_kit::nmea::sentences::Dbs;
 use nmea_kit::{NmeaSentence, parse_frame};
 
 #[test]
-fn dispatch() {
-    let frame = parse_frame("$IIDBS,035.53,f,010.83,M,005.85,F*24").expect("valid");
-    assert!(matches!(NmeaSentence::parse(&frame), NmeaSentence::Dbs(_)));
-}
-
-#[test]
 fn decode_encode() {
     let frame = parse_frame("$IIDBS,035.53,f,010.83,M,005.85,F*24").expect("valid");
     let dbs = Dbs::parse(&frame.fields).expect("parse");
@@ -17,6 +11,12 @@ fn decode_encode() {
     let frame2 = parse_frame(sentence.trim()).expect("re-parse");
     let dbs2 = Dbs::parse(&frame2.fields).expect("parse");
     assert_eq!(dbs, dbs2);
+}
+
+#[test]
+fn dispatch() {
+    let frame = parse_frame("$IIDBS,035.53,f,010.83,M,005.85,F*24").expect("valid");
+    assert!(matches!(NmeaSentence::parse(&frame), NmeaSentence::Dbs(_)));
 }
 
 #[test]

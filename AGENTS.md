@@ -121,29 +121,50 @@ Tests come first. Every change follows this cycle:
 - `{type}_full_signalk` / `{type}_signalk` — from SignalK fixtures
 - `{type}_gpsd` / `{type}_zero_gpsd` — from GPSD fixtures
 - `{type}_pynmeagps` — from pynmeagps fixtures
+- `{type}_gonmea` — from go-nmea fixtures
 - `{type}_encode_roundtrip` — construct → encode → re-parse → assert equal
 - Source suffix always at the end of the test name
+- Tests within each `mod tests` block are sorted alphabetically
 
 ### Test fixture sources (in order of preference)
 
-1. **SignalK** — `github.com/SignalK/signalk-parser-nmea0183/test/` — real fixtures with edge cases (empty fields, invalid units, lowercase indicators)
+1. **SignalK** — `external_fixtures/signalk-parser-nmea0183/` — real device fixtures with edge cases
 2. **GPSD** — `gitlab.com/gpsd/gpsd/test/daemon/` — real device captures (Garmin, Humminbird, Saab, pypilot)
-3. **pynmeagps** — `github.com/semuconsulting/pynmeagps` — canonical field definitions for struct design
-4. **Synthetic** — only when no real fixture exists. Compute checksum manually: XOR all bytes between `$`/`!` (exclusive) and `*` (exclusive), format as 2-digit uppercase hex.
+3. **pynmeagps** — `external_fixtures/pynmeagps/` — canonical field definitions for struct design
+4. **go-nmea** — `external_fixtures/go-nmea/` — 80+ sentence types with test fixtures
+5. **Synthetic** — only when no real fixture exists. Compute checksum manually: XOR all bytes between `$`/`!` (exclusive) and `*` (exclusive), format as 2-digit uppercase hex.
+
+### Test rules
+
+- Every sentence must have an **empty** test and an **encode_roundtrip** test
+- Every fixture test must have a **source suffix** (`_signalk`, `_gpsd`, `_pynmeagps`, `_gonmea`)
+- Empty tests have **no source suffix** (they are synthetic by nature)
+- Tests are always **sorted alphabetically** within their `mod tests` block
+- Use `assert_eq!(original, parsed)` for roundtrip tests (not field-by-field comparison)
+- Use `expect("description")` instead of `unwrap()` (clippy enforces this)
 
 ### What each sentence file must contain
 
+**Unit tests** in `src/nmea/sentences/{type}.rs`:
 ```rust
-// 1. Struct + impl (parse, encode, to_sentence)
-// 2. #[cfg(test)] mod tests with:
-//    - At least one real fixture parse test (with source suffix)
-//    - One empty test (all-None fields)
-//    - One roundtrip test (construct -> encode -> re-parse -> assert equal)
-//    - Edge cases if fixtures exist (empty fields, partial data)
-// 3. Integration test file tests/nmea_<type>.rs with:
-//    - dispatch: NmeaSentence::parse() returns correct variant
-//    - decode_encode: parse raw sentence → encode → re-parse → assert equal
-//    - roundtrip: construct struct → to_sentence() → parse → assert equal
+#[cfg(test)] mod tests {
+    // Required:
+    //   {type}_empty — parse sentence with all empty fields, assert all None
+    //   {type}_encode_roundtrip — construct → to_sentence() → parse_frame → parse → assert_eq
+    // At least one fixture test:
+    //   {type}_{description}_{source} — parse a real sentence, assert key fields
+    // Optional:
+    //   Edge cases (partial data, unusual talkers, negative values, etc.)
+}
+```
+
+**Integration tests** in `tests/nmea_{type}.rs`:
+```rust
+#![cfg(feature = "{type}")]
+// Required:
+//   dispatch — NmeaSentence::parse() returns correct variant
+//   decode_encode — parse raw sentence → encode → re-parse → assert_eq
+//   roundtrip — construct struct → to_sentence() → parse → assert_eq
 ```
 
 ## Known design issues

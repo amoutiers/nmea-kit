@@ -4,12 +4,6 @@ use nmea_kit::nmea::sentences::Mwd;
 use nmea_kit::{NmeaSentence, parse_frame};
 
 #[test]
-fn dispatch() {
-    let frame = parse_frame("$IIMWD,,,046.,M,10.1,N,05.2,M*0B").expect("valid");
-    assert!(matches!(NmeaSentence::parse(&frame), NmeaSentence::Mwd(_)));
-}
-
-#[test]
 fn decode_encode() {
     let frame = parse_frame("$IIMWD,046.,T,046.,M,10.1,N,05.2,M*43").expect("valid");
     let mwd = Mwd::parse(&frame.fields).expect("parse");
@@ -17,6 +11,12 @@ fn decode_encode() {
     let frame2 = parse_frame(sentence.trim()).expect("re-parse");
     let mwd2 = Mwd::parse(&frame2.fields).expect("parse");
     assert_eq!(mwd, mwd2);
+}
+
+#[test]
+fn dispatch() {
+    let frame = parse_frame("$IIMWD,,,046.,M,10.1,N,05.2,M*0B").expect("valid");
+    assert!(matches!(NmeaSentence::parse(&frame), NmeaSentence::Mwd(_)));
 }
 
 #[test]

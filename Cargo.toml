@@ -1,6 +1,6 @@
 [package]
 name = "nmea-kit"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2024"
 rust-version = "1.85.0"
 description = "Bidirectional NMEA 0183 parser and encoder with AIS decoding"
@@ -22,9 +22,11 @@ nmea = [
     "dbs",
     "dbt",
     "dpt",
+    "gbs",
     "gga",
     "gll",
     "gns",
+    "gst",
     "hdg",
     "hdm",
     "hdt",
@@ -42,9 +44,11 @@ ais = []
 dbs = []
 dbt = []
 dpt = []
+gbs = []
 gga = []
 gll = []
 gns = []
+gst = []
 hdg = []
 hdm = []
 hdt = []

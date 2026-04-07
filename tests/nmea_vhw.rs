@@ -4,12 +4,6 @@ use nmea_kit::nmea::sentences::Vhw;
 use nmea_kit::{NmeaSentence, parse_frame};
 
 #[test]
-fn dispatch() {
-    let frame = parse_frame("$SDVHW,182.5,T,181.8,M,0.0,N,0.0,K*4C").expect("valid");
-    assert!(matches!(NmeaSentence::parse(&frame), NmeaSentence::Vhw(_)));
-}
-
-#[test]
 fn decode_encode() {
     let frame = parse_frame("$SDVHW,182.5,T,181.8,M,0.0,N,0.0,K*4C").expect("valid");
     let vhw = Vhw::parse(&frame.fields).expect("parse");
@@ -17,6 +11,12 @@ fn decode_encode() {
     let frame2 = parse_frame(sentence.trim()).expect("re-parse");
     let vhw2 = Vhw::parse(&frame2.fields).expect("parse");
     assert_eq!(vhw, vhw2);
+}
+
+#[test]
+fn dispatch() {
+    let frame = parse_frame("$SDVHW,182.5,T,181.8,M,0.0,N,0.0,K*4C").expect("valid");
+    assert!(matches!(NmeaSentence::parse(&frame), NmeaSentence::Vhw(_)));
 }
 
 #[test]

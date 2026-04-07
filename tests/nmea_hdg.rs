@@ -4,12 +4,6 @@ use nmea_kit::nmea::sentences::Hdg;
 use nmea_kit::{NmeaSentence, parse_frame};
 
 #[test]
-fn dispatch() {
-    let frame = parse_frame("$SDHDG,181.9,,,0.6,E*32").expect("valid");
-    assert!(matches!(NmeaSentence::parse(&frame), NmeaSentence::Hdg(_)));
-}
-
-#[test]
 fn decode_encode() {
     let frame = parse_frame("$SDHDG,181.9,,,0.6,E*32").expect("valid");
     let hdg = Hdg::parse(&frame.fields).expect("parse");
@@ -17,6 +11,12 @@ fn decode_encode() {
     let frame2 = parse_frame(sentence.trim()).expect("re-parse");
     let hdg2 = Hdg::parse(&frame2.fields).expect("parse");
     assert_eq!(hdg, hdg2);
+}
+
+#[test]
+fn dispatch() {
+    let frame = parse_frame("$SDHDG,181.9,,,0.6,E*32").expect("valid");
+    assert!(matches!(NmeaSentence::parse(&frame), NmeaSentence::Hdg(_)));
 }
 
 #[test]
