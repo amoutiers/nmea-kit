@@ -107,7 +107,13 @@ Tests come first. Every change follows this cycle:
 2. **Watch it fail** — `cargo test --all-features` must show the new test failing for the right reason (missing struct, wrong value, etc.).
 3. **Write the minimum code** to make it pass.
 4. **Roundtrip test** — for every NMEA sentence: construct a struct, call `to_sentence()`, re-parse with `parse_frame()` + `Type::parse()`, assert fields match. This catches encode/decode asymmetry.
-5. **Run full suite** — `cargo test --all-features` must pass with zero failures before moving on. Never leave broken tests behind.
+5. **Run full suite** — all three checks must pass before committing:
+   ```sh
+   cargo fmt                                                # fix formatting
+   cargo clippy --all-features --all-targets -- -D warnings # zero warnings
+   cargo test --all-features                                # zero failures
+   ```
+   CI enforces all three — a commit that fails any of them will block the publish workflow.
 
 ### Test naming convention
 
