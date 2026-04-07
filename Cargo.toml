@@ -10,7 +10,7 @@ readme = "README.md"
 repository = "https://github.com/amoutiers/nmea-kit"
 homepage = "https://github.com/amoutiers/nmea-kit"
 documentation = "https://docs.rs/nmea-kit"
-keywords = ["nmea", "ais", "gps", "marine", "boat", "navigation"]
+keywords = ["nmea", "ais", "gps", "marine", "navigation"]
 categories = ["parser-implementations", "encoding", "science::geo"]
 exclude = ["/tests/"]
 
