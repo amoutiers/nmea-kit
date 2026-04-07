@@ -39,7 +39,7 @@ mod tests {
     use crate::parse_frame;
 
     #[test]
-    fn hdt_empty_signalk() {
+    fn hdt_empty() {
         let f = parse_frame("$IIHDT,,*58").expect("valid");
         let t = Hdt::parse(&f.fields).expect("parse");
         assert!(t.heading_true.is_none());

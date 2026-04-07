@@ -10,7 +10,7 @@ Non-obsolete sentences from the [NMEA 0183 standard](https://gpsd.gitlab.io/gpsd
 - [x] GNS — GNSS Fix Data
 - [ ] GTD — Geographic Location in Time Differences
 - [ ] RMA — Recommended Minimum Navigation Information
-- [ ] RMB — Recommended Minimum Navigation Information (to waypoint)
+- [x] RMB — Recommended Minimum Navigation Information (to waypoint)
 - [x] RMC — Recommended Minimum Navigation Information
 
 ## Satellites
@@ -54,7 +54,7 @@ Non-obsolete sentences from the [NMEA 0183 standard](https://gpsd.gitlab.io/gpsd
 - [ ] APA — Autopilot Sentence "A"
 - [ ] APB — Autopilot Sentence "B"
 - [ ] HSC — Heading Steering Command
-- [ ] ROT — Rate of Turn
+- [x] ROT — Rate of Turn
 - [ ] RSA — Rudder Sensor Angle
 
 ## Waypoints & Routes

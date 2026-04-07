@@ -36,6 +36,11 @@ pub enum NmeaSentence {
     Hdg(sentences::Hdg),
     #[cfg(feature = "hdm")]
     Hdm(sentences::Hdm),
+    #[cfg(feature = "rot")]
+    Rot(sentences::Rot),
+    // Navigation
+    #[cfg(feature = "rmb")]
+    Rmb(sentences::Rmb),
     // Speed
     #[cfg(feature = "vtg")]
     Vtg(sentences::Vtg),
@@ -93,6 +98,11 @@ impl NmeaSentence {
             "HDG" => try_parse!(sentences::Hdg::parse, Hdg),
             #[cfg(feature = "hdm")]
             "HDM" => try_parse!(sentences::Hdm::parse, Hdm),
+            #[cfg(feature = "rot")]
+            "ROT" => try_parse!(sentences::Rot::parse, Rot),
+            // Navigation
+            #[cfg(feature = "rmb")]
+            "RMB" => try_parse!(sentences::Rmb::parse, Rmb),
             // Speed
             #[cfg(feature = "vtg")]
             "VTG" => try_parse!(sentences::Vtg::parse, Vtg),

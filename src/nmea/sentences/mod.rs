@@ -22,8 +22,12 @@ mod hdt;
 mod mwd;
 #[cfg(feature = "mwv")]
 mod mwv;
+#[cfg(feature = "rmb")]
+mod rmb;
 #[cfg(feature = "rmc")]
 mod rmc;
+#[cfg(feature = "rot")]
+mod rot;
 #[cfg(feature = "vhw")]
 mod vhw;
 #[cfg(feature = "vtg")]
@@ -51,8 +55,12 @@ pub use hdt::*;
 pub use mwd::*;
 #[cfg(feature = "mwv")]
 pub use mwv::*;
+#[cfg(feature = "rmb")]
+pub use rmb::*;
 #[cfg(feature = "rmc")]
 pub use rmc::*;
+#[cfg(feature = "rot")]
+pub use rot::*;
 #[cfg(feature = "vhw")]
 pub use vhw::*;
 #[cfg(feature = "vtg")]

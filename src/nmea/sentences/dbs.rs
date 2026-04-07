@@ -52,7 +52,7 @@ mod tests {
     use crate::parse_frame;
 
     #[test]
-    fn dbs_empty_signalk() {
+    fn dbs_empty() {
         let f = parse_frame("$IIDBS,,,,,,*55").expect("empty DBS frame");
         let d = Dbs::parse(&f.fields).expect("parse DBS");
         assert!(d.depth_feet.is_none());

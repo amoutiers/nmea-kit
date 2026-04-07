@@ -54,7 +54,7 @@ mod tests {
     use crate::parse_frame;
 
     #[test]
-    fn mwv_empty_signalk() {
+    fn mwv_empty() {
         let frame = parse_frame("$IIMWV,,,,*4C").expect("valid");
         let mwv = Mwv::parse(&frame.fields).expect("parse MWV");
         assert!(mwv.wind_angle.is_none());

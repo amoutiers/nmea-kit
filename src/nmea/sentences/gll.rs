@@ -62,7 +62,7 @@ mod tests {
     use crate::parse_frame;
 
     #[test]
-    fn gll_empty_signalk() {
+    fn gll_empty() {
         // SignalK fixture: all fields empty
         let frame = parse_frame("$GPGLL,,,,,,,*7C").expect("valid empty GLL frame");
         let gll = Gll::parse(&frame.fields).expect("parse empty GLL");

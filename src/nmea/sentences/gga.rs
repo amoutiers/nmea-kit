@@ -90,7 +90,7 @@ mod tests {
     use crate::parse_frame;
 
     #[test]
-    fn gga_empty_signalk() {
+    fn gga_empty() {
         // SignalK fixture: all fields empty
         let frame = parse_frame("$GPGGA,,,,,,,,,,,,,,*56").expect("valid empty GGA frame");
         let gga = Gga::parse(&frame.fields).expect("parse empty GGA");

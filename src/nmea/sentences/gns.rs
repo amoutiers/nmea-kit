@@ -86,7 +86,7 @@ mod tests {
     use crate::parse_frame;
 
     #[test]
-    fn gns_empty_signalk() {
+    fn gns_empty() {
         // SignalK fixture: all fields empty except nav_status
         let frame = parse_frame("$GPGNS,,,,,,,,,,,,,S*32").expect("valid empty GNS frame");
         let gns = Gns::parse(&frame.fields).expect("parse empty GNS");

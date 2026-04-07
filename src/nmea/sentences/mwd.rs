@@ -61,7 +61,7 @@ mod tests {
     use crate::parse_frame;
 
     #[test]
-    fn mwd_empty_signalk() {
+    fn mwd_empty() {
         let f = parse_frame("$IIMWD,,,,,,,,*5E").expect("valid");
         let m = Mwd::parse(&f.fields).expect("parse");
         assert!(m.wind_dir_true.is_none());

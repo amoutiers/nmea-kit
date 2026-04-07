@@ -67,7 +67,7 @@ mod tests {
     use crate::parse_frame;
 
     #[test]
-    fn vtg_empty_signalk() {
+    fn vtg_empty() {
         let f = parse_frame("$IIVTG,,,,,,,,,*69").expect("valid");
         let v = Vtg::parse(&f.fields).expect("parse");
         assert!(v.course_true.is_none());

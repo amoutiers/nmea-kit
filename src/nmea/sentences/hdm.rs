@@ -39,7 +39,7 @@ mod tests {
     use crate::parse_frame;
 
     #[test]
-    fn hdm_empty_signalk() {
+    fn hdm_empty() {
         let f = parse_frame("$IIHDM,,*41").expect("valid");
         let m = Hdm::parse(&f.fields).expect("parse");
         assert!(m.heading_mag.is_none());

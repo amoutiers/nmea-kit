@@ -1,6 +1,6 @@
 [package]
 name = "nmea-kit"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2024"
 rust-version = "1.85.0"
 description = "Bidirectional NMEA 0183 parser and encoder with AIS decoding"
@@ -10,7 +10,7 @@ readme = "README.md"
 repository = "https://github.com/amoutiers/nmea-kit"
 homepage = "https://github.com/amoutiers/nmea-kit"
 documentation = "https://docs.rs/nmea-kit"
-keywords = ["nmea", "ais", "gps", "marine", "navigation"]
+keywords = ["nmea", "ais", "gps", "marine", "boat", "navigation"]
 categories = ["parser-implementations", "encoding", "science::geo"]
 exclude = ["/tests/"]
 
@@ -18,7 +18,24 @@ exclude = ["/tests/"]
 
 [features]
 default = ["nmea", "ais"]
-nmea = ["dbs", "dbt", "dpt", "gga", "gll", "gns", "hdg", "hdm", "hdt", "mwd", "mwv", "rmc", "vhw", "vtg"]
+nmea = [
+    "dbs",
+    "dbt",
+    "dpt",
+    "gga",
+    "gll",
+    "gns",
+    "hdg",
+    "hdm",
+    "hdt",
+    "mwd",
+    "mwv",
+    "rmb",
+    "rmc",
+    "rot",
+    "vhw",
+    "vtg",
+]
 ais = []
 
 # Individual NMEA sentence types
@@ -33,7 +50,9 @@ hdm = []
 hdt = []
 mwd = []
 mwv = []
+rmb = []
 rmc = []
+rot = []
 vhw = []
 vtg = []
 

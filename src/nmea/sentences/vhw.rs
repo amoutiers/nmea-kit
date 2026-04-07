@@ -62,7 +62,7 @@ mod tests {
     use crate::parse_frame;
 
     #[test]
-    fn vhw_empty_signalk() {
+    fn vhw_empty() {
         let f = parse_frame("$IIVHW,,,,,,,,*49").expect("valid");
         let v = Vhw::parse(&f.fields).expect("parse");
         assert!(v.heading_true.is_none());

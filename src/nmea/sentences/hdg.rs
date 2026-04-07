@@ -54,7 +54,7 @@ mod tests {
     use crate::parse_frame;
 
     #[test]
-    fn hdg_all_empty_signalk() {
+    fn hdg_empty() {
         let frame = parse_frame("$SDHDG,,,,,*70").expect("valid");
         let hdg = Hdg::parse(&frame.fields).expect("parse HDG");
         assert!(hdg.heading_mag.is_none());

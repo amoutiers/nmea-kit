@@ -44,7 +44,7 @@ mod tests {
     use crate::parse_frame;
 
     #[test]
-    fn dpt_empty_signalk() {
+    fn dpt_empty() {
         let f = parse_frame("$IIDPT,,,*6C").expect("valid");
         let d = Dpt::parse(&f.fields).expect("parse");
         assert!(d.depth.is_none());

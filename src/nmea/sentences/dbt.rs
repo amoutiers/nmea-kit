@@ -52,7 +52,7 @@ mod tests {
     use crate::parse_frame;
 
     #[test]
-    fn dbt_empty_signalk() {
+    fn dbt_empty() {
         let f = parse_frame("$IIDBT,,,,,,*52").expect("valid");
         let d = Dbt::parse(&f.fields).expect("parse");
         assert!(d.depth_feet.is_none());

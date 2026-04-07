@@ -2,7 +2,7 @@
 
 Bidirectional NMEA 0183 parser/encoder with AIS message decoding, written in Rust.
 
-- **14 NMEA sentence types** — parse and encode with checksum
+- **16 NMEA sentence types** — parse and encode with checksum
 - **7 AIS message types** — decode Class A/B position reports and static data
 - **Shared frame layer** — handles `$` (NMEA) and `!` (AIS) framing, IEC 61162-450 tag blocks
 - **Zero dependencies**
@@ -83,8 +83,9 @@ raw line ──→ parse_frame() ──→ NmeaFrame { prefix, talker, sentence_
 | Category | Sentences |
 |----------|-----------|
 | Position | RMC, GGA, GLL, GNS |
+| Navigation | RMB |
 | Wind | MWD, MWV |
-| Heading | HDT, HDG, HDM |
+| Heading | HDT, HDG, HDM, ROT |
 | Speed | VTG, VHW |
 | Depth | DPT, DBT, DBS |
 
@@ -102,7 +103,7 @@ raw line ──→ parse_frame() ──→ NmeaFrame { prefix, talker, sentence_
 
 | Issue | `nmea` 0.7 / `ais` 0.12 | `nmea-kit` |
 |-------|--------------------------|------------|
-| Sentence coverage | ~10 types, rest manual | 14 types, all typed |
+| Sentence coverage | ~10 types, rest manual | 16 types, all typed |
 | Encoding | Read-only | Bidirectional (parse + encode) |
 | Error distinction | Can't tell unsupported vs malformed | Frame errors vs content errors |
 | AIS lat/lon precision | `f32` (11m error) | `f64` |
@@ -119,9 +120,9 @@ nmea-kit = "0.1"
 
 | Feature | Default | Description |
 |---------|---------|-------------|
-| `nmea` | yes | All 14 NMEA sentence types |
+| `nmea` | yes | All 16 NMEA sentence types |
 | `ais` | yes | AIS message decoding |
-| `dbs`, `dbt`, `dpt`, `gga`, `gll`, `gns`, `hdg`, `hdm`, `hdt`, `mwd`, `mwv`, `rmc`, `vhw`, `vtg` | via `nmea` | Individual sentence types |
+| `dbs`, `dbt`, `dpt`, `gga`, `gll`, `gns`, `hdg`, `hdm`, `hdt`, `mwd`, `mwv`, `rmb`, `rmc`, `rot`, `vhw`, `vtg` | via `nmea` | Individual sentence types |
 
 
 Cherry-pick only the sentences you need (no AIS, minimal code):

@@ -82,7 +82,7 @@ mod tests {
     use crate::parse_frame;
 
     #[test]
-    fn rmc_empty_signalk() {
+    fn rmc_empty() {
         let f = parse_frame("$IIRMC,,,,,,,,,,,,,*70").expect("valid");
         let r = Rmc::parse(&f.fields).expect("parse");
         assert!(r.time.is_none());
