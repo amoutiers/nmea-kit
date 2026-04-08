@@ -46,18 +46,6 @@ mod tests {
     }
 
     #[test]
-    fn hdm_encode_roundtrip() {
-        let hdm = Hdm {
-            heading_mag: Some(186.5),
-        };
-        let sentence = hdm.to_sentence("04");
-        assert!(sentence.starts_with("$04HDM,"));
-        let frame = parse_frame(sentence.trim()).expect("re-parse");
-        let hdm2 = Hdm::parse(&frame.fields).expect("re-parse HDM");
-        assert_eq!(hdm.heading_mag, hdm2.heading_mag);
-    }
-
-    #[test]
     fn hdm_full_signalk() {
         let frame = parse_frame("$04HDM,186.5,M*2C").expect("valid");
         let hdm = Hdm::parse(&frame.fields).expect("parse HDM");
@@ -76,5 +64,16 @@ mod tests {
         let frame = parse_frame("$IIHDM,70.6,M*13").expect("valid pynmeagps II HDM");
         let hdm = Hdm::parse(&frame.fields).expect("parse HDM");
         assert!((hdm.heading_mag.expect("hdg") - 70.6).abs() < 0.1);
+    }
+    #[test]
+    fn hdm_roundtrip() {
+        let hdm = Hdm {
+            heading_mag: Some(186.5),
+        };
+        let sentence = hdm.to_sentence("04");
+        assert!(sentence.starts_with("$04HDM,"));
+        let frame = parse_frame(sentence.trim()).expect("re-parse");
+        let hdm2 = Hdm::parse(&frame.fields).expect("re-parse HDM");
+        assert_eq!(hdm.heading_mag, hdm2.heading_mag);
     }
 }

@@ -80,25 +80,6 @@ mod tests {
     }
 
     #[test]
-    fn gst_encode_roundtrip() {
-        let gst = Gst {
-            time: Some("131519.00".to_string()),
-            range_rms: Some(11.0),
-            std_major: Some(5.2),
-            std_minor: Some(3.1),
-            orient: Some(45.0),
-            std_lat: Some(0.7),
-            std_lon: Some(0.49),
-            std_alt: Some(1.1),
-        };
-        let sentence = gst.to_sentence("GP");
-        assert!(sentence.starts_with("$GPGST,"));
-        let frame = parse_frame(sentence.trim()).expect("re-parse");
-        let gst2 = Gst::parse(&frame.fields).expect("re-parse GST");
-        assert_eq!(gst, gst2);
-    }
-
-    #[test]
     fn gst_full_pynmeagps() {
         // pynmeagps fixture with all fields populated, GN talker
         let frame =
@@ -126,5 +107,23 @@ mod tests {
         assert!((gst.std_lat.expect("std_lat") - 0.70).abs() < 0.01);
         assert!((gst.std_lon.expect("std_lon") - 0.49).abs() < 0.01);
         assert!((gst.std_alt.expect("std_alt") - 1.1).abs() < 0.1);
+    }
+    #[test]
+    fn gst_roundtrip() {
+        let gst = Gst {
+            time: Some("131519.00".to_string()),
+            range_rms: Some(11.0),
+            std_major: Some(5.2),
+            std_minor: Some(3.1),
+            orient: Some(45.0),
+            std_lat: Some(0.7),
+            std_lon: Some(0.49),
+            std_alt: Some(1.1),
+        };
+        let sentence = gst.to_sentence("GP");
+        assert!(sentence.starts_with("$GPGST,"));
+        let frame = parse_frame(sentence.trim()).expect("re-parse");
+        let gst2 = Gst::parse(&frame.fields).expect("re-parse GST");
+        assert_eq!(gst, gst2);
     }
 }

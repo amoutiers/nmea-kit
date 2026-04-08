@@ -78,17 +78,18 @@ raw line ──→ parse_frame() ──→ NmeaFrame { prefix, talker, sentence_
 
 ## Supported types
 
-### NMEA 0183 sentences (bidirectional)
+### NMEA 0183 sentences (bidirectional) — [full coverage list](SENTENCES.md)
 
 | Category | Sentences |
 |----------|-----------|
 | Position | RMC, GGA, GLL, GNS |
 | Satellites | GBS, GST |
-| Navigation | RMB |
 | Wind | MWD, MWV |
-| Heading | HDT, HDG, HDM, ROT |
-| Speed | VTG, VHW |
+| Heading | HDT, HDG, HDM |
+| Course & Speed | VTG, VHW |
 | Depth | DPT, DBT, DBS |
+| Steering | ROT |
+| Waypoints & Routes | RMB |
 
 ### AIS messages (read-only)
 

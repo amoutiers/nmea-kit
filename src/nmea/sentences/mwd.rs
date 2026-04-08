@@ -86,24 +86,6 @@ mod tests {
     }
 
     #[test]
-    fn mwd_encode_roundtrip() {
-        let mwd = Mwd {
-            wind_dir_true: Some(270.0),
-            wind_dir_mag: Some(268.5),
-            wind_speed_kts: Some(12.4),
-            wind_speed_ms: Some(6.4),
-        };
-        let sentence = mwd.to_sentence("WI");
-        assert!(sentence.starts_with("$WIMWD,"));
-        assert!(sentence.contains('*'));
-        // Re-parse
-        let frame = parse_frame(sentence.trim()).expect("re-parse");
-        let mwd2 = Mwd::parse(&frame.fields).expect("re-parse MWD");
-        assert_eq!(mwd.wind_dir_true, mwd2.wind_dir_true);
-        assert_eq!(mwd.wind_dir_mag, mwd2.wind_dir_mag);
-    }
-
-    #[test]
     fn mwd_full() {
         let frame = parse_frame("$IIMWD,046.,T,046.,M,10.1,N,05.2,M*43").expect("valid");
         let mwd = Mwd::parse(&frame.fields).expect("parse MWD");
@@ -129,5 +111,22 @@ mod tests {
         assert!(mwd.wind_dir_mag.is_none());
         assert!(mwd.wind_speed_kts.is_none());
         assert!((mwd.wind_speed_ms.expect("ms") - 5.2).abs() < 0.1);
+    }
+    #[test]
+    fn mwd_roundtrip() {
+        let mwd = Mwd {
+            wind_dir_true: Some(270.0),
+            wind_dir_mag: Some(268.5),
+            wind_speed_kts: Some(12.4),
+            wind_speed_ms: Some(6.4),
+        };
+        let sentence = mwd.to_sentence("WI");
+        assert!(sentence.starts_with("$WIMWD,"));
+        assert!(sentence.contains('*'));
+        // Re-parse
+        let frame = parse_frame(sentence.trim()).expect("re-parse");
+        let mwd2 = Mwd::parse(&frame.fields).expect("re-parse MWD");
+        assert_eq!(mwd.wind_dir_true, mwd2.wind_dir_true);
+        assert_eq!(mwd.wind_dir_mag, mwd2.wind_dir_mag);
     }
 }

@@ -65,23 +65,6 @@ mod tests {
     }
 
     #[test]
-    fn hdg_encode_roundtrip() {
-        let hdg = Hdg {
-            heading_mag: Some(181.9),
-            deviation: Some(2.5),
-            deviation_ew: Some('E'),
-            variation: Some(0.6),
-            variation_ew: Some('E'),
-        };
-        let sentence = hdg.to_sentence("SD");
-        assert!(sentence.starts_with("$SDHDG,"));
-        let frame = parse_frame(sentence.trim()).expect("re-parse");
-        let hdg2 = Hdg::parse(&frame.fields).expect("re-parse HDG");
-        assert_eq!(hdg.heading_mag, hdg2.heading_mag);
-        assert_eq!(hdg.variation_ew, hdg2.variation_ew);
-    }
-
-    #[test]
     fn hdg_full_deviation_and_variation_signalk() {
         let frame = parse_frame("$INHDG,180,5,W,10,W*6D").expect("valid");
         let hdg = Hdg::parse(&frame.fields).expect("parse HDG");
@@ -110,6 +93,23 @@ mod tests {
         assert!((hdg.heading_mag.expect("hdg") - 70.6).abs() < 0.1);
         assert!(hdg.deviation.is_none());
         assert_eq!(hdg.variation_ew, Some('W'));
+    }
+
+    #[test]
+    fn hdg_roundtrip() {
+        let hdg = Hdg {
+            heading_mag: Some(181.9),
+            deviation: Some(2.5),
+            deviation_ew: Some('E'),
+            variation: Some(0.6),
+            variation_ew: Some('E'),
+        };
+        let sentence = hdg.to_sentence("SD");
+        assert!(sentence.starts_with("$SDHDG,"));
+        let frame = parse_frame(sentence.trim()).expect("re-parse");
+        let hdg2 = Hdg::parse(&frame.fields).expect("re-parse HDG");
+        assert_eq!(hdg.heading_mag, hdg2.heading_mag);
+        assert_eq!(hdg.variation_ew, hdg2.variation_ew);
     }
 
     #[test]

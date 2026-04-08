@@ -80,25 +80,6 @@ mod tests {
     }
 
     #[test]
-    fn gbs_encode_roundtrip() {
-        let gbs = Gbs {
-            time: Some("194907.00".to_string()),
-            err_lat: Some(3.0),
-            err_lon: Some(1.9),
-            err_alt: Some(4.2),
-            svid: Some(12),
-            prob: Some(0.5),
-            bias: Some(1.1),
-            stddev: Some(0.8),
-        };
-        let sentence = gbs.to_sentence("GP");
-        assert!(sentence.starts_with("$GPGBS,"));
-        let frame = parse_frame(sentence.trim()).expect("re-parse");
-        let gbs2 = Gbs::parse(&frame.fields).expect("re-parse GBS");
-        assert_eq!(gbs, gbs2);
-    }
-
-    #[test]
     fn gbs_full_pynmeagps() {
         // pynmeagps fixture with svid, bias, stddev populated
         let frame = parse_frame("$GPGBS,235458.00,1.4,1.3,3.1,03,,-21.4,3.8,1,0*5A")
@@ -143,5 +124,23 @@ mod tests {
         assert_eq!(gbs.time, Some("235503.00".to_string()));
         assert!((gbs.err_lat.expect("err_lat") - 1.6).abs() < 0.1);
         assert!((gbs.err_alt.expect("err_alt") - 3.2).abs() < 0.1);
+    }
+    #[test]
+    fn gbs_roundtrip() {
+        let gbs = Gbs {
+            time: Some("194907.00".to_string()),
+            err_lat: Some(3.0),
+            err_lon: Some(1.9),
+            err_alt: Some(4.2),
+            svid: Some(12),
+            prob: Some(0.5),
+            bias: Some(1.1),
+            stddev: Some(0.8),
+        };
+        let sentence = gbs.to_sentence("GP");
+        assert!(sentence.starts_with("$GPGBS,"));
+        let frame = parse_frame(sentence.trim()).expect("re-parse");
+        let gbs2 = Gbs::parse(&frame.fields).expect("re-parse GBS");
+        assert_eq!(gbs, gbs2);
     }
 }

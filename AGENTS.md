@@ -10,9 +10,9 @@ src/
 ├── frame.rs            # frame layer: checksum, tag blocks, $ and ! prefix
 ├── error.rs            # FrameError enum
 ├── nmea/
-│   ├── mod.rs          # NmeaSentence dispatch enum (16 variants + Unknown)
+│   ├── mod.rs          # NmeaSentence dispatch enum (18 variants + Unknown)
 │   ├── field.rs        # FieldReader (parse) + FieldWriter (encode) helpers
-│   └── sentences/      # one file per sentence type (16 files, each feature-gated)
+│   └── sentences/      # one file per sentence type (18 files, each feature-gated)
 │       ├── mod.rs      # #[cfg(feature = "xyz")] mod/pub use per sentence
 │       ├── mwd.rs      # example: struct Mwd { parse(), encode(), to_sentence() }
 │       └── ...
@@ -32,19 +32,19 @@ tests/
 ├── frame.rs            # frame-level integration tests
 ├── ais_decode.rs       # AIS end-to-end decoding tests
 ├── nmea_unknown.rs     # Unknown variant dispatch tests
-└── nmea_<type>.rs      # one file per sentence type (16 files)
+└── nmea_<type>.rs      # one file per sentence type (18 files)
                         # each with: dispatch, decode_encode, roundtrip
 ```
 
 ## Supported sentence types
 
-16 NMEA sentence types, each behind its own feature flag:
-DBS, DBT, DPT, GGA, GLL, GNS, HDG, HDM, HDT, MWD, MWV, RMB, RMC, ROT, VHW, VTG
+18 NMEA sentence types, each behind its own feature flag:
+DBS, DBT, DPT, GBS, GGA, GLL, GNS, GST, HDG, HDM, HDT, MWD, MWV, RMB, RMC, ROT, VHW, VTG
 
-The `nmea` umbrella feature enables all 16. Individual features can be cherry-picked:
+The `nmea` umbrella feature enables all 18. Individual features can be cherry-picked:
 ```toml
 # Only RMC and MWD, nothing else
-nmea-kit = { version = "0.1.1", default-features = false, features = ["rmc", "mwd"] }
+nmea-kit = { version = "0.1", default-features = false, features = ["rmc", "mwd"] }
 ```
 
 7 AIS message types (read-only): Types 1/2/3, 5, 18, 19, 24.
@@ -169,7 +169,7 @@ Tests come first. Every change follows this cycle:
 
 ## Known design issues
 
-- **`to_sentence()` boilerplate** — identical 4-line method duplicated across all 16 files. Should become a trait with a default impl.
+- **`to_sentence()` boilerplate** — identical 4-line method duplicated across all 18 files. Should become a trait with a default impl.
 - **Lat/lon format inconsistency** — NMEA sentences store raw `DDMM.MMMM`, AIS converts to decimal degrees. No conversion helper exists.
 - **`FieldWriter::f32` formatting** — `format!("{v}")` may drop trailing `.0` or leading zeros vs original wire format.
 

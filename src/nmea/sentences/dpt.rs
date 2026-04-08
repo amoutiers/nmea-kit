@@ -1,6 +1,8 @@
 use crate::nmea::field::{FieldReader, FieldWriter};
 
 /// DPT — Depth of Water.
+///
+/// Wire: `depth,offset,rangescale`
 #[derive(Debug, Clone, PartialEq)]
 pub struct Dpt {
     /// Water depth below transducer in meters.
