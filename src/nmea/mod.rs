@@ -58,6 +58,11 @@ pub enum NmeaSentence {
     Dbt(sentences::Dbt),
     #[cfg(feature = "dbs")]
     Dbs(sentences::Dbs),
+    #[cfg(feature = "dbk")]
+    Dbk(sentences::Dbk),
+    // Time
+    #[cfg(feature = "zda")]
+    Zda(sentences::Zda),
     // Unknown
     Unknown {
         sentence_type: String,
@@ -125,6 +130,11 @@ impl NmeaSentence {
             "DBT" => try_parse!(sentences::Dbt::parse, Dbt),
             #[cfg(feature = "dbs")]
             "DBS" => try_parse!(sentences::Dbs::parse, Dbs),
+            #[cfg(feature = "dbk")]
+            "DBK" => try_parse!(sentences::Dbk::parse, Dbk),
+            // Time
+            #[cfg(feature = "zda")]
+            "ZDA" => try_parse!(sentences::Zda::parse, Zda),
             // Unknown
             _ => Self::from_frame(frame),
         }

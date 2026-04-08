@@ -45,7 +45,7 @@ Sentences from the [NMEA 0183 standard](https://gpsd.gitlab.io/gpsd/NMEA.html) a
 
 ## Depth
 
-- [ ] DBK — Depth Below Keel
+- [x] DBK — Depth Below Keel
 - [x] DBS — Depth Below Surface
 - [x] DBT — Depth Below Transducer
 - [x] DPT — Depth of Water
@@ -86,7 +86,7 @@ Sentences from the [NMEA 0183 standard](https://gpsd.gitlab.io/gpsd/NMEA.html) a
 
 ## Time
 
-- [ ] ZDA — Time & Date
+- [x] ZDA — Time & Date
 
 ## Targets
 

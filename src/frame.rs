@@ -12,7 +12,7 @@ use crate::FrameError;
 pub struct NmeaFrame<'a> {
     /// Sentence prefix: `$` for NMEA, `!` for AIS.
     pub prefix: char,
-    /// Talker identifier (typically 2 characters, e.g. "GP", "WI", "AI").
+    /// Talker identifier (typically 2 letters, e.g. "GP", "WI", "AI"). Some devices use numeric IDs (e.g. "04").
     pub talker: &'a str,
     /// Sentence type (3 characters, e.g. "RMC", "MWD", "VDM").
     pub sentence_type: &'a str,
