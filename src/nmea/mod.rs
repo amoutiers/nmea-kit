@@ -60,6 +60,9 @@ pub enum NmeaSentence {
     Dbs(sentences::Dbs),
     #[cfg(feature = "dbk")]
     Dbk(sentences::Dbk),
+    // Environment
+    #[cfg(feature = "xdr")]
+    Xdr(sentences::Xdr),
     // Time
     #[cfg(feature = "zda")]
     Zda(sentences::Zda),
@@ -132,6 +135,9 @@ impl NmeaSentence {
             "DBS" => try_parse!(sentences::Dbs::parse, Dbs),
             #[cfg(feature = "dbk")]
             "DBK" => try_parse!(sentences::Dbk::parse, Dbk),
+            // Environment
+            #[cfg(feature = "xdr")]
+            "XDR" => try_parse!(sentences::Xdr::parse, Xdr),
             // Time
             #[cfg(feature = "zda")]
             "ZDA" => try_parse!(sentences::Zda::parse, Zda),

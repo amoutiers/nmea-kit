@@ -82,7 +82,7 @@ Sentences from the [NMEA 0183 standard](https://gpsd.gitlab.io/gpsd/NMEA.html) a
 - [ ] MDA — Meteorological Composite
 - [ ] MTA — Air Temperature
 - [ ] MTW — Mean Temperature of Water
-- [ ] XDR — Transducer Measurement
+- [x] XDR — Transducer Measurement
 
 ## Time
 

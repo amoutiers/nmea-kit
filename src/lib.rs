@@ -17,7 +17,7 @@
 //!
 //! ## Features
 //!
-//! - `nmea` (default) — all 20 NMEA sentence types
+//! - `nmea` (default) — all 21 NMEA sentence types
 //! - `ais` (default) — AIS message decoding
 //! - `dbs`, `dbt`, `dpt`, … — individual sentence types
 
@@ -45,6 +45,7 @@ mod frame;
     feature = "rot",
     feature = "vhw",
     feature = "vtg",
+    feature = "xdr",
     feature = "zda",
 ))]
 pub mod nmea;

@@ -38,6 +38,8 @@ mod rot;
 mod vhw;
 #[cfg(feature = "vtg")]
 mod vtg;
+#[cfg(feature = "xdr")]
+mod xdr;
 #[cfg(feature = "zda")]
 mod zda;
 
@@ -79,5 +81,7 @@ pub use rot::*;
 pub use vhw::*;
 #[cfg(feature = "vtg")]
 pub use vtg::*;
+#[cfg(feature = "xdr")]
+pub use xdr::*;
 #[cfg(feature = "zda")]
 pub use zda::*;
