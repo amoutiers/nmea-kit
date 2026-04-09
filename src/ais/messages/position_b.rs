@@ -3,9 +3,8 @@
 use crate::ais::armor::{extract_i32, extract_u32};
 
 use super::common::AisClass;
-use super::position_a::{
-    PositionReport, decode_cog, decode_heading, decode_latitude, decode_longitude, decode_sog,
-};
+use super::position_a::PositionReport;
+use super::utils::{decode_cog, decode_heading, decode_latitude, decode_longitude, decode_sog};
 
 impl PositionReport {
     /// Decode a Type 18 Class B standard position report.

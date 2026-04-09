@@ -38,10 +38,18 @@ use crate::NmeaFrame;
 pub enum AisMessage {
     /// Types 1, 2, 3 (Class A), 18 (Class B), 19 (Class B+) position reports.
     Position(PositionReport),
+    /// Type 4: UTC time and position from base station (coast guard / port authority).
+    BaseStation(BaseStationReport),
     /// Type 5: static and voyage related data (Class A).
     StaticVoyage(StaticVoyageData),
     /// Type 24: static data report (Class B), Part A or Part B.
     StaticReport(StaticDataReport),
+    /// Type 14: safety-related broadcast message (text alert from shore/vessel).
+    Safety(SafetyBroadcast),
+    /// Type 21: aid-to-navigation report (buoy, beacon, lighthouse).
+    AidToNavigation(AidToNavigation),
+    /// Type 27: long-range position report (satellite AIS / Class D).
+    LongRangePosition(LongRangePosition),
     /// Unsupported message type.
     Unknown { msg_type: u8 },
 }
@@ -88,10 +96,14 @@ impl AisParser {
         // Dispatch to message decoder
         match msg_type {
             1..=3 => PositionReport::decode_class_a(&bits).map(AisMessage::Position),
+            4 => BaseStationReport::decode(&bits).map(AisMessage::BaseStation),
             5 => StaticVoyageData::decode(&bits).map(AisMessage::StaticVoyage),
+            14 => SafetyBroadcast::decode(&bits).map(AisMessage::Safety),
             18 => PositionReport::decode_class_b(&bits).map(AisMessage::Position),
             19 => PositionReport::decode_class_b_extended(&bits).map(AisMessage::Position),
+            21 => AidToNavigation::decode(&bits).map(AisMessage::AidToNavigation),
             24 => StaticDataReport::decode(&bits).map(AisMessage::StaticReport),
+            27 => LongRangePosition::decode(&bits).map(AisMessage::LongRangePosition),
             _ => Some(AisMessage::Unknown { msg_type }),
         }
     }
@@ -250,6 +262,65 @@ mod tests {
             assert_eq!(msg_type, 8);
         } else {
             panic!("expected Unknown type 8, got {msg:?}");
+        }
+    }
+
+    #[test]
+    fn type_14_safety_broadcast() {
+        let mut parser = AisParser::new();
+        // Type 14 safety broadcast — payload starts with '>' (val=14)
+        let frame =
+            parse_frame("!AIVDM,1,1,,A,>5?Per18=HB1U:1@E=B0m<L,0*53").expect("valid type 14 frame");
+        let msg = parser.decode(&frame).expect("decoded");
+        if let AisMessage::Safety(broadcast) = msg {
+            assert!(broadcast.mmsi > 0, "MMSI must be set");
+        } else {
+            panic!("expected Safety (type 14), got {msg:?}");
+        }
+    }
+
+    #[test]
+    fn type_14_empty_text_no_panic() {
+        let mut parser = AisParser::new();
+        // Minimal type 14: short payload, text portion may be empty
+        let frame = parse_frame("!AIVDM,1,1,,A,>5?Per1,0*64").expect("valid minimal type 14");
+        // Should decode (returns Safety with empty text) or return None — must not panic
+        let _ = parser.decode(&frame);
+    }
+
+    #[test]
+    fn type_21_aid_to_navigation() {
+        let mut parser = AisParser::new();
+        // Type 21 AtoN — 46-char payload (276 bits > 272 minimum), fill=4
+        // payload starts with 'E' (val=21 → msg_type=21)
+        let frame =
+            parse_frame("!AIVDM,1,1,,B,E>jCfrv2`0c2h0W:0a0h6220d5Du0`Htp00000l1@Dc2P0,4*3C")
+                .expect("valid type 21 frame");
+        let msg = parser.decode(&frame).expect("decoded");
+        if let AisMessage::AidToNavigation(aton) = msg {
+            assert!(aton.mmsi > 0, "MMSI must be set");
+            assert!(
+                aton.aid_type <= 31,
+                "aid_type must be 0–31, got {}",
+                aton.aid_type
+            );
+        } else {
+            panic!("expected AidToNavigation (type 21), got {msg:?}");
+        }
+    }
+
+    #[test]
+    fn type_21_position_in_range() {
+        let mut parser = AisParser::new();
+        let frame =
+            parse_frame("!AIVDM,1,1,,B,E>jCfrv2`0c2h0W:0a0h6220d5Du0`Htp00000l1@Dc2P0,4*3C")
+                .expect("valid type 21");
+        let msg = parser.decode(&frame).expect("decoded");
+        if let AisMessage::AidToNavigation(aton) = msg {
+            if let (Some(lat), Some(lon)) = (aton.lat, aton.lon) {
+                assert!((-90.0..=90.0).contains(&lat), "lat out of range: {lat}");
+                assert!((-180.0..=180.0).contains(&lon), "lon out of range: {lon}");
+            }
         }
     }
 }
