@@ -1,6 +1,7 @@
 //! Common AIS types: NavigationStatus, ShipType.
 
 /// AIS Navigation Status (4 bits, 0-15).
+#[non_exhaustive]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum NavigationStatus {
     UnderWayEngine,
@@ -62,6 +63,7 @@ impl From<NavigationStatus> for u8 {
 }
 
 /// AIS transceiver class, inferred from message type.
+#[non_exhaustive]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AisClass {
     /// Class A — SOLAS vessels (Types 1/2/3/5)

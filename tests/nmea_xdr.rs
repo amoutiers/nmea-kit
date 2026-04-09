@@ -1,4 +1,5 @@
 #![cfg(feature = "xdr")]
+use nmea_kit::nmea::NmeaEncodable;
 
 use nmea_kit::nmea::sentences::{Xdr, XdrGroup};
 use nmea_kit::{NmeaSentence, parse_frame};

@@ -1,4 +1,5 @@
 #![cfg(feature = "rmc")]
+use nmea_kit::nmea::NmeaEncodable;
 
 use nmea_kit::nmea::sentences::Rmc;
 use nmea_kit::{NmeaSentence, parse_frame};

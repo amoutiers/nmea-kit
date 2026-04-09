@@ -1,4 +1,4 @@
-use crate::nmea::field::{FieldReader, FieldWriter};
+use crate::nmea::field::{FieldReader, FieldWriter, NmeaEncodable};
 
 /// ROT — Rate of Turn.
 ///
@@ -12,8 +12,6 @@ pub struct Rot {
 }
 
 impl Rot {
-    pub const SENTENCE_TYPE: &str = "ROT";
-
     pub fn parse(fields: &[&str]) -> Option<Self> {
         let mut r = FieldReader::new(fields);
         Some(Self {
@@ -21,18 +19,16 @@ impl Rot {
             valid: r.char(),
         })
     }
+}
 
-    pub fn encode(&self) -> Vec<String> {
+impl NmeaEncodable for Rot {
+    const SENTENCE_TYPE: &str = "ROT";
+
+    fn encode(&self) -> Vec<String> {
         let mut w = FieldWriter::new();
         w.f32(self.rate_of_turn);
         w.char(self.valid);
         w.finish()
-    }
-
-    pub fn to_sentence(&self, talker: &str) -> String {
-        let fields = self.encode();
-        let field_refs: Vec<&str> = fields.iter().map(|s| s.as_str()).collect();
-        crate::encode_frame('$', talker, Self::SENTENCE_TYPE, &field_refs)
     }
 }
 

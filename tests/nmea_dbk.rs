@@ -1,4 +1,5 @@
 #![cfg(feature = "dbk")]
+use nmea_kit::nmea::NmeaEncodable;
 
 use nmea_kit::nmea::sentences::Dbk;
 use nmea_kit::{NmeaSentence, parse_frame};

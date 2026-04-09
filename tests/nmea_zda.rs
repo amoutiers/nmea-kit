@@ -1,4 +1,5 @@
 #![cfg(feature = "zda")]
+use nmea_kit::nmea::NmeaEncodable;
 
 use nmea_kit::nmea::sentences::Zda;
 use nmea_kit::{NmeaSentence, parse_frame};
@@ -29,7 +30,7 @@ fn roundtrip() {
         day: Some(11),
         month: Some(3),
         year: Some(2004),
-        local_hour_offset: Some(-1.0),
+        local_hour_offset: Some(-1),
         local_min_offset: Some(0),
     };
     let sentence = original.to_sentence("GP");

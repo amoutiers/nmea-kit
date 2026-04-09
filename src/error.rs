@@ -1,4 +1,5 @@
 /// Errors from frame-level parsing (checksum, delimiters, tag blocks).
+#[non_exhaustive]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum FrameError {
     /// Input is empty or whitespace-only.

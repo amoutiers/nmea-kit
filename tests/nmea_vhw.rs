@@ -1,4 +1,5 @@
 #![cfg(feature = "vhw")]
+use nmea_kit::nmea::NmeaEncodable;
 
 use nmea_kit::nmea::sentences::Vhw;
 use nmea_kit::{NmeaSentence, parse_frame};

@@ -13,6 +13,7 @@ use crate::NmeaFrame;
 /// Use `NmeaSentence::parse(&frame)` to dispatch a parsed frame to the
 /// appropriate typed struct. Unknown sentence types are captured in the
 /// `Unknown` variant.
+#[non_exhaustive]
 #[derive(Debug, Clone, PartialEq)]
 pub enum NmeaSentence {
     // Position

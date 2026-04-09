@@ -1,4 +1,5 @@
 #![cfg(feature = "rot")]
+use nmea_kit::nmea::NmeaEncodable;
 
 use nmea_kit::nmea::sentences::Rot;
 use nmea_kit::{NmeaSentence, parse_frame};

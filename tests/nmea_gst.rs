@@ -1,4 +1,5 @@
 #![cfg(feature = "gst")]
+use nmea_kit::nmea::NmeaEncodable;
 
 use nmea_kit::nmea::sentences::Gst;
 use nmea_kit::{NmeaSentence, parse_frame};

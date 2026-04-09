@@ -1,4 +1,4 @@
-use crate::nmea::field::{FieldReader, FieldWriter};
+use crate::nmea::field::{FieldReader, FieldWriter, NmeaEncodable};
 
 /// ZDA — Time and Date.
 ///
@@ -14,14 +14,12 @@ pub struct Zda {
     /// Four-digit year.
     pub year: Option<u32>,
     /// Local zone hours offset from UTC (-13 to +13).
-    pub local_hour_offset: Option<f32>,
+    pub local_hour_offset: Option<i8>,
     /// Local zone minutes offset (00-59).
     pub local_min_offset: Option<u8>,
 }
 
 impl Zda {
-    pub const SENTENCE_TYPE: &str = "ZDA";
-
     pub fn parse(fields: &[&str]) -> Option<Self> {
         let mut r = FieldReader::new(fields);
         Some(Self {
@@ -29,26 +27,24 @@ impl Zda {
             day: r.u8(),
             month: r.u8(),
             year: r.u32(),
-            local_hour_offset: r.f32(),
+            local_hour_offset: r.i8(),
             local_min_offset: r.u8(),
         })
     }
+}
 
-    pub fn encode(&self) -> Vec<String> {
+impl NmeaEncodable for Zda {
+    const SENTENCE_TYPE: &str = "ZDA";
+
+    fn encode(&self) -> Vec<String> {
         let mut w = FieldWriter::new();
         w.string(self.time.as_deref());
         w.u8(self.day);
         w.u8(self.month);
         w.u32(self.year);
-        w.f32(self.local_hour_offset);
+        w.i8(self.local_hour_offset);
         w.u8(self.local_min_offset);
         w.finish()
-    }
-
-    pub fn to_sentence(&self, talker: &str) -> String {
-        let fields = self.encode();
-        let field_refs: Vec<&str> = fields.iter().map(|s| s.as_str()).collect();
-        crate::encode_frame('$', talker, Self::SENTENCE_TYPE, &field_refs)
     }
 }
 
@@ -76,7 +72,7 @@ mod tests {
             day: Some(11),
             month: Some(3),
             year: Some(2004),
-            local_hour_offset: Some(-1.0),
+            local_hour_offset: Some(-1),
             local_min_offset: Some(0),
         };
         let sentence = zda.to_sentence("GP");
@@ -98,7 +94,7 @@ mod tests {
         assert_eq!(z.day, Some(12));
         assert_eq!(z.month, Some(7));
         assert_eq!(z.year, Some(1996));
-        assert!((z.local_hour_offset.expect("ltzh present") - 0.0).abs() < 0.01);
+        assert_eq!(z.local_hour_offset, Some(0));
         assert_eq!(z.local_min_offset, Some(0));
     }
 

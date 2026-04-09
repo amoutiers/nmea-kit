@@ -1,4 +1,5 @@
 #![cfg(feature = "gbs")]
+use nmea_kit::nmea::NmeaEncodable;
 
 use nmea_kit::nmea::sentences::Gbs;
 use nmea_kit::{NmeaSentence, parse_frame};

@@ -1,4 +1,4 @@
-use crate::nmea::field::{FieldReader, FieldWriter};
+use crate::nmea::field::{FieldReader, FieldWriter, NmeaEncodable};
 
 /// GNS — GNSS Fix Data (multi-constellation).
 ///
@@ -34,8 +34,6 @@ pub struct Gns {
 }
 
 impl Gns {
-    pub const SENTENCE_TYPE: &str = "GNS";
-
     pub fn parse(fields: &[&str]) -> Option<Self> {
         let mut r = FieldReader::new(fields);
         Some(Self {
@@ -54,8 +52,12 @@ impl Gns {
             nav_status: r.char(),
         })
     }
+}
 
-    pub fn encode(&self) -> Vec<String> {
+impl NmeaEncodable for Gns {
+    const SENTENCE_TYPE: &str = "GNS";
+
+    fn encode(&self) -> Vec<String> {
         let mut w = FieldWriter::new();
         w.string(self.time.as_deref());
         w.f64(self.lat);
@@ -71,12 +73,6 @@ impl Gns {
         w.string(self.dgps_station.as_deref());
         w.char(self.nav_status);
         w.finish()
-    }
-
-    pub fn to_sentence(&self, talker: &str) -> String {
-        let fields = self.encode();
-        let field_refs: Vec<&str> = fields.iter().map(|s| s.as_str()).collect();
-        crate::encode_frame('$', talker, Self::SENTENCE_TYPE, &field_refs)
     }
 }
 

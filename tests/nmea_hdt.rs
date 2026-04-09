@@ -1,4 +1,5 @@
 #![cfg(feature = "hdt")]
+use nmea_kit::nmea::NmeaEncodable;
 
 use nmea_kit::nmea::sentences::Hdt;
 use nmea_kit::{NmeaSentence, parse_frame};

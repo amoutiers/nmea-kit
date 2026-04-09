@@ -1,4 +1,4 @@
-use crate::nmea::field::{FieldReader, FieldWriter};
+use crate::nmea::field::{FieldReader, FieldWriter, NmeaEncodable};
 
 /// MWV — Wind Speed and Angle.
 ///
@@ -18,8 +18,6 @@ pub struct Mwv {
 }
 
 impl Mwv {
-    pub const SENTENCE_TYPE: &str = "MWV";
-
     pub fn parse(fields: &[&str]) -> Option<Self> {
         let mut r = FieldReader::new(fields);
         Some(Self {
@@ -30,8 +28,12 @@ impl Mwv {
             status: r.char(),
         })
     }
+}
 
-    pub fn encode(&self) -> Vec<String> {
+impl NmeaEncodable for Mwv {
+    const SENTENCE_TYPE: &str = "MWV";
+
+    fn encode(&self) -> Vec<String> {
         let mut w = FieldWriter::new();
         w.f32(self.wind_angle);
         w.char(self.reference);
@@ -39,12 +41,6 @@ impl Mwv {
         w.char(self.speed_units);
         w.char(self.status);
         w.finish()
-    }
-
-    pub fn to_sentence(&self, talker: &str) -> String {
-        let fields = self.encode();
-        let field_refs: Vec<&str> = fields.iter().map(|s| s.as_str()).collect();
-        crate::encode_frame('$', talker, Self::SENTENCE_TYPE, &field_refs)
     }
 }
 

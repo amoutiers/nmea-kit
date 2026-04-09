@@ -1,4 +1,4 @@
-use crate::nmea::field::{FieldReader, FieldWriter};
+use crate::nmea::field::{FieldReader, FieldWriter, NmeaEncodable};
 
 /// DBK — Depth Below Keel.
 ///
@@ -14,8 +14,6 @@ pub struct Dbk {
 }
 
 impl Dbk {
-    pub const SENTENCE_TYPE: &str = "DBK";
-
     pub fn parse(fields: &[&str]) -> Option<Self> {
         let mut r = FieldReader::new(fields);
         let depth_feet = r.f32();
@@ -29,8 +27,12 @@ impl Dbk {
             depth_fathoms,
         })
     }
+}
 
-    pub fn encode(&self) -> Vec<String> {
+impl NmeaEncodable for Dbk {
+    const SENTENCE_TYPE: &str = "DBK";
+
+    fn encode(&self) -> Vec<String> {
         let mut w = FieldWriter::new();
         w.f32(self.depth_feet);
         w.fixed('f');
@@ -39,12 +41,6 @@ impl Dbk {
         w.f32(self.depth_fathoms);
         w.fixed('F');
         w.finish()
-    }
-
-    pub fn to_sentence(&self, talker: &str) -> String {
-        let fields = self.encode();
-        let field_refs: Vec<&str> = fields.iter().map(|s| s.as_str()).collect();
-        crate::encode_frame('$', talker, Self::SENTENCE_TYPE, &field_refs)
     }
 }
 

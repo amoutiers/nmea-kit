@@ -1,4 +1,5 @@
 #![cfg(feature = "gga")]
+use nmea_kit::nmea::NmeaEncodable;
 
 use nmea_kit::nmea::sentences::Gga;
 use nmea_kit::{NmeaSentence, parse_frame};

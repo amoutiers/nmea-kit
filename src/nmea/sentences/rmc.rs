@@ -1,4 +1,4 @@
-use crate::nmea::field::{FieldReader, FieldWriter};
+use crate::nmea::field::{FieldReader, FieldWriter, NmeaEncodable};
 
 /// RMC — Recommended Minimum Navigation Information.
 ///
@@ -32,8 +32,6 @@ pub struct Rmc {
 }
 
 impl Rmc {
-    pub const SENTENCE_TYPE: &str = "RMC";
-
     pub fn parse(fields: &[&str]) -> Option<Self> {
         let mut r = FieldReader::new(fields);
         Some(Self {
@@ -51,8 +49,12 @@ impl Rmc {
             pos_mode: r.char(),
         })
     }
+}
 
-    pub fn encode(&self) -> Vec<String> {
+impl NmeaEncodable for Rmc {
+    const SENTENCE_TYPE: &str = "RMC";
+
+    fn encode(&self) -> Vec<String> {
         let mut w = FieldWriter::new();
         w.string(self.time.as_deref());
         w.char(self.status);
@@ -67,12 +69,6 @@ impl Rmc {
         w.char(self.mag_var_ew);
         w.char(self.pos_mode);
         w.finish()
-    }
-
-    pub fn to_sentence(&self, talker: &str) -> String {
-        let fields = self.encode();
-        let field_refs: Vec<&str> = fields.iter().map(|s| s.as_str()).collect();
-        crate::encode_frame('$', talker, Self::SENTENCE_TYPE, &field_refs)
     }
 }
 

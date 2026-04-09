@@ -1,4 +1,4 @@
-use crate::nmea::field::{FieldReader, FieldWriter};
+use crate::nmea::field::{FieldReader, FieldWriter, NmeaEncodable};
 
 /// GST — GNSS Pseudo-Range Error Statistics.
 ///
@@ -24,8 +24,6 @@ pub struct Gst {
 }
 
 impl Gst {
-    pub const SENTENCE_TYPE: &str = "GST";
-
     pub fn parse(fields: &[&str]) -> Option<Self> {
         let mut r = FieldReader::new(fields);
         Some(Self {
@@ -39,8 +37,12 @@ impl Gst {
             std_alt: r.f32(),
         })
     }
+}
 
-    pub fn encode(&self) -> Vec<String> {
+impl NmeaEncodable for Gst {
+    const SENTENCE_TYPE: &str = "GST";
+
+    fn encode(&self) -> Vec<String> {
         let mut w = FieldWriter::new();
         w.string(self.time.as_deref());
         w.f32(self.range_rms);
@@ -51,12 +53,6 @@ impl Gst {
         w.f32(self.std_lon);
         w.f32(self.std_alt);
         w.finish()
-    }
-
-    pub fn to_sentence(&self, talker: &str) -> String {
-        let fields = self.encode();
-        let field_refs: Vec<&str> = fields.iter().map(|s| s.as_str()).collect();
-        crate::encode_frame('$', talker, Self::SENTENCE_TYPE, &field_refs)
     }
 }
 

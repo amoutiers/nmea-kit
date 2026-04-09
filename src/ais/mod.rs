@@ -33,6 +33,7 @@ use fragments::FragmentCollector;
 use crate::NmeaFrame;
 
 /// Unified AIS message enum.
+#[non_exhaustive]
 #[derive(Debug, Clone, PartialEq)]
 pub enum AisMessage {
     /// Types 1, 2, 3 (Class A), 18 (Class B), 19 (Class B+) position reports.

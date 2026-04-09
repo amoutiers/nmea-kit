@@ -1,4 +1,4 @@
-use crate::nmea::field::{FieldReader, FieldWriter};
+use crate::nmea::field::{FieldReader, FieldWriter, NmeaEncodable};
 
 /// GLL — Geographic Position (Latitude/Longitude).
 ///
@@ -22,8 +22,6 @@ pub struct Gll {
 }
 
 impl Gll {
-    pub const SENTENCE_TYPE: &str = "GLL";
-
     pub fn parse(fields: &[&str]) -> Option<Self> {
         let mut r = FieldReader::new(fields);
         Some(Self {
@@ -36,8 +34,12 @@ impl Gll {
             mode: r.char(),
         })
     }
+}
 
-    pub fn encode(&self) -> Vec<String> {
+impl NmeaEncodable for Gll {
+    const SENTENCE_TYPE: &str = "GLL";
+
+    fn encode(&self) -> Vec<String> {
         let mut w = FieldWriter::new();
         w.f64(self.lat);
         w.char(self.ns);
@@ -47,12 +49,6 @@ impl Gll {
         w.char(self.status);
         w.char(self.mode);
         w.finish()
-    }
-
-    pub fn to_sentence(&self, talker: &str) -> String {
-        let fields = self.encode();
-        let field_refs: Vec<&str> = fields.iter().map(|s| s.as_str()).collect();
-        crate::encode_frame('$', talker, Self::SENTENCE_TYPE, &field_refs)
     }
 }
 

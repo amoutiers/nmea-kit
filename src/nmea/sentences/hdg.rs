@@ -1,4 +1,4 @@
-use crate::nmea::field::{FieldReader, FieldWriter};
+use crate::nmea::field::{FieldReader, FieldWriter, NmeaEncodable};
 
 /// HDG — Heading with Deviation & Variation.
 ///
@@ -18,8 +18,6 @@ pub struct Hdg {
 }
 
 impl Hdg {
-    pub const SENTENCE_TYPE: &str = "HDG";
-
     pub fn parse(fields: &[&str]) -> Option<Self> {
         let mut r = FieldReader::new(fields);
         Some(Self {
@@ -30,8 +28,12 @@ impl Hdg {
             variation_ew: r.char(),
         })
     }
+}
 
-    pub fn encode(&self) -> Vec<String> {
+impl NmeaEncodable for Hdg {
+    const SENTENCE_TYPE: &str = "HDG";
+
+    fn encode(&self) -> Vec<String> {
         let mut w = FieldWriter::new();
         w.f32(self.heading_mag);
         w.f32(self.deviation);
@@ -39,12 +41,6 @@ impl Hdg {
         w.f32(self.variation);
         w.char(self.variation_ew);
         w.finish()
-    }
-
-    pub fn to_sentence(&self, talker: &str) -> String {
-        let fields = self.encode();
-        let field_refs: Vec<&str> = fields.iter().map(|s| s.as_str()).collect();
-        crate::encode_frame('$', talker, Self::SENTENCE_TYPE, &field_refs)
     }
 }
 

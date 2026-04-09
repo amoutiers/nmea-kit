@@ -1,4 +1,5 @@
 #![cfg(feature = "gns")]
+use nmea_kit::nmea::NmeaEncodable;
 
 use nmea_kit::nmea::sentences::Gns;
 use nmea_kit::{NmeaSentence, parse_frame};

@@ -1,4 +1,5 @@
 #![cfg(feature = "mwv")]
+use nmea_kit::nmea::NmeaEncodable;
 
 use nmea_kit::nmea::sentences::Mwv;
 use nmea_kit::{NmeaSentence, parse_frame};

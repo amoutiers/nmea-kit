@@ -15,7 +15,7 @@ pub fn decode_armor(payload: &str, fill_bits: u8) -> Option<Vec<u8>> {
     let mut bits = Vec::with_capacity(payload.len() * 6);
 
     for ch in payload.bytes() {
-        let mut val = ch - 48; // subtract ASCII '0'
+        let mut val = ch.checked_sub(48)?; // byte below ASCII '0' is invalid
         if val > 40 {
             val -= 8; // skip the gap 0x58-0x5F
         }
@@ -155,6 +155,12 @@ mod tests {
     fn decode_invalid_character() {
         // '~' (0x7E) is outside the valid AIS character range (0x30-0x77)
         assert!(decode_armor("~", 0).is_none());
+    }
+
+    #[test]
+    fn decode_low_byte_rejected() {
+        // Byte 0x20 (space) is below valid AIS range — must not panic
+        assert!(decode_armor("\x20", 0).is_none());
     }
 
     #[test]

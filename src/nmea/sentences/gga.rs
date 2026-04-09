@@ -1,4 +1,4 @@
-use crate::nmea::field::{FieldReader, FieldWriter};
+use crate::nmea::field::{FieldReader, FieldWriter, NmeaEncodable};
 
 /// GGA — Global Positioning System Fix Data.
 ///
@@ -36,8 +36,6 @@ pub struct Gga {
 }
 
 impl Gga {
-    pub const SENTENCE_TYPE: &str = "GGA";
-
     pub fn parse(fields: &[&str]) -> Option<Self> {
         let mut r = FieldReader::new(fields);
         Some(Self {
@@ -57,8 +55,12 @@ impl Gga {
             dgps_station: r.string(),
         })
     }
+}
 
-    pub fn encode(&self) -> Vec<String> {
+impl NmeaEncodable for Gga {
+    const SENTENCE_TYPE: &str = "GGA";
+
+    fn encode(&self) -> Vec<String> {
         let mut w = FieldWriter::new();
         w.string(self.time.as_deref());
         w.f64(self.lat);
@@ -75,12 +77,6 @@ impl Gga {
         w.f32(self.dgps_age);
         w.string(self.dgps_station.as_deref());
         w.finish()
-    }
-
-    pub fn to_sentence(&self, talker: &str) -> String {
-        let fields = self.encode();
-        let field_refs: Vec<&str> = fields.iter().map(|s| s.as_str()).collect();
-        crate::encode_frame('$', talker, Self::SENTENCE_TYPE, &field_refs)
     }
 }
 

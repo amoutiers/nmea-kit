@@ -1,4 +1,4 @@
-use crate::nmea::field::FieldWriter;
+use crate::nmea::field::{FieldWriter, NmeaEncodable};
 
 /// A single transducer measurement group within an XDR sentence.
 #[derive(Debug, Clone, PartialEq)]
@@ -72,8 +72,6 @@ pub struct Xdr {
 }
 
 impl Xdr {
-    pub const SENTENCE_TYPE: &str = "XDR";
-
     pub fn parse(fields: &[&str]) -> Option<Self> {
         let mut groups = Vec::new();
         let mut i = 0;
@@ -107,27 +105,6 @@ impl Xdr {
             i += 4;
         }
         Some(Self { groups })
-    }
-
-    pub fn encode(&self) -> Vec<String> {
-        let mut w = FieldWriter::new();
-        for g in &self.groups {
-            w.char(g.sensor_type);
-            w.f32(g.value);
-            w.char(g.unit);
-            w.string(g.name.as_deref());
-        }
-        w.finish()
-    }
-
-    /// Encode into a single NMEA sentence.
-    ///
-    /// For XDR with many groups, prefer [`to_sentences()`](Self::to_sentences) which splits
-    /// automatically to stay within the 82-character NMEA 0183 limit.
-    pub fn to_sentence(&self, talker: &str) -> String {
-        let fields = self.encode();
-        let field_refs: Vec<&str> = fields.iter().map(|s| s.as_str()).collect();
-        crate::encode_frame('$', talker, Self::SENTENCE_TYPE, &field_refs)
     }
 
     /// Encode into one or more NMEA sentences, splitting groups across sentences as needed
@@ -165,6 +142,21 @@ impl Xdr {
         }
 
         sentences
+    }
+}
+
+impl NmeaEncodable for Xdr {
+    const SENTENCE_TYPE: &str = "XDR";
+
+    fn encode(&self) -> Vec<String> {
+        let mut w = FieldWriter::new();
+        for g in &self.groups {
+            w.char(g.sensor_type);
+            w.f32(g.value);
+            w.char(g.unit);
+            w.string(g.name.as_deref());
+        }
+        w.finish()
     }
 }
 

@@ -7,6 +7,7 @@ use crate::ais::armor::{extract_string, extract_u32};
 /// Type 24 comes in two parts:
 /// - Part A: vessel name
 /// - Part B: callsign + ship type
+#[non_exhaustive]
 #[derive(Debug, Clone, PartialEq)]
 pub enum StaticDataReport {
     PartA {

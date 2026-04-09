@@ -69,6 +69,19 @@ impl<'a> FieldReader<'a> {
         val
     }
 
+    /// Read an optional i8 and advance.
+    pub fn i8(&mut self) -> Option<i8> {
+        let val = self.fields.get(self.idx).and_then(|f| {
+            if f.is_empty() {
+                None
+            } else {
+                f.parse::<i8>().ok()
+            }
+        });
+        self.idx += 1;
+        val
+    }
+
     /// Read an optional single character and advance.
     pub fn char(&mut self) -> Option<char> {
         let val = self
@@ -134,6 +147,14 @@ impl FieldWriter {
         });
     }
 
+    /// Write an optional i8. `None` → empty field.
+    pub fn i8(&mut self, value: Option<i8>) {
+        self.fields.push(match value {
+            Some(v) => v.to_string(),
+            None => String::new(),
+        });
+    }
+
     /// Write an optional u32. `None` → empty field.
     pub fn u32(&mut self, value: Option<u32>) {
         self.fields.push(match value {
@@ -169,6 +190,36 @@ impl FieldWriter {
 impl Default for FieldWriter {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+/// Trait for NMEA sentence types that can be encoded to wire format.
+///
+/// Provides `SENTENCE_TYPE` and `encode()` — the `to_sentence()` default
+/// method combines them with [`encode_frame()`](crate::encode_frame) to
+/// produce a complete NMEA sentence with checksum.
+///
+/// # Example
+///
+/// ```
+/// use nmea_kit::nmea::{NmeaEncodable, sentences::Dpt};
+///
+/// let dpt = Dpt { depth: Some(4.1), offset: Some(0.0), rangescale: None };
+/// let sentence = dpt.to_sentence("II");
+/// assert!(sentence.starts_with("$IIDPT,"));
+/// ```
+pub trait NmeaEncodable {
+    /// The 3-character sentence type identifier (e.g. `"MWD"`, `"RMC"`).
+    const SENTENCE_TYPE: &str;
+
+    /// Encode fields into a `Vec` of strings in wire order.
+    fn encode(&self) -> Vec<String>;
+
+    /// Encode into a complete NMEA 0183 sentence with checksum and `\r\n`.
+    fn to_sentence(&self, talker: &str) -> String {
+        let fields = self.encode();
+        let field_refs: Vec<&str> = fields.iter().map(|s| s.as_str()).collect();
+        crate::encode_frame('$', talker, Self::SENTENCE_TYPE, &field_refs)
     }
 }
 
