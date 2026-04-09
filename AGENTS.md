@@ -10,9 +10,9 @@ src/
 ├── frame.rs            # frame layer: checksum, tag blocks, $ and ! prefix
 ├── error.rs            # FrameError enum
 ├── nmea/
-│   ├── mod.rs          # NmeaSentence dispatch enum (23 variants + Unknown)
+│   ├── mod.rs          # NmeaSentence dispatch enum (25 variants + Unknown)
 │   ├── field.rs        # FieldReader (parse) + FieldWriter (encode) helpers
-│   └── sentences/      # one file per sentence type (23 files, each feature-gated)
+│   └── sentences/      # one file per sentence type (25 files, each feature-gated)
 │       ├── mod.rs      # #[cfg(feature = "xyz")] mod/pub use per sentence
 │       ├── mwd.rs      # example: struct Mwd { parse(), encode(), to_sentence() }
 │       └── ...
@@ -32,19 +32,29 @@ tests/
 ├── frame.rs            # frame-level integration tests
 ├── ais_decode.rs       # AIS end-to-end decoding tests
 ├── nmea_unknown.rs     # Unknown variant dispatch tests
-└── nmea_<type>.rs      # one file per sentence type (23 files)
+└── nmea_<type>.rs      # one file per sentence type (25 files)
                         # each with: dispatch, decode_encode, roundtrip
 ```
 
 ## Supported sentence types
 
-23 NMEA sentence types, each behind its own feature flag:
-DBK, DBS, DBT, DPT, GBS, GGA, GLL, GNS, GST, HDG, HDM, HDT, MTW, MWD, MWV, RMB, RMC, ROT, VBW, VHW, VTG, XDR, ZDA
+25 NMEA sentence types, each behind its own feature flag:
+DBK, DBS, DBT, DPT, GBS, GGA, GLL, GNS, GST, HDG, HDM, HDT, MTW, MWD, MWV, RMB, RMC, ROT, RSA, VBW, VHW, VLW, VTG, XDR, ZDA
 
-The `nmea` umbrella feature enables all 23. Individual features can be cherry-picked:
+Five semantic group features bundle related sentence types:
+
+| Group | Sentences |
+|---|---|
+| `positioning` | GGA, GLL, RMC, GNS |
+| `speed` | VTG, VHW, VBW, RMC |
+| `heading` | HDG, HDM, HDT |
+| `wind` | MWD, MWV |
+| `depth` | DBT, DBS, DBK, DPT |
+
+The `nmea` umbrella enables all 5 groups plus the ungrouped sentences (GBS, GST, MTW, RMB, ROT, RSA, VLW, XDR, ZDA). Individual features can also be cherry-picked directly:
 ```toml
 # Only RMC and MWD, nothing else
-nmea-kit = { version = "0.1", default-features = false, features = ["rmc", "mwd"] }
+nmea-kit = { version = "0.2", default-features = false, features = ["rmc", "mwd"] }
 ```
 
 7 AIS message types (read-only): Types 1/2/3, 5, 18, 19, 24.

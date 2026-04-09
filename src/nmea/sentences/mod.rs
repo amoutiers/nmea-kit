@@ -36,10 +36,14 @@ mod rmb;
 mod rmc;
 #[cfg(feature = "rot")]
 mod rot;
+#[cfg(feature = "rsa")]
+mod rsa;
 #[cfg(feature = "vbw")]
 mod vbw;
 #[cfg(feature = "vhw")]
 mod vhw;
+#[cfg(feature = "vlw")]
+mod vlw;
 #[cfg(feature = "vtg")]
 mod vtg;
 #[cfg(feature = "xdr")]
@@ -83,10 +87,14 @@ pub use rmb::*;
 pub use rmc::*;
 #[cfg(feature = "rot")]
 pub use rot::*;
+#[cfg(feature = "rsa")]
+pub use rsa::*;
 #[cfg(feature = "vbw")]
 pub use vbw::*;
 #[cfg(feature = "vhw")]
 pub use vhw::*;
+#[cfg(feature = "vlw")]
+pub use vlw::*;
 #[cfg(feature = "vtg")]
 pub use vtg::*;
 #[cfg(feature = "xdr")]

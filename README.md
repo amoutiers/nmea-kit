@@ -2,7 +2,7 @@
 
 Bidirectional NMEA 0183 parser/encoder with AIS message decoding, written in Rust.
 
-- **23 NMEA sentence types** — parse and encode with checksum
+- **25 NMEA sentence types** — parse and encode with checksum
 - **7 AIS message types** — decode Class A/B position reports and static data
 - **Shared frame layer** — handles `$` (NMEA) and `!` (AIS) framing, IEC 61162-450 tag blocks
 - **Zero dependencies**
@@ -87,9 +87,9 @@ raw line ──→ parse_frame() ──→ NmeaFrame { prefix, talker, sentence_
 | Satellites | GBS, GST |
 | Wind | MWD, MWV |
 | Heading | HDT, HDG, HDM |
-| Course & Speed | VBW, VTG, VHW |
+| Course & Speed | VBW, VLW, VTG, VHW |
 | Depth | DPT, DBT, DBS, DBK |
-| Steering | ROT |
+| Steering | ROT, RSA |
 | Environment | MTW, XDR¹ |
 | Waypoints & Routes | RMB |
 | Time | ZDA |
@@ -110,7 +110,7 @@ raw line ──→ parse_frame() ──→ NmeaFrame { prefix, talker, sentence_
 
 | Issue | `nmea` 0.7 / `ais` 0.12 | `nmea-kit` |
 |-------|--------------------------|------------|
-| Sentence coverage | ~10 types, rest manual | 23 types, all typed |
+| Sentence coverage | ~10 types, rest manual | 25 types, all typed |
 | Encoding | Read-only | Bidirectional (parse + encode) |
 | Error distinction | Can't tell unsupported vs malformed | Frame errors vs content errors |
 | AIS lat/lon precision | `f32` (11m error) | `f64` |
@@ -125,24 +125,33 @@ raw line ──→ parse_frame() ──→ NmeaFrame { prefix, talker, sentence_
 nmea-kit = "0.2"
 ```
 
-| Feature | Default | Description |
-|---------|---------|-------------|
-| `nmea` | yes | All 23 NMEA sentence types |
+| Feature | Default | Enables |
+|---------|---------|---------|
+| `nmea` | yes | All 25 NMEA sentence types |
 | `ais` | yes | AIS message decoding |
-| `dbk`, `dbs`, `dbt`, `dpt`, `gbs`, `gga`, `gll`, `gns`, `gst`, `hdg`, `hdm`, `hdt`, `mtw`, `mwd`, `mwv`, `rmb`, `rmc`, `rot`, `vbw`, `vhw`, `vtg`, `xdr`, `zda` | via `nmea` | Individual sentence types |
+| `positioning` | via `nmea` | GGA, GLL, RMC, GNS |
+| `speed` | via `nmea` | VTG, VHW, VBW, RMC |
+| `heading` | via `nmea` | HDG, HDM, HDT |
+| `wind` | via `nmea` | MWD, MWV |
+| `depth` | via `nmea` | DBT, DBS, DBK, DPT |
+| `dbk`, `dbs`, `dbt`, `dpt`, `gbs`, `gga`, `gll`, `gns`, `gst`, `hdg`, `hdm`, `hdt`, `mtw`, `mwd`, `mwv`, `rmb`, `rmc`, `rot`, `rsa`, `vbw`, `vhw`, `vlw`, `vtg`, `xdr`, `zda` | via `nmea` | Individual sentence types |
 
-
-Cherry-pick only the sentences you need (no AIS, minimal code):
+Use a group feature for common use cases:
 
 ```toml
-[dependencies]
+# Only positioning sentences (GGA, GLL, RMC, GNS), no AIS
+nmea-kit = { version = "0.2", default-features = false, features = ["positioning"] }
+```
+
+Cherry-pick individual sentences you need:
+
+```toml
 nmea-kit = { version = "0.2", default-features = false, features = ["rmc", "mwd"] }
 ```
 
-NMEA-only (no AIS, all sentences, zero dependencies):
+NMEA-only (no AIS, all sentences):
 
 ```toml
-[dependencies]
 nmea-kit = { version = "0.2", default-features = false, features = ["nmea"] }
 ```
 
@@ -181,7 +190,7 @@ impl NmeaEncodable for Xyz {
 }
 ```
 
-Then add `mod xyz; pub use xyz::*;` to `sentences/mod.rs` and a variant to `NmeaSentence` in `nmea/mod.rs`.
+Then add `mod xyz; pub use xyz::*;` (feature-gated) to `sentences/mod.rs`, one line to the `nmea_sentences!` invocation in `nmea/mod.rs`, and `xyz = []` to `[features]` in `Cargo.toml`.
 
 ## License
 

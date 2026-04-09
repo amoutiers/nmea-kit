@@ -24,7 +24,7 @@
 //!
 //! ## Features
 //!
-//! - `nmea` (default) — all 23 NMEA sentence types
+//! - `nmea` (default) — all 25 NMEA sentence types
 //! - `ais` (default) — AIS message decoding
 //! - `dbs`, `dbt`, `dpt`, … — individual sentence types
 
@@ -51,8 +51,10 @@ mod frame;
     feature = "rmb",
     feature = "rmc",
     feature = "rot",
+    feature = "rsa",
     feature = "vbw",
     feature = "vhw",
+    feature = "vlw",
     feature = "vtg",
     feature = "xdr",
     feature = "zda",
@@ -85,9 +87,12 @@ pub use frame::*;
     feature = "rmb",
     feature = "rmc",
     feature = "rot",
+    feature = "rsa",
     feature = "vbw",
     feature = "vhw",
+    feature = "vlw",
     feature = "vtg",
+    feature = "xdr",
     feature = "zda",
 ))]
 pub use nmea::NmeaSentence;
@@ -112,8 +117,10 @@ pub use nmea::NmeaSentence;
     feature = "rmb",
     feature = "rmc",
     feature = "rot",
+    feature = "rsa",
     feature = "vbw",
     feature = "vhw",
+    feature = "vlw",
     feature = "vtg",
     feature = "xdr",
     feature = "zda",

@@ -84,7 +84,7 @@ mod tests {
     }
 
     #[test]
-    fn mwd_full() {
+    fn mwd_full_signalk() {
         let frame = parse_frame("$IIMWD,046.,T,046.,M,10.1,N,05.2,M*43").expect("valid");
         let mwd = Mwd::parse(&frame.fields).expect("parse MWD");
         assert!((mwd.wind_dir_true.expect("dir") - 46.0).abs() < 0.1);

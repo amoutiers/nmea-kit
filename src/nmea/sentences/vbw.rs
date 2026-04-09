@@ -99,6 +99,22 @@ mod tests {
     }
 
     #[test]
+    fn vbw_stern_gonmea() {
+        let frame = parse_frame("$VMVBW,-7.1,0.1,A,,,V,,V,,V*65").expect("valid go-nmea VBW frame");
+        let vbw = Vbw::parse(&frame.fields).expect("parse VBW");
+        assert!((vbw.long_water_spd.expect("long_water") - (-7.1)).abs() < 0.01);
+        assert!((vbw.trans_water_spd.expect("trans_water") - 0.1).abs() < 0.01);
+        assert_eq!(vbw.water_spd_status, Some('A'));
+        assert!(vbw.long_ground_spd.is_none());
+        assert!(vbw.trans_ground_spd.is_none());
+        assert_eq!(vbw.ground_spd_status, Some('V'));
+        assert!(vbw.stern_trans_water_spd.is_none());
+        assert_eq!(vbw.stern_water_spd_status, Some('V'));
+        assert!(vbw.stern_trans_ground_spd.is_none());
+        assert_eq!(vbw.stern_ground_spd_status, Some('V'));
+    }
+
+    #[test]
     fn vbw_encode_roundtrip() {
         let original = Vbw {
             long_water_spd: Some(5.2),
