@@ -30,7 +30,7 @@ Sentences from the [NMEA 0183 standard](https://gpsd.gitlab.io/gpsd/NMEA.html) a
 ## Course & Speed
 
 - [ ] OSD — Own Ship Data
-- [ ] VBW — Dual Ground/Water Speed
+- [x] VBW — Dual Ground/Water Speed
 - [x] VHW — Water Speed and Heading
 - [ ] VLW — Distance Traveled through Water
 - [ ] VPW — Speed, Measured Parallel to Wind
@@ -81,7 +81,7 @@ Sentences from the [NMEA 0183 standard](https://gpsd.gitlab.io/gpsd/NMEA.html) a
 
 - [ ] MDA — Meteorological Composite
 - [ ] MTA — Air Temperature
-- [ ] MTW — Mean Temperature of Water
+- [x] MTW — Mean Temperature of Water
 - [x] XDR — Transducer Measurement
 
 ## Time

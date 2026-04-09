@@ -24,6 +24,8 @@ mod hdg;
 mod hdm;
 #[cfg(feature = "hdt")]
 mod hdt;
+#[cfg(feature = "mtw")]
+mod mtw;
 #[cfg(feature = "mwd")]
 mod mwd;
 #[cfg(feature = "mwv")]
@@ -34,6 +36,8 @@ mod rmb;
 mod rmc;
 #[cfg(feature = "rot")]
 mod rot;
+#[cfg(feature = "vbw")]
+mod vbw;
 #[cfg(feature = "vhw")]
 mod vhw;
 #[cfg(feature = "vtg")]
@@ -67,6 +71,8 @@ pub use hdg::*;
 pub use hdm::*;
 #[cfg(feature = "hdt")]
 pub use hdt::*;
+#[cfg(feature = "mtw")]
+pub use mtw::*;
 #[cfg(feature = "mwd")]
 pub use mwd::*;
 #[cfg(feature = "mwv")]
@@ -77,6 +83,8 @@ pub use rmb::*;
 pub use rmc::*;
 #[cfg(feature = "rot")]
 pub use rot::*;
+#[cfg(feature = "vbw")]
+pub use vbw::*;
 #[cfg(feature = "vhw")]
 pub use vhw::*;
 #[cfg(feature = "vtg")]

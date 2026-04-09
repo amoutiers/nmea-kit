@@ -10,9 +10,9 @@ src/
 ├── frame.rs            # frame layer: checksum, tag blocks, $ and ! prefix
 ├── error.rs            # FrameError enum
 ├── nmea/
-│   ├── mod.rs          # NmeaSentence dispatch enum (21 variants + Unknown)
+│   ├── mod.rs          # NmeaSentence dispatch enum (23 variants + Unknown)
 │   ├── field.rs        # FieldReader (parse) + FieldWriter (encode) helpers
-│   └── sentences/      # one file per sentence type (21 files, each feature-gated)
+│   └── sentences/      # one file per sentence type (23 files, each feature-gated)
 │       ├── mod.rs      # #[cfg(feature = "xyz")] mod/pub use per sentence
 │       ├── mwd.rs      # example: struct Mwd { parse(), encode(), to_sentence() }
 │       └── ...
@@ -32,16 +32,16 @@ tests/
 ├── frame.rs            # frame-level integration tests
 ├── ais_decode.rs       # AIS end-to-end decoding tests
 ├── nmea_unknown.rs     # Unknown variant dispatch tests
-└── nmea_<type>.rs      # one file per sentence type (21 files)
+└── nmea_<type>.rs      # one file per sentence type (23 files)
                         # each with: dispatch, decode_encode, roundtrip
 ```
 
 ## Supported sentence types
 
-21 NMEA sentence types, each behind its own feature flag:
-DBK, DBS, DBT, DPT, GBS, GGA, GLL, GNS, GST, HDG, HDM, HDT, MWD, MWV, RMB, RMC, ROT, VHW, VTG, XDR, ZDA
+23 NMEA sentence types, each behind its own feature flag:
+DBK, DBS, DBT, DPT, GBS, GGA, GLL, GNS, GST, HDG, HDM, HDT, MTW, MWD, MWV, RMB, RMC, ROT, VBW, VHW, VTG, XDR, ZDA
 
-The `nmea` umbrella feature enables all 21. Individual features can be cherry-picked:
+The `nmea` umbrella feature enables all 23. Individual features can be cherry-picked:
 ```toml
 # Only RMC and MWD, nothing else
 nmea-kit = { version = "0.1", default-features = false, features = ["rmc", "mwd"] }

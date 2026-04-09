@@ -48,6 +48,8 @@ pub enum NmeaSentence {
     #[cfg(feature = "rmb")]
     Rmb(sentences::Rmb),
     // Speed
+    #[cfg(feature = "vbw")]
+    Vbw(sentences::Vbw),
     #[cfg(feature = "vtg")]
     Vtg(sentences::Vtg),
     #[cfg(feature = "vhw")]
@@ -62,6 +64,8 @@ pub enum NmeaSentence {
     #[cfg(feature = "dbk")]
     Dbk(sentences::Dbk),
     // Environment
+    #[cfg(feature = "mtw")]
+    Mtw(sentences::Mtw),
     #[cfg(feature = "xdr")]
     Xdr(sentences::Xdr),
     // Time
@@ -123,6 +127,8 @@ impl NmeaSentence {
             #[cfg(feature = "rmb")]
             "RMB" => try_parse!(sentences::Rmb::parse, Rmb),
             // Speed
+            #[cfg(feature = "vbw")]
+            "VBW" => try_parse!(sentences::Vbw::parse, Vbw),
             #[cfg(feature = "vtg")]
             "VTG" => try_parse!(sentences::Vtg::parse, Vtg),
             #[cfg(feature = "vhw")]
@@ -137,6 +143,8 @@ impl NmeaSentence {
             #[cfg(feature = "dbk")]
             "DBK" => try_parse!(sentences::Dbk::parse, Dbk),
             // Environment
+            #[cfg(feature = "mtw")]
+            "MTW" => try_parse!(sentences::Mtw::parse, Mtw),
             #[cfg(feature = "xdr")]
             "XDR" => try_parse!(sentences::Xdr::parse, Xdr),
             // Time
