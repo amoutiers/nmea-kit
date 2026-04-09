@@ -32,7 +32,7 @@ Sentences from the [NMEA 0183 standard](https://gpsd.gitlab.io/gpsd/NMEA.html) a
 - [ ] OSD — Own Ship Data
 - [x] VBW — Dual Ground/Water Speed
 - [x] VHW — Water Speed and Heading
-- [ ] VLW — Distance Traveled through Water
+- [x] VLW — Distance Traveled through Water
 - [ ] VPW — Speed, Measured Parallel to Wind
 - [x] VTG — Track Made Good and Ground Speed
 
@@ -56,7 +56,7 @@ Sentences from the [NMEA 0183 standard](https://gpsd.gitlab.io/gpsd/NMEA.html) a
 - [ ] APB — Autopilot Sentence "B"
 - [ ] HSC — Heading Steering Command
 - [x] ROT — Rate of Turn
-- [ ] RSA — Rudder Sensor Angle
+- [x] RSA — Rudder Sensor Angle
 
 ## Waypoints & Routes
 
