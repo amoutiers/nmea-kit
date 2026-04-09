@@ -1,0 +1,29 @@
+//! AIS Type 21 — Aid-to-Navigation Report.
+#![cfg(feature = "ais")]
+
+use nmea_kit::ais::{AisMessage, AisParser};
+use nmea_kit::parse_frame;
+
+#[test]
+fn type_21_aid_to_navigation_gpsd() {
+    let mut parser = AisParser::new();
+    let frame = parse_frame("!AIVDM,1,1,,B,E>jCfrv2`0c2h0W:0a0h6220d5Du0`Htp00000l1@Dc2P0,4*3C")
+        .expect("valid Type 21 frame");
+    let msg = parser.decode(&frame).expect("Type 21 should decode");
+
+    match msg {
+        AisMessage::AidToNavigation(aton) => {
+            assert!(aton.mmsi > 0, "MMSI should be non-zero");
+            assert!(
+                aton.aid_type <= 31,
+                "aid_type must be 0–31, got {}",
+                aton.aid_type
+            );
+            if let (Some(lat), Some(lon)) = (aton.lat, aton.lon) {
+                assert!((-90.0..=90.0).contains(&lat), "lat out of range: {lat}");
+                assert!((-180.0..=180.0).contains(&lon), "lon out of range: {lon}");
+            }
+        }
+        other => panic!("expected AidToNavigation, got {other:?}"),
+    }
+}
