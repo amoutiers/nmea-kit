@@ -24,6 +24,8 @@ pub struct Gst {
 }
 
 impl Gst {
+    /// Parse fields from a decoded NMEA frame.
+    /// Always returns `Some`; missing or malformed fields become `None`.
     pub fn parse(fields: &[&str]) -> Option<Self> {
         let mut r = FieldReader::new(fields);
         Some(Self {
@@ -105,7 +107,7 @@ mod tests {
         assert!((gst.std_alt.expect("std_alt") - 1.1).abs() < 0.1);
     }
     #[test]
-    fn gst_roundtrip() {
+    fn gst_encode_roundtrip() {
         let gst = Gst {
             time: Some("131519.00".to_string()),
             range_rms: Some(11.0),

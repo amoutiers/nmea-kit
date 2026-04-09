@@ -22,6 +22,8 @@ pub struct Gll {
 }
 
 impl Gll {
+    /// Parse fields from a decoded NMEA frame.
+    /// Always returns `Some`; missing or malformed fields become `None`.
     pub fn parse(fields: &[&str]) -> Option<Self> {
         let mut r = FieldReader::new(fields);
         Some(Self {
@@ -97,7 +99,7 @@ mod tests {
     }
 
     #[test]
-    fn gll_roundtrip() {
+    fn gll_encode_roundtrip() {
         let gll = Gll {
             lat: Some(4807.038),
             ns: Some('N'),
@@ -110,7 +112,6 @@ mod tests {
         let sentence = gll.to_sentence("GP");
         let frame = parse_frame(sentence.trim()).expect("re-parse GLL");
         let gll2 = Gll::parse(&frame.fields).expect("parse roundtrip GLL");
-        assert_eq!(gll.lat, gll2.lat);
-        assert_eq!(gll.status, gll2.status);
+        assert_eq!(gll, gll2);
     }
 }

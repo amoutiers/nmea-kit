@@ -24,6 +24,8 @@ pub struct Gbs {
 }
 
 impl Gbs {
+    /// Parse fields from a decoded NMEA frame.
+    /// Always returns `Some`; missing or malformed fields become `None`.
     pub fn parse(fields: &[&str]) -> Option<Self> {
         let mut r = FieldReader::new(fields);
         Some(Self {
@@ -122,7 +124,7 @@ mod tests {
         assert!((gbs.err_alt.expect("err_alt") - 3.2).abs() < 0.1);
     }
     #[test]
-    fn gbs_roundtrip() {
+    fn gbs_encode_roundtrip() {
         let gbs = Gbs {
             time: Some("194907.00".to_string()),
             err_lat: Some(3.0),

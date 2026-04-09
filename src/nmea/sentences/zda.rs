@@ -20,6 +20,8 @@ pub struct Zda {
 }
 
 impl Zda {
+    /// Parse fields from a decoded NMEA frame.
+    /// Always returns `Some`; missing or malformed fields become `None`.
     pub fn parse(fields: &[&str]) -> Option<Self> {
         let mut r = FieldReader::new(fields);
         Some(Self {

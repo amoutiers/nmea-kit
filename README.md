@@ -30,6 +30,7 @@ match sentence {
 ### Encode and send an NMEA sentence
 
 ```rust
+use nmea_kit::nmea::NmeaEncodable;
 use nmea_kit::nmea::sentences::Dbt;
 
 let dbt = Dbt {
@@ -89,9 +90,11 @@ raw line ──→ parse_frame() ──→ NmeaFrame { prefix, talker, sentence_
 | Course & Speed | VBW, VTG, VHW |
 | Depth | DPT, DBT, DBS, DBK |
 | Steering | ROT |
-| Environment | MTW, XDR |
+| Environment | MTW, XDR¹ |
 | Waypoints & Routes | RMB |
 | Time | ZDA |
+
+¹ `Xdr` has an additional `to_sentences() -> Vec<String>` method that automatically splits many measurements into multiple sentences to stay within the 82-character NMEA line limit.
 
 ### AIS messages (read-only)
 
@@ -119,7 +122,7 @@ raw line ──→ parse_frame() ──→ NmeaFrame { prefix, talker, sentence_
 
 ```toml
 [dependencies]
-nmea-kit = "0.1"
+nmea-kit = "0.2"
 ```
 
 | Feature | Default | Description |
@@ -133,14 +136,14 @@ Cherry-pick only the sentences you need (no AIS, minimal code):
 
 ```toml
 [dependencies]
-nmea-kit = { version = "0.1", default-features = false, features = ["rmc", "mwd"] }
+nmea-kit = { version = "0.2", default-features = false, features = ["rmc", "mwd"] }
 ```
 
 NMEA-only (no AIS, all sentences, zero dependencies):
 
 ```toml
 [dependencies]
-nmea-kit = { version = "0.1", default-features = false, features = ["nmea"] }
+nmea-kit = { version = "0.2", default-features = false, features = ["nmea"] }
 ```
 
 ## Adding a new sentence type

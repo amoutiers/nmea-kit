@@ -18,6 +18,8 @@ pub struct Hdg {
 }
 
 impl Hdg {
+    /// Parse fields from a decoded NMEA frame.
+    /// Always returns `Some`; missing or malformed fields become `None`.
     pub fn parse(fields: &[&str]) -> Option<Self> {
         let mut r = FieldReader::new(fields);
         Some(Self {
@@ -92,7 +94,7 @@ mod tests {
     }
 
     #[test]
-    fn hdg_roundtrip() {
+    fn hdg_encode_roundtrip() {
         let hdg = Hdg {
             heading_mag: Some(181.9),
             deviation: Some(2.5),
@@ -101,11 +103,9 @@ mod tests {
             variation_ew: Some('E'),
         };
         let sentence = hdg.to_sentence("SD");
-        assert!(sentence.starts_with("$SDHDG,"));
         let frame = parse_frame(sentence.trim()).expect("re-parse");
         let hdg2 = Hdg::parse(&frame.fields).expect("re-parse HDG");
-        assert_eq!(hdg.heading_mag, hdg2.heading_mag);
-        assert_eq!(hdg.variation_ew, hdg2.variation_ew);
+        assert_eq!(hdg, hdg2);
     }
 
     #[test]

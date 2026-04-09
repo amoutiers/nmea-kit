@@ -10,6 +10,8 @@ pub struct Hdm {
 }
 
 impl Hdm {
+    /// Parse fields from a decoded NMEA frame.
+    /// Always returns `Some`; missing or malformed fields become `None`.
     pub fn parse(fields: &[&str]) -> Option<Self> {
         let mut r = FieldReader::new(fields);
         let heading_mag = r.f32();
@@ -62,14 +64,13 @@ mod tests {
         assert!((hdm.heading_mag.expect("hdg") - 70.6).abs() < 0.1);
     }
     #[test]
-    fn hdm_roundtrip() {
+    fn hdm_encode_roundtrip() {
         let hdm = Hdm {
             heading_mag: Some(186.5),
         };
         let sentence = hdm.to_sentence("04");
-        assert!(sentence.starts_with("$04HDM,"));
         let frame = parse_frame(sentence.trim()).expect("re-parse");
         let hdm2 = Hdm::parse(&frame.fields).expect("re-parse HDM");
-        assert_eq!(hdm.heading_mag, hdm2.heading_mag);
+        assert_eq!(hdm, hdm2);
     }
 }

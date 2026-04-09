@@ -16,6 +16,8 @@ pub struct Vhw {
 }
 
 impl Vhw {
+    /// Parse fields from a decoded NMEA frame.
+    /// Always returns `Some`; missing or malformed fields become `None`.
     pub fn parse(fields: &[&str]) -> Option<Self> {
         let mut r = FieldReader::new(fields);
         let heading_true = r.f32();
@@ -83,7 +85,7 @@ mod tests {
     }
 
     #[test]
-    fn vhw_roundtrip() {
+    fn vhw_encode_roundtrip() {
         let original = Vhw {
             heading_true: Some(182.5),
             heading_mag: Some(181.8),
@@ -91,14 +93,9 @@ mod tests {
             speed_kmh: Some(23.1),
         };
         let sentence = original.to_sentence("SD");
-        assert!(sentence.starts_with("$SDVHW,"));
-
         let frame = parse_frame(sentence.trim()).expect("re-parse VHW sentence");
         let parsed = Vhw::parse(&frame.fields).expect("parse VHW from re-encoded frame");
 
-        assert_eq!(original.heading_true, parsed.heading_true);
-        assert_eq!(original.heading_mag, parsed.heading_mag);
-        assert_eq!(original.speed_kts, parsed.speed_kts);
-        assert_eq!(original.speed_kmh, parsed.speed_kmh);
+        assert_eq!(original, parsed);
     }
 }

@@ -18,6 +18,8 @@ pub struct Mwv {
 }
 
 impl Mwv {
+    /// Parse fields from a decoded NMEA frame.
+    /// Always returns `Some`; missing or malformed fields become `None`.
     pub fn parse(fields: &[&str]) -> Option<Self> {
         let mut r = FieldReader::new(fields);
         Some(Self {
@@ -69,7 +71,7 @@ mod tests {
     }
 
     #[test]
-    fn mwv_roundtrip() {
+    fn mwv_encode_roundtrip() {
         let original = Mwv {
             wind_angle: Some(336.0),
             reference: Some('R'),
@@ -78,16 +80,10 @@ mod tests {
             status: Some('A'),
         };
         let sentence = original.to_sentence("II");
-        assert!(sentence.starts_with("$IIMWV,"));
-
         let frame = parse_frame(sentence.trim()).expect("re-parse MWV sentence");
         let parsed = Mwv::parse(&frame.fields).expect("parse MWV from re-encoded frame");
 
-        assert_eq!(original.wind_angle, parsed.wind_angle);
-        assert_eq!(original.reference, parsed.reference);
-        assert_eq!(original.wind_speed, parsed.wind_speed);
-        assert_eq!(original.speed_units, parsed.speed_units);
-        assert_eq!(original.status, parsed.status);
+        assert_eq!(original, parsed);
     }
 
     #[test]

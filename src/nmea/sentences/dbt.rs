@@ -14,6 +14,8 @@ pub struct Dbt {
 }
 
 impl Dbt {
+    /// Parse fields from a decoded NMEA frame.
+    /// Always returns `Some`; missing or malformed fields become `None`.
     pub fn parse(fields: &[&str]) -> Option<Self> {
         let mut r = FieldReader::new(fields);
         let depth_feet = r.f32();
@@ -66,7 +68,7 @@ mod tests {
     }
 
     #[test]
-    fn dbt_roundtrip() {
+    fn dbt_encode_roundtrip() {
         let original = Dbt {
             depth_feet: Some(35.53),
             depth_meters: Some(10.83),
@@ -78,9 +80,7 @@ mod tests {
         let frame = parse_frame(sentence.trim()).expect("re-parse DBT sentence");
         let parsed = Dbt::parse(&frame.fields).expect("parse DBT from re-encoded frame");
 
-        assert_eq!(original.depth_feet, parsed.depth_feet);
-        assert_eq!(original.depth_meters, parsed.depth_meters);
-        assert_eq!(original.depth_fathoms, parsed.depth_fathoms);
+        assert_eq!(original, parsed);
     }
 
     #[test]

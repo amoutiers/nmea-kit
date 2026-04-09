@@ -89,7 +89,7 @@ impl NmeaSentence {
             ($parser:expr, $variant:ident) => {
                 match $parser(&frame.fields) {
                     Some(v) => Self::$variant(v),
-                    None => Self::from_frame(frame),
+                    None => unreachable!("parse() always returns Some for known sentence types"),
                 }
             };
         }

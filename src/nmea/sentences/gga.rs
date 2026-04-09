@@ -36,6 +36,8 @@ pub struct Gga {
 }
 
 impl Gga {
+    /// Parse fields from a decoded NMEA frame.
+    /// Always returns `Some`; missing or malformed fields become `None`.
     pub fn parse(fields: &[&str]) -> Option<Self> {
         let mut r = FieldReader::new(fields);
         Some(Self {
@@ -126,7 +128,7 @@ mod tests {
     }
 
     #[test]
-    fn gga_roundtrip() {
+    fn gga_encode_roundtrip() {
         let gga = Gga {
             time: Some("120000.00".to_string()),
             lat: Some(4807.038),
@@ -146,7 +148,6 @@ mod tests {
         let sentence = gga.to_sentence("GP");
         let frame = parse_frame(sentence.trim()).expect("re-parse GGA");
         let gga2 = Gga::parse(&frame.fields).expect("parse roundtrip GGA");
-        assert_eq!(gga.quality, gga2.quality);
-        assert_eq!(gga.num_sats, gga2.num_sats);
+        assert_eq!(gga, gga2);
     }
 }

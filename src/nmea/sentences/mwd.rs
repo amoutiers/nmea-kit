@@ -16,6 +16,8 @@ pub struct Mwd {
 }
 
 impl Mwd {
+    /// Parse fields from a decoded NMEA frame.
+    /// Always returns `Some`; missing or malformed fields become `None`.
     pub fn parse(fields: &[&str]) -> Option<Self> {
         let mut r = FieldReader::new(fields);
         let wind_dir_true = r.f32();
@@ -109,7 +111,7 @@ mod tests {
         assert!((mwd.wind_speed_ms.expect("ms") - 5.2).abs() < 0.1);
     }
     #[test]
-    fn mwd_roundtrip() {
+    fn mwd_encode_roundtrip() {
         let mwd = Mwd {
             wind_dir_true: Some(270.0),
             wind_dir_mag: Some(268.5),
@@ -117,12 +119,8 @@ mod tests {
             wind_speed_ms: Some(6.4),
         };
         let sentence = mwd.to_sentence("WI");
-        assert!(sentence.starts_with("$WIMWD,"));
-        assert!(sentence.contains('*'));
-        // Re-parse
         let frame = parse_frame(sentence.trim()).expect("re-parse");
         let mwd2 = Mwd::parse(&frame.fields).expect("re-parse MWD");
-        assert_eq!(mwd.wind_dir_true, mwd2.wind_dir_true);
-        assert_eq!(mwd.wind_dir_mag, mwd2.wind_dir_mag);
+        assert_eq!(mwd, mwd2);
     }
 }

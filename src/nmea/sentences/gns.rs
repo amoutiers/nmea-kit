@@ -34,6 +34,8 @@ pub struct Gns {
 }
 
 impl Gns {
+    /// Parse fields from a decoded NMEA frame.
+    /// Always returns `Some`; missing or malformed fields become `None`.
     pub fn parse(fields: &[&str]) -> Option<Self> {
         let mut r = FieldReader::new(fields);
         Some(Self {
@@ -124,7 +126,7 @@ mod tests {
     }
 
     #[test]
-    fn gns_roundtrip() {
+    fn gns_encode_roundtrip() {
         let gns = Gns {
             time: Some("120000.00".to_string()),
             lat: Some(4807.038),
@@ -143,7 +145,6 @@ mod tests {
         let sentence = gns.to_sentence("GP");
         let frame = parse_frame(sentence.trim()).expect("re-parse GNS");
         let gns2 = Gns::parse(&frame.fields).expect("parse roundtrip GNS");
-        assert_eq!(gns.mode, gns2.mode);
-        assert_eq!(gns.num_sats, gns2.num_sats);
+        assert_eq!(gns, gns2);
     }
 }

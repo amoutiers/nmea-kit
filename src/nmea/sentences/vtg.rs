@@ -18,6 +18,8 @@ pub struct Vtg {
 }
 
 impl Vtg {
+    /// Parse fields from a decoded NMEA frame.
+    /// Always returns `Some`; missing or malformed fields become `None`.
     pub fn parse(fields: &[&str]) -> Option<Self> {
         let mut r = FieldReader::new(fields);
         let course_true = r.f32();
@@ -90,7 +92,7 @@ mod tests {
     }
 
     #[test]
-    fn vtg_roundtrip() {
+    fn vtg_encode_roundtrip() {
         let v = Vtg {
             course_true: Some(0.0),
             course_mag: Some(359.3),
@@ -101,6 +103,6 @@ mod tests {
         let s = v.to_sentence("GP");
         let f = parse_frame(s.trim()).expect("re-parse VTG frame");
         let v2 = Vtg::parse(&f.fields).expect("re-parse VTG");
-        assert_eq!(v.course_true, v2.course_true);
+        assert_eq!(v, v2);
     }
 }

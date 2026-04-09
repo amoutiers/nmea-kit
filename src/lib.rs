@@ -15,6 +15,13 @@
 //!               Typed struct    Raw fields      AisMessage enum
 //! ```
 //!
+//! ## Public API
+//!
+//! - [`parse_frame`] / [`encode_frame`] — frame layer (always available)
+//! - [`NmeaSentence`] — dispatch enum for all typed NMEA sentences
+//! - [`NmeaEncodable`] — trait for encoding NMEA sentences to wire format
+//! - [`ais`] — AIS decoder (behind `ais` feature)
+//!
 //! ## Features
 //!
 //! - `nmea` (default) — all 23 NMEA sentence types
@@ -84,3 +91,31 @@ pub use frame::*;
     feature = "zda",
 ))]
 pub use nmea::NmeaSentence;
+
+#[cfg(any(
+    feature = "nmea",
+    feature = "dbk",
+    feature = "dbs",
+    feature = "dbt",
+    feature = "dpt",
+    feature = "gbs",
+    feature = "gga",
+    feature = "gll",
+    feature = "gns",
+    feature = "gst",
+    feature = "hdg",
+    feature = "hdm",
+    feature = "hdt",
+    feature = "mtw",
+    feature = "mwd",
+    feature = "mwv",
+    feature = "rmb",
+    feature = "rmc",
+    feature = "rot",
+    feature = "vbw",
+    feature = "vhw",
+    feature = "vtg",
+    feature = "xdr",
+    feature = "zda",
+))]
+pub use nmea::NmeaEncodable;

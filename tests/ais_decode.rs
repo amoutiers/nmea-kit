@@ -1,6 +1,6 @@
 #![cfg(feature = "ais")]
 
-use nmea_kit::ais::{AisClass, AisMessage, AisParser};
+use nmea_kit::ais::{AisClass, AisMessage, AisParser, StaticDataReport};
 use nmea_kit::parse_frame;
 
 #[test]
@@ -58,6 +58,24 @@ fn type_18_class_b_position() {
 }
 
 #[test]
+fn type_19_class_b_extended_gpsd() {
+    let mut parser = AisParser::new();
+    let frame =
+        parse_frame("!AIVDM,1,1,,B,C5N3SRgPEnJGEBT>NhWAwwo862PaLELTBJ:V00000000S0D:R220,0*0B")
+            .expect("valid Type 19 frame");
+    let msg = parser.decode(&frame).expect("Type 19 should decode");
+
+    match msg {
+        AisMessage::Position(pos) => {
+            assert_eq!(pos.msg_type, 19, "msg_type should be 19");
+            assert_eq!(pos.ais_class, AisClass::BPlus, "Type 19 should be Class B+");
+            assert!(pos.mmsi > 0, "MMSI should be non-zero");
+        }
+        other => panic!("expected Position, got {other:?}"),
+    }
+}
+
+#[test]
 fn type_1_single_fragment_class_a_signalk() {
     let mut parser = AisParser::new();
     let frame =
@@ -81,6 +99,40 @@ fn type_1_single_fragment_class_a_signalk() {
             );
         }
         other => panic!("expected Position, got {other:?}"),
+    }
+}
+
+#[test]
+fn type_24_class_b_static_gpsd() {
+    let mut parser = AisParser::new();
+
+    // Part A: vessel name
+    let frame_a = parse_frame("!AIVDM,1,1,,A,H42O55i18tMET00000000000000,2*6D")
+        .expect("valid Type 24 Part A");
+    let msg_a = parser
+        .decode(&frame_a)
+        .expect("Type 24 Part A should decode");
+
+    match msg_a {
+        AisMessage::StaticReport(StaticDataReport::PartA { mmsi, vessel_name }) => {
+            assert!(mmsi > 0, "MMSI should be non-zero");
+            assert!(!vessel_name.is_empty(), "vessel_name should not be empty");
+        }
+        other => panic!("expected StaticReport(PartA), got {other:?}"),
+    }
+
+    // Part B: callsign + ship type
+    let frame_b = parse_frame("!AIVDM,1,1,,A,H42O55lti4hhhilD3nink000?050,0*40")
+        .expect("valid Type 24 Part B");
+    let msg_b = parser
+        .decode(&frame_b)
+        .expect("Type 24 Part B should decode");
+
+    match msg_b {
+        AisMessage::StaticReport(StaticDataReport::PartB { mmsi, .. }) => {
+            assert!(mmsi > 0, "MMSI should be non-zero");
+        }
+        other => panic!("expected StaticReport(PartB), got {other:?}"),
     }
 }
 

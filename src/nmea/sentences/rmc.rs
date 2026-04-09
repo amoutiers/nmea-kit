@@ -32,6 +32,8 @@ pub struct Rmc {
 }
 
 impl Rmc {
+    /// Parse fields from a decoded NMEA frame.
+    /// Always returns `Some`; missing or malformed fields become `None`.
     pub fn parse(fields: &[&str]) -> Option<Self> {
         let mut r = FieldReader::new(fields);
         Some(Self {
@@ -136,7 +138,7 @@ mod tests {
     }
 
     #[test]
-    fn rmc_roundtrip() {
+    fn rmc_encode_roundtrip() {
         let rmc = Rmc {
             time: Some("120000.00".to_string()),
             status: Some('A'),
@@ -154,9 +156,6 @@ mod tests {
         let sentence = rmc.to_sentence("GP");
         let frame = parse_frame(sentence.trim()).expect("re-parse RMC");
         let rmc2 = Rmc::parse(&frame.fields).expect("parse roundtrip RMC");
-        assert_eq!(rmc.time, rmc2.time);
-        assert_eq!(rmc.status, rmc2.status);
-        assert_eq!(rmc.lat, rmc2.lat);
-        assert_eq!(rmc.pos_mode, rmc2.pos_mode);
+        assert_eq!(rmc, rmc2);
     }
 }
