@@ -59,16 +59,16 @@ if let Some(AisMessage::Position(pos)) = parser.decode(&frame) {
 
 ## Architecture
 
-```
-raw line ──→ parse_frame() ──→ NmeaFrame { prefix, talker, sentence_type, fields }
-                                    |
-                     +--------------+--------------+
-                     v              v               v
-               $ + known      $ + unknown     ! (AIVDM/AIVDO)
-                     |              |               |
-                     v              v               v
-              Typed struct    Raw fields      AisMessage enum
-              (Mwd, Apb..)   (pass-through)  (Types 1-5,14,18,19,21,24,27)
+```mermaid
+flowchart TD
+    raw["raw line"] --> pf["parse_frame()"]
+    pf --> frame["NmeaFrame\nprefix · talker · sentence_type · fields"]
+    frame --> known["$ + known type"]
+    frame --> unknown["$ + unknown type"]
+    frame --> ais_in["! AIVDM/AIVDO"]
+    known --> typed["Typed struct\nMwd, Rmc…"]
+    unknown --> raw_fields["Raw fields\npass-through"]
+    ais_in --> ais_msg["AisMessage enum\nTypes 1-5, 14, 18, 19, 21, 24, 27"]
 ```
 
 **Frame layer** validates checksum, strips tag blocks, extracts talker ID and sentence type. Shared by both NMEA and AIS.
@@ -127,7 +127,7 @@ raw line ──→ parse_frame() ──→ NmeaFrame { prefix, talker, sentence_
 
 ```toml
 [dependencies]
-nmea-kit = "0.2"
+nmea-kit = "0.3"
 ```
 
 | Feature | Default | Enables |
@@ -145,57 +145,53 @@ Use a group feature for common use cases:
 
 ```toml
 # Only positioning sentences (GGA, GLL, RMC, GNS), no AIS
-nmea-kit = { version = "0.2", default-features = false, features = ["positioning"] }
+nmea-kit = { version = "0.3", default-features = false, features = ["positioning"] }
 ```
 
 Cherry-pick individual sentences you need:
 
 ```toml
-nmea-kit = { version = "0.2", default-features = false, features = ["rmc", "mwd"] }
+nmea-kit = { version = "0.3", default-features = false, features = ["rmc", "mwd"] }
 ```
 
 NMEA-only (no AIS, all sentences):
 
 ```toml
-nmea-kit = { version = "0.2", default-features = false, features = ["nmea"] }
+nmea-kit = { version = "0.3", default-features = false, features = ["nmea"] }
 ```
 
-## Adding a new sentence type
+## Coordinate conversion
 
-Create `src/nmea/sentences/xyz.rs`:
+NMEA sentences encode lat/lon as `DDMM.MMMM`; AIS uses decimal degrees. Two helpers bridge the gap:
 
 ```rust
-use crate::nmea::field::{FieldReader, FieldWriter, NmeaEncodable};
+use nmea_kit::nmea::{ddmm_to_decimal, decimal_to_ddmm};
 
-#[derive(Debug, Clone, PartialEq)]
-pub struct Xyz {
-    pub some_value: Option<f32>,
-    pub some_flag: Option<char>,
-}
+// Parse a GGA latitude field: "4807.038" N → 48.1173°
+let lat = ddmm_to_decimal(4807.038); // → 48.1173
 
-impl Xyz {
-    pub fn parse(fields: &[&str]) -> Option<Self> {
-        let mut r = FieldReader::new(fields);
-        Some(Self {
-            some_value: r.f32(),
-            some_flag: r.char(),
-        })
-    }
-}
-
-impl NmeaEncodable for Xyz {
-    const SENTENCE_TYPE: &str = "XYZ";
-
-    fn encode(&self) -> Vec<String> {
-        let mut w = FieldWriter::new();
-        w.f32(self.some_value);
-        w.char(self.some_flag);
-        w.finish()
-    }
-}
+// Encode back for a sentence
+let ddmm = decimal_to_ddmm(48.1173); // → 4807.038
 ```
 
-Then add `mod xyz; pub use xyz::*;` (feature-gated) to `sentences/mod.rs`, one line to the `nmea_sentences!` invocation in `nmea/mod.rs`, and `xyz = []` to `[features]` in `Cargo.toml`.
+Apply the N/S / E/W sign separately (negate for S or W).
+
+## Documentation
+
+| File | Purpose |
+|------|---------|
+| [CONTRIBUTING.md](CONTRIBUTING.md) | TDD workflow, test rules, adding a sentence type |
+| [SENTENCES.md](SENTENCES.md) | Full NMEA / AIS coverage matrix |
+| [CHANGELOG.md](CHANGELOG.md) | Release history |
+| [AGENTS.md](AGENTS.md) | Codebase structure and implementation patterns |
+
+## Development
+
+```sh
+git config core.hooksPath .githooks   # activate pre-commit checks (fmt + clippy)
+cargo test --all-features             # run all tests
+cargo doc --all-features --open       # browse docs locally
+```
 
 ## License
 

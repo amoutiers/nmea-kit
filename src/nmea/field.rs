@@ -223,6 +223,47 @@ pub trait NmeaEncodable {
     }
 }
 
+/// Convert an NMEA `DDMM.MMMM` coordinate to decimal degrees.
+///
+/// NMEA sentences encode latitude as `DDMM.MMMM` (degrees + minutes) and
+/// longitude as `DDDMM.MMMM`. AIS and most application code use decimal degrees.
+/// The sign (N/S, E/W) is not part of `ddmm` — apply it after conversion.
+///
+/// # Example
+///
+/// ```
+/// use nmea_kit::nmea::ddmm_to_decimal;
+///
+/// // 4807.038 → 48°07.038′ → 48.1173°
+/// let lat = ddmm_to_decimal(4807.038);
+/// assert!((lat - 48.1173).abs() < 0.0001);
+/// ```
+pub fn ddmm_to_decimal(ddmm: f64) -> f64 {
+    let degrees = (ddmm / 100.0).floor();
+    let minutes = ddmm - degrees * 100.0;
+    degrees + minutes / 60.0
+}
+
+/// Convert decimal degrees to an NMEA `DDMM.MMMM` coordinate.
+///
+/// This is the inverse of [`ddmm_to_decimal`]. The sign is not encoded —
+/// strip it before calling and re-apply the N/S or E/W indicator separately.
+///
+/// # Example
+///
+/// ```
+/// use nmea_kit::nmea::decimal_to_ddmm;
+///
+/// // 48.1173° → 48°07.038′ → 4807.038
+/// let ddmm = decimal_to_ddmm(48.1173);
+/// assert!((ddmm - 4807.038).abs() < 0.001);
+/// ```
+pub fn decimal_to_ddmm(decimal: f64) -> f64 {
+    let degrees = decimal.floor();
+    let minutes = (decimal - degrees) * 60.0;
+    degrees * 100.0 + minutes
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -279,5 +320,33 @@ mod tests {
         w.fixed('M');
         let fields = w.finish();
         assert_eq!(fields, vec!["270", "T", "", "M"]);
+    }
+
+    #[test]
+    fn ddmm_to_decimal_lat() {
+        // 4807.038 → 48°07.038′ → 48.1173°
+        let result = ddmm_to_decimal(4807.038);
+        assert!((result - 48.1173).abs() < 0.0001);
+    }
+
+    #[test]
+    fn ddmm_to_decimal_lon() {
+        // 01131.000 → 11°31.000′ → 11.5167°
+        let result = ddmm_to_decimal(1131.0);
+        assert!((result - 11.5167).abs() < 0.0001);
+    }
+
+    #[test]
+    fn decimal_to_ddmm_lat() {
+        // 48.1173° → 4807.038
+        let result = decimal_to_ddmm(48.1173);
+        assert!((result - 4807.038).abs() < 0.001);
+    }
+
+    #[test]
+    fn decimal_to_ddmm_roundtrip() {
+        let original = 5132.5200_f64;
+        let roundtrip = decimal_to_ddmm(ddmm_to_decimal(original));
+        assert!((roundtrip - original).abs() < 0.0001);
     }
 }
