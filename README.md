@@ -3,7 +3,7 @@
 Bidirectional NMEA 0183 parser/encoder with AIS message decoding, written in Rust.
 
 - **25 NMEA sentence types** — parse and encode with checksum
-- **7 AIS message types** — decode Class A/B position reports and static data
+- **9 AIS message types** — decode Class A/B position, base station, safety broadcasts, AtoN, long range
 - **Shared frame layer** — handles `$` (NMEA) and `!` (AIS) framing, IEC 61162-450 tag blocks
 - **Zero dependencies**
 - **No `nom`, no proc-macro** — `FieldReader`/`FieldWriter` helpers for clean sequential parsing
@@ -68,7 +68,7 @@ raw line ──→ parse_frame() ──→ NmeaFrame { prefix, talker, sentence_
                      |              |               |
                      v              v               v
               Typed struct    Raw fields      AisMessage enum
-              (Mwd, Apb..)   (pass-through)  (Types 1-5,18,19,24)
+              (Mwd, Apb..)   (pass-through)  (Types 1-5,14,18,19,21,24,27)
 ```
 
 **Frame layer** validates checksum, strips tag blocks, extracts talker ID and sentence type. Shared by both NMEA and AIS.
@@ -96,21 +96,26 @@ raw line ──→ parse_frame() ──→ NmeaFrame { prefix, talker, sentence_
 
 ¹ `Xdr` has an additional `to_sentences() -> Vec<String>` method that automatically splits many measurements into multiple sentences to stay within the 82-character NMEA line limit.
 
-### AIS messages (read-only)
+### AIS messages (read-only) — [full type list](SENTENCES.md#ais-message-types-decoded-from-aivdmaivdo)
 
-| File | Type | Description |
-|------|------|-------------|
-| `position_a.rs` | 1, 2, 3 | Class A position report |
-| `voyage_a.rs` | 5 | Static and voyage data |
-| `position_b.rs` | 18 | Class B standard position |
-| `position_b_ext.rs` | 19 | Class B+ extended position |
-| `static_b.rs` | 24 | Class B static data report |
+| Type(s) | Struct | Description |
+|---------|--------|-------------|
+| 1, 2, 3 | `PositionReport` | Class A position report |
+| 4 | `BaseStationReport` | Base station UTC + position |
+| 5 | `StaticVoyageData` | Static and voyage data (Class A) |
+| 14 | `SafetyBroadcast` | Safety-related broadcast message |
+| 18 | `PositionReport` | Class B standard position |
+| 19 | `PositionReport` | Class B+ extended position |
+| 21 | `AidToNavigation` | Aid-to-navigation report (buoys, beacons) |
+| 24 | `StaticDataReport` | Static data report (Class B) |
+| 27 | `LongRangePosition` | Long range position (satellite AIS, 1/10° precision) |
 
 ### Key improvements over existing crates
 
 | Issue | `nmea` 0.7 / `ais` 0.12 | `nmea-kit` |
 |-------|--------------------------|------------|
-| Sentence coverage | ~10 types, rest manual | 25 types, all typed |
+| NMEA sentence coverage | ~10 types, rest manual | 25 types, all typed |
+| AIS message coverage | ~5 types | 9 types (1-5, 14, 18, 19, 21, 24, 27) |
 | Encoding | Read-only | Bidirectional (parse + encode) |
 | Error distinction | Can't tell unsupported vs malformed | Frame errors vs content errors |
 | AIS lat/lon precision | `f32` (11m error) | `f64` |

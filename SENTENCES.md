@@ -102,6 +102,36 @@ Sentences from the [NMEA 0183 standard](https://gpsd.gitlab.io/gpsd/NMEA.html) a
 - [ ] BBM — Broadcast Binary Message
 - [ ] VSD — AIS Voyage Static Data
 
+## AIS Message Types (decoded from AIVDM/AIVDO)
+
+- [x] Type 1 — Class A Position Report (under way, engine)
+- [x] Type 2 — Class A Position Report (at anchor)
+- [x] Type 3 — Class A Position Report (special maneuver)
+- [x] Type 4 — Base Station Report (UTC + position)
+- [x] Type 5 — Static and Voyage Related Data (Class A)
+- [ ] Type 6 — Addressed Binary Message
+- [ ] Type 7 — Binary Acknowledge
+- [ ] Type 8 — Binary Broadcast Message
+- [ ] Type 9 — Standard SAR Aircraft Position Report
+- [ ] Type 10 — UTC/Date Inquiry
+- [ ] Type 11 — UTC/Date Response
+- [ ] Type 12 — Addressed Safety-Related Message
+- [ ] Type 13 — Safety-Related Acknowledge
+- [x] Type 14 — Safety-Related Broadcast Message
+- [ ] Type 15 — Interrogation
+- [ ] Type 16 — Assignment Mode Command
+- [ ] Type 17 — DGNSS Broadcast Binary Message
+- [x] Type 18 — Standard Class B Position Report
+- [x] Type 19 — Extended Class B Position Report
+- [ ] Type 20 — Data Link Management
+- [x] Type 21 — Aid-to-Navigation Report
+- [ ] Type 22 — Channel Management
+- [ ] Type 23 — Group Assignment Command
+- [x] Type 24 — Static Data Report (Class B)
+- [ ] Type 25 — Single Slot Binary Message
+- [ ] Type 26 — Multiple Slot Binary Message
+- [x] Type 27 — Long Range Position Report (satellite AIS)
+
 ## Safety & Alarms
 
 - [ ] ACK — Acknowledge Alarm
