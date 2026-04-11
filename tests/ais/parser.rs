@@ -16,12 +16,12 @@ fn ignores_nmea_dollar_frames() {
 }
 
 #[test]
-fn unknown_message_type_signalk() {
+fn type8_now_decoded() {
     let mut parser = AisParser::new();
     let frame =
         parse_frame("!AIVDM,1,1,,A,85Mv070j2d>=<e<<=PQhhg`59P00,0*26").expect("valid Type 8 frame");
     match parser.decode(&frame) {
-        Some(AisMessage::Unknown { msg_type }) => assert_eq!(msg_type, 8),
-        other => panic!("expected Unknown {{ msg_type: 8 }}, got {other:?}"),
+        Some(AisMessage::BinaryBroadcast(bb)) => assert!(bb.mmsi > 0),
+        other => panic!("expected BinaryBroadcast (type 8), got {other:?}"),
     }
 }

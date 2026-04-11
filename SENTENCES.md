@@ -109,16 +109,16 @@ Sentences from the [NMEA 0183 standard](https://gpsd.gitlab.io/gpsd/NMEA.html) a
 - [x] Type 3 — Class A Position Report (special maneuver)
 - [x] Type 4 — Base Station Report (UTC + position)
 - [x] Type 5 — Static and Voyage Related Data (Class A)
-- [ ] Type 6 — Addressed Binary Message
-- [ ] Type 7 — Binary Acknowledge
-- [ ] Type 8 — Binary Broadcast Message
-- [ ] Type 9 — Standard SAR Aircraft Position Report
+- [x] Type 6 — Addressed Binary Message
+- [x] Type 7 — Binary Acknowledge
+- [x] Type 8 — Binary Broadcast Message
+- [x] Type 9 — Standard SAR Aircraft Position Report
 - [ ] Type 10 — UTC/Date Inquiry
-- [ ] Type 11 — UTC/Date Response
-- [ ] Type 12 — Addressed Safety-Related Message
-- [ ] Type 13 — Safety-Related Acknowledge
+- [x] Type 11 — UTC/Date Response
+- [x] Type 12 — Addressed Safety-Related Message
+- [x] Type 13 — Safety-Related Acknowledge
 - [x] Type 14 — Safety-Related Broadcast Message
-- [ ] Type 15 — Interrogation
+- [x] Type 15 — Interrogation
 - [ ] Type 16 — Assignment Mode Command
 - [ ] Type 17 — DGNSS Broadcast Binary Message
 - [x] Type 18 — Standard Class B Position Report

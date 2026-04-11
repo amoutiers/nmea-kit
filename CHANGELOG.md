@@ -2,6 +2,19 @@
 
 All notable changes to nmea-kit are documented here.
 
+## [0.4.0] — 2026-04-11
+
+### Added
+- AIS Type 6 — Addressed Binary Message
+- AIS Type 7 / 13 — Binary / Safety Acknowledge
+- AIS Type 8 — Binary Broadcast Message
+- AIS Type 9 — Standard SAR Aircraft Position Report
+- AIS Type 11 — UTC/Date Response
+- AIS Type 12 — Addressed Safety-Related Message
+- AIS Type 15 — Interrogation
+
+AIS coverage expanded from 9 to 16 message types.
+
 ## [0.3.1] — 2026-04-11
 
 ### Added
@@ -83,6 +96,7 @@ All notable changes to nmea-kit are documented here.
 - Zero external dependencies
 - CI: tests, clippy, rustfmt, doc checks on stable + MSRV 1.85.0
 
+[0.4.0]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.4.0
 [0.3.1]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.3.1
 [0.3.0]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.3.0
 [0.2.3]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.2.3

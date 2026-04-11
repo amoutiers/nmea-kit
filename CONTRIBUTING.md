@@ -30,10 +30,9 @@ Tests come first. Every change follows this cycle:
 1. Create `src/nmea/sentences/xyz.rs` with struct + `parse()` + `NmeaEncodable` impl + `#[cfg(test)]` block
 2. Add `xyz = []` to `[features]` in `Cargo.toml`, and add `"xyz"` to the `nmea` feature list
 3. Add `#[cfg(feature = "xyz")] mod xyz;` and `#[cfg(feature = "xyz")] pub use xyz::*;` to `sentences/mod.rs`
-4. Add `#[cfg(feature = "xyz")] Xyz(sentences::Xyz)` variant to `NmeaSentence` enum in `nmea/mod.rs`
-5. Add `#[cfg(feature = "xyz")] "XYZ" => try_parse!(sentences::Xyz::parse, Xyz)` to the dispatch match
-6. Add `feature = "xyz"` to the `any(...)` gate in `lib.rs`
-7. Create `tests/nmea/xyz.rs` with `dispatch`, `decode_encode`, and `roundtrip` tests
+4. Add `["xyz", Xyz, "XYZ"],` to the `nmea_sentences!` macro invocation in `nmea/mod.rs` (under the appropriate category comment)
+5. Add `feature = "xyz"` to the `any(...)` gate in `lib.rs`
+6. Create `tests/nmea/xyz.rs` with `dispatch`, `decode_encode`, and `roundtrip` tests
 
 ## What each sentence file must contain
 

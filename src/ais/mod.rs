@@ -42,12 +42,26 @@ pub enum AisMessage {
     BaseStation(BaseStationReport),
     /// Type 5: static and voyage related data (Class A).
     StaticVoyage(StaticVoyageData),
-    /// Type 24: static data report (Class B), Part A or Part B.
-    StaticReport(StaticDataReport),
+    /// Type 6: addressed binary message (application-specific data).
+    BinaryAddressed(BinaryAddressed),
+    /// Types 7/13: binary / safety acknowledge.
+    BinaryAck(BinaryAck),
+    /// Type 8: binary broadcast message (application-specific data).
+    BinaryBroadcast(BinaryBroadcast),
+    /// Type 9: standard SAR aircraft position report.
+    SarAircraft(SarAircraftReport),
+    /// Type 11: UTC/date response (mobile station reply to interrogation).
+    UtcDateResponse(UtcDateResponse),
+    /// Type 12: addressed safety-related message (text to specific MMSI).
+    SafetyAddressed(SafetyAddressed),
     /// Type 14: safety-related broadcast message (text alert from shore/vessel).
     Safety(SafetyBroadcast),
+    /// Type 15: interrogation (request data from other vessel).
+    Interrogation(Interrogation),
     /// Type 21: aid-to-navigation report (buoy, beacon, lighthouse).
     AidToNavigation(AidToNavigation),
+    /// Type 24: static data report (Class B), Part A or Part B.
+    StaticReport(StaticDataReport),
     /// Type 27: long-range position report (satellite AIS / Class D).
     LongRangePosition(LongRangePosition),
     /// Unsupported message type.
@@ -98,7 +112,14 @@ impl AisParser {
             1..=3 => PositionReport::decode_class_a(&bits).map(AisMessage::Position),
             4 => BaseStationReport::decode(&bits).map(AisMessage::BaseStation),
             5 => StaticVoyageData::decode(&bits).map(AisMessage::StaticVoyage),
+            6 => BinaryAddressed::decode(&bits).map(AisMessage::BinaryAddressed),
+            7 | 13 => BinaryAck::decode(&bits).map(AisMessage::BinaryAck),
+            8 => BinaryBroadcast::decode(&bits).map(AisMessage::BinaryBroadcast),
+            9 => SarAircraftReport::decode(&bits).map(AisMessage::SarAircraft),
+            11 => UtcDateResponse::decode(&bits).map(AisMessage::UtcDateResponse),
+            12 => SafetyAddressed::decode(&bits).map(AisMessage::SafetyAddressed),
             14 => SafetyBroadcast::decode(&bits).map(AisMessage::Safety),
+            15 => Interrogation::decode(&bits).map(AisMessage::Interrogation),
             18 => PositionReport::decode_class_b(&bits).map(AisMessage::Position),
             19 => PositionReport::decode_class_b_extended(&bits).map(AisMessage::Position),
             21 => AidToNavigation::decode(&bits).map(AisMessage::AidToNavigation),
@@ -253,15 +274,14 @@ mod tests {
     }
 
     #[test]
-    fn unknown_message_type() {
+    fn type_8_binary_broadcast() {
         let mut parser = AisParser::new();
-        // Type 8 binary broadcast — should return Unknown
         let frame = parse_frame("!AIVDM,1,1,,A,85Mv070j2d>=<e<<=PQhhg`59P00,0*26").expect("valid");
         let msg = parser.decode(&frame);
-        if let Some(AisMessage::Unknown { msg_type }) = msg {
-            assert_eq!(msg_type, 8);
+        if let Some(AisMessage::BinaryBroadcast(bb)) = msg {
+            assert!(bb.mmsi > 0);
         } else {
-            panic!("expected Unknown type 8, got {msg:?}");
+            panic!("expected BinaryBroadcast type 8, got {msg:?}");
         }
     }
 

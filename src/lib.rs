@@ -25,6 +25,7 @@
 //! ## Features
 //!
 //! - `nmea` (default) — all 27 NMEA sentence types
+//! - `ais` (default) — 16 AIS message types (read-only decode)
 //! - `ais` (default) — AIS message decoding
 //! - `dbs`, `dbt`, `dpt`, … — individual sentence types
 

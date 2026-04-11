@@ -2,10 +2,18 @@
 
 Bidirectional NMEA 0183 parser/encoder with AIS message decoding, written in Rust.
 
-- **27 NMEA sentence types** — parse and encode with checksum
-- **9 AIS message types** — decode Class A/B position, base station, safety broadcasts, AtoN, long range
+| | |
+|---|---|
+| **Crate** | `nmea-kit` |
+| **Version** | 0.4.0 |
+| **MSRV** | 1.85.0 |
+| **Edition** | 2024 |
+| **Dependencies** | 0 |
+| **License** | MIT OR Apache-2.0 |
+| **NMEA sentences** | 27 (bidirectional: parse + encode) |
+| **AIS message types** | 16 (read-only decode) |
+
 - **Shared frame layer** — handles `$` (NMEA) and `!` (AIS) framing, IEC 61162-450 tag blocks
-- **Zero dependencies**
 - **No `nom`, no proc-macro** — `FieldReader`/`FieldWriter` helpers for clean sequential parsing
 
 ## Quick start
@@ -104,7 +112,14 @@ flowchart TD
 | 1, 2, 3 | `PositionReport` | Class A position report |
 | 4 | `BaseStationReport` | Base station UTC + position |
 | 5 | `StaticVoyageData` | Static and voyage data (Class A) |
+| 6 | `BinaryAddressed` | Addressed binary message (DAC/FID + data) |
+| 7, 13 | `BinaryAck` | Binary / safety acknowledge |
+| 8 | `BinaryBroadcast` | Binary broadcast message (DAC/FID + data) |
+| 9 | `SarAircraftReport` | Standard SAR aircraft position |
+| 11 | `UtcDateResponse` | UTC/date response (mobile station) |
+| 12 | `SafetyAddressed` | Addressed safety-related message |
 | 14 | `SafetyBroadcast` | Safety-related broadcast message |
+| 15 | `Interrogation` | Interrogation (request data from vessel) |
 | 18 | `PositionReport` | Class B standard position |
 | 19 | `PositionReport` | Class B+ extended position |
 | 21 | `AidToNavigation` | Aid-to-navigation report (buoys, beacons) |
@@ -116,7 +131,7 @@ flowchart TD
 | Issue | `nmea` 0.7 / `ais` 0.12 | `nmea-kit` |
 |-------|--------------------------|------------|
 | NMEA sentence coverage | ~10 types, rest manual | 27 types, all typed |
-| AIS message coverage | ~5 types | 9 types (1-5, 14, 18, 19, 21, 24, 27) |
+| AIS message coverage | ~5 types | 16 types (1-9, 11-15, 18-19, 21, 24, 27) |
 | Encoding | Read-only | Bidirectional (parse + encode) |
 | Error distinction | Can't tell unsupported vs malformed | Frame errors vs content errors |
 | AIS lat/lon precision | `f32` (11m error) | `f64` |
@@ -137,7 +152,7 @@ nmea-kit = "0.3"
 | `ais` | yes | AIS message decoding |
 | `positioning` | via `nmea` | GGA, GLL, RMC, GNS |
 | `speed` | via `nmea` | VTG, VHW, VBW, RMC |
-| `heading` | via `nmea` | HDG, HDM, HDT |
+| `heading` | via `nmea` | HDG, HDM, HDT, THS |
 | `wind` | via `nmea` | MWD, MWV |
 | `depth` | via `nmea` | DBT, DBS, DBK, DPT |
 | `dbk`, `dbs`, `dbt`, `dpt`, `gbs`, `gga`, `gll`, `gns`, `gst`, `hdg`, `hdm`, `hdt`, `mtw`, `mwd`, `mwv`, `rmb`, `rmc`, `rot`, `rsa`, `ths`, `txt`, `vbw`, `vhw`, `vlw`, `vtg`, `xdr`, `zda` | via `nmea` | Individual sentence types |
@@ -181,18 +196,10 @@ Apply the N/S / E/W sign separately (negate for S or W).
 
 | File | Purpose |
 |------|---------|
-| [CONTRIBUTING.md](CONTRIBUTING.md) | TDD workflow, test rules, adding a sentence type |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | Getting started, TDD workflow, test rules, adding a sentence type |
 | [SENTENCES.md](SENTENCES.md) | Full NMEA / AIS coverage matrix |
 | [CHANGELOG.md](CHANGELOG.md) | Release history |
-| [AGENTS.md](AGENTS.md) | Codebase structure and implementation patterns |
-
-## Development
-
-```sh
-git config core.hooksPath .githooks   # activate pre-commit checks (fmt + clippy)
-cargo test --all-features             # run all tests
-cargo doc --all-features --open       # browse docs locally
-```
+| [AGENTS.md](AGENTS.md) | API surface, struct fields, and patterns (optimized for LLMs) |
 
 ## License
 

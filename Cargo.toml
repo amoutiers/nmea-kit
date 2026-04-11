@@ -1,6 +1,6 @@
 [package]
 name = "nmea-kit"
-version = "0.3.1"
+version = "0.4.0"
 edition = "2024"
 rust-version = "1.85.0"
 description = "Bidirectional NMEA 0183 parser and encoder with AIS decoding"
@@ -22,14 +22,14 @@ default = ["nmea", "ais"]
 # Semantic groups
 positioning = ["gga", "gll", "rmc", "gns"]
 speed       = ["vtg", "vhw", "vbw", "rmc"]
-heading     = ["hdg", "hdm", "hdt"]
+heading     = ["hdg", "hdm", "hdt", "ths"]
 wind        = ["mwd", "mwv"]
 depth       = ["dbt", "dbs", "dbk", "dpt"]
 
 # Umbrella — all sentence types
 nmea = [
     "positioning", "speed", "heading", "wind", "depth",
-    "gbs", "gst", "mtw", "rmb", "rot", "rsa", "ths", "txt", "vlw", "xdr", "zda",
+    "gbs", "gst", "mtw", "rmb", "rot", "rsa", "txt", "vlw", "xdr", "zda",
 ]
 ais = []
 
