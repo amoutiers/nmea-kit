@@ -2,6 +2,14 @@
 
 All notable changes to nmea-kit are documented here.
 
+## [0.3.1] — 2026-04-11
+
+### Added
+- THS (True Heading and Status) sentence type
+- TXT (Text Transmission) sentence type
+- `ddmm_to_decimal` / `decimal_to_ddmm` coordinate conversion helpers
+- CONTRIBUTING.md, CHANGELOG.md, `.githooks/pre-commit`
+
 ## [0.3.0] — 2026-04-10
 
 ### Added
@@ -75,6 +83,7 @@ All notable changes to nmea-kit are documented here.
 - Zero external dependencies
 - CI: tests, clippy, rustfmt, doc checks on stable + MSRV 1.85.0
 
+[0.3.1]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.3.1
 [0.3.0]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.3.0
 [0.2.3]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.2.3
 [0.2.2]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.2.2

@@ -25,7 +25,7 @@ Sentences from the [NMEA 0183 standard](https://gpsd.gitlab.io/gpsd/NMEA.html) a
 - [x] HDG — Heading, Deviation & Variation
 - [x] HDM — Heading, Magnetic
 - [x] HDT — Heading, True
-- [ ] THS — True Heading and Status
+- [x] THS — True Heading and Status
 
 ## Course & Speed
 
@@ -162,7 +162,7 @@ Sentences from the [NMEA 0183 standard](https://gpsd.gitlab.io/gpsd/NMEA.html) a
 - [ ] RLM — Return Link Message
 - [ ] SFI — Scanning Frequency Information
 - [ ] STN — Multiple Data ID
-- [ ] TXT — Text Transmission
+- [x] TXT — Text Transmission
 
 ## Trawl / Fishing
 

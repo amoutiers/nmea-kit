@@ -2,7 +2,7 @@
 
 Bidirectional NMEA 0183 parser/encoder with AIS message decoding, written in Rust.
 
-- **25 NMEA sentence types** — parse and encode with checksum
+- **27 NMEA sentence types** — parse and encode with checksum
 - **9 AIS message types** — decode Class A/B position, base station, safety broadcasts, AtoN, long range
 - **Shared frame layer** — handles `$` (NMEA) and `!` (AIS) framing, IEC 61162-450 tag blocks
 - **Zero dependencies**
@@ -86,12 +86,13 @@ flowchart TD
 | Position | RMC, GGA, GLL, GNS |
 | Satellites | GBS, GST |
 | Wind | MWD, MWV |
-| Heading | HDT, HDG, HDM |
+| Heading | HDT, HDG, HDM, THS |
 | Course & Speed | VBW, VLW, VTG, VHW |
 | Depth | DPT, DBT, DBS, DBK |
 | Steering | ROT, RSA |
 | Environment | MTW, XDR¹ |
 | Waypoints & Routes | RMB |
+| Communication | TXT |
 | Time | ZDA |
 
 ¹ `Xdr` has an additional `to_sentences() -> Vec<String>` method that automatically splits many measurements into multiple sentences to stay within the 82-character NMEA line limit.
@@ -114,7 +115,7 @@ flowchart TD
 
 | Issue | `nmea` 0.7 / `ais` 0.12 | `nmea-kit` |
 |-------|--------------------------|------------|
-| NMEA sentence coverage | ~10 types, rest manual | 25 types, all typed |
+| NMEA sentence coverage | ~10 types, rest manual | 27 types, all typed |
 | AIS message coverage | ~5 types | 9 types (1-5, 14, 18, 19, 21, 24, 27) |
 | Encoding | Read-only | Bidirectional (parse + encode) |
 | Error distinction | Can't tell unsupported vs malformed | Frame errors vs content errors |
@@ -132,14 +133,14 @@ nmea-kit = "0.3"
 
 | Feature | Default | Enables |
 |---------|---------|---------|
-| `nmea` | yes | All 25 NMEA sentence types |
+| `nmea` | yes | All 27 NMEA sentence types |
 | `ais` | yes | AIS message decoding |
 | `positioning` | via `nmea` | GGA, GLL, RMC, GNS |
 | `speed` | via `nmea` | VTG, VHW, VBW, RMC |
 | `heading` | via `nmea` | HDG, HDM, HDT |
 | `wind` | via `nmea` | MWD, MWV |
 | `depth` | via `nmea` | DBT, DBS, DBK, DPT |
-| `dbk`, `dbs`, `dbt`, `dpt`, `gbs`, `gga`, `gll`, `gns`, `gst`, `hdg`, `hdm`, `hdt`, `mtw`, `mwd`, `mwv`, `rmb`, `rmc`, `rot`, `rsa`, `vbw`, `vhw`, `vlw`, `vtg`, `xdr`, `zda` | via `nmea` | Individual sentence types |
+| `dbk`, `dbs`, `dbt`, `dpt`, `gbs`, `gga`, `gll`, `gns`, `gst`, `hdg`, `hdm`, `hdt`, `mtw`, `mwd`, `mwv`, `rmb`, `rmc`, `rot`, `rsa`, `ths`, `txt`, `vbw`, `vhw`, `vlw`, `vtg`, `xdr`, `zda` | via `nmea` | Individual sentence types |
 
 Use a group feature for common use cases:
 

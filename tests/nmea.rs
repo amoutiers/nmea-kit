@@ -36,6 +36,10 @@ mod rmc;
 mod rot;
 #[path = "nmea/rsa.rs"]
 mod rsa;
+#[path = "nmea/ths.rs"]
+mod ths;
+#[path = "nmea/txt.rs"]
+mod txt;
 #[path = "nmea/unknown.rs"]
 mod unknown;
 #[path = "nmea/vbw.rs"]

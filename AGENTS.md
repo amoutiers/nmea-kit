@@ -12,7 +12,7 @@ src/
 ├── frame.rs            # frame layer: checksum, tag blocks, $ and ! prefix
 ├── error.rs            # FrameError enum
 ├── nmea/
-│   ├── mod.rs          # NmeaSentence dispatch enum (25 variants + Unknown)
+│   ├── mod.rs          # NmeaSentence dispatch enum (27 variants + Unknown)
 │   ├── field.rs        # FieldReader (parse) + FieldWriter (encode) + geo helpers
 │   └── sentences/      # one file per sentence type (feature-gated)
 │       ├── mod.rs      # #[cfg(feature = "xyz")] mod/pub use per sentence

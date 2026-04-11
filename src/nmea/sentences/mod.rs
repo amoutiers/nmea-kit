@@ -38,6 +38,10 @@ mod rmc;
 mod rot;
 #[cfg(feature = "rsa")]
 mod rsa;
+#[cfg(feature = "ths")]
+mod ths;
+#[cfg(feature = "txt")]
+mod txt;
 #[cfg(feature = "vbw")]
 mod vbw;
 #[cfg(feature = "vhw")]
@@ -89,6 +93,10 @@ pub use rmc::*;
 pub use rot::*;
 #[cfg(feature = "rsa")]
 pub use rsa::*;
+#[cfg(feature = "ths")]
+pub use ths::*;
+#[cfg(feature = "txt")]
+pub use txt::*;
 #[cfg(feature = "vbw")]
 pub use vbw::*;
 #[cfg(feature = "vhw")]

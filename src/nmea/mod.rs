@@ -80,6 +80,7 @@ nmea_sentences![
     ["hdg", Hdg, "HDG"],
     ["hdm", Hdm, "HDM"],
     ["rot", Rot, "ROT"],
+    ["ths", Ths, "THS"],
     // Navigation
     ["rmb", Rmb, "RMB"],
     // Rudder
@@ -97,6 +98,8 @@ nmea_sentences![
     // Environment
     ["mtw", Mtw, "MTW"],
     ["xdr", Xdr, "XDR"],
+    // Communication
+    ["txt", Txt, "TXT"],
     // Time
     ["zda", Zda, "ZDA"],
 ];
