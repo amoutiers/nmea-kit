@@ -25,14 +25,30 @@ Tests come first. Every change follows this cycle:
    ```
    CI enforces all three — a commit that fails any of them blocks the publish workflow.
 
-## Adding a NMEA sentence type
+## Adding a standard NMEA sentence type
 
 1. Create `src/nmea/sentences/xyz.rs` with struct + `parse()` + `NmeaEncodable` impl + `#[cfg(test)]` block
 2. Add `xyz = []` to `[features]` in `Cargo.toml`, and add `"xyz"` to the `nmea` feature list
 3. Add `#[cfg(feature = "xyz")] mod xyz;` and `#[cfg(feature = "xyz")] pub use xyz::*;` to `sentences/mod.rs`
-4. Add `["xyz", Xyz, "XYZ"],` to the `nmea_sentences!` macro invocation in `nmea/mod.rs` (under the appropriate category comment)
+4. Add `["xyz", Xyz, "XYZ"],` to the `standard:` section of the `nmea_sentences!` macro in `nmea/mod.rs`
 5. Add `feature = "xyz"` to the `any(...)` gate in `lib.rs`
 6. Create `tests/nmea/xyz.rs` with `dispatch`, `decode_encode`, and `roundtrip` tests
+
+## Adding a proprietary NMEA sentence type
+
+Proprietary sentences start with `$P` (e.g. `$PASHR`, `$PSKPDPT`). The frame parser
+sets `talker = ""` and `sentence_type` = the full address, so there is no collision
+with standard 3-char sentence types.
+
+1. Create `src/nmea/sentences/pxyz.rs` — same pattern as standard, but:
+   - Set `const PROPRIETARY_ID: &str = "PXYZ";` (the full wire address)
+   - `const SENTENCE_TYPE` stays as the last 3 chars (legacy compat)
+   - Use `to_proprietary_sentence()` in tests instead of `to_sentence(talker)`
+2. Add `pxyz = []` to `[features]` in `Cargo.toml`, and add `"pxyz"` to the `nmea` feature list
+3. Add `#[cfg(feature = "pxyz")] mod pxyz;` and `pub use pxyz::*;` to `sentences/mod.rs`
+4. Add `["pxyz", Pxyz, "PXYZ"],` to the `proprietary:` section of the `nmea_sentences!` macro in `nmea/mod.rs`
+5. Add `feature = "pxyz"` to the `any(...)` gate in `lib.rs`
+6. Create `tests/nmea/pxyz.rs` with `dispatch`, `decode_encode`, and `roundtrip` tests
 
 ## What each sentence file must contain
 

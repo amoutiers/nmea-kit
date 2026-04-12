@@ -26,10 +26,25 @@ struct FragmentSlot {
     payload: String,
 }
 
+/// Maximum accumulated payload size in characters.
+///
+/// ITU-R M.1371-5 allows at most 5 TDMA slots (128 + 4×256 = 1152 bits).
+/// At 6 bits per armored character that's 192 characters. We use 256 to
+/// allow headroom for non-conforming implementations.
+const MAX_PAYLOAD_SIZE: usize = 256;
+
+/// Maximum number of fragments per message.
+///
+/// The AIVDM/AIVDO sentence format uses a single-digit fragment count (1-9),
+/// but ITU-R M.1371-5 limits transmissions to 5 TDMA slots. 5 fragments is
+/// sufficient for the 1152-bit maximum.
+const MAX_FRAGMENTS: u8 = 5;
+
 /// Multi-fragment reassembler.
 ///
 /// Maintains 10 slots (message IDs 0-9) for concurrent multi-fragment
-/// message assembly.
+/// message assembly. Enforces payload size and fragment count limits to
+/// prevent unbounded memory growth from malformed input.
 pub struct FragmentCollector {
     slots: [Option<FragmentSlot>; 10],
 }
@@ -64,7 +79,7 @@ impl FragmentCollector {
         let payload = fields[4];
         let fill_bits: u8 = fields[5].parse().unwrap_or(0);
 
-        if total == 0 || frag_num == 0 || frag_num > total {
+        if total == 0 || frag_num == 0 || frag_num > total || total > MAX_FRAGMENTS {
             return None;
         }
 
@@ -85,6 +100,9 @@ impl FragmentCollector {
 
         if frag_num == 1 {
             // Start new assembly
+            if payload.len() > MAX_PAYLOAD_SIZE {
+                return None;
+            }
             self.slots[msg_id] = Some(FragmentSlot {
                 total,
                 received: 1,
@@ -100,6 +118,10 @@ impl FragmentCollector {
                 return None;
             }
 
+            if slot.payload.len() + payload.len() > MAX_PAYLOAD_SIZE {
+                self.slots[msg_id] = None;
+                return None;
+            }
             slot.payload.push_str(payload);
             slot.received = frag_num;
 

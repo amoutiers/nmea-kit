@@ -1,6 +1,7 @@
 # NMEA 0183 sentence coverage
 
-Sentences from the [NMEA 0183 standard](https://gpsd.gitlab.io/gpsd/NMEA.html) and [go-nmea](https://github.com/adrianmo/go-nmea). Checked = supported by nmea-kit.
+Checked = supported by nmea-kit.
+Sources : go-nmea, gpsd.
 
 ## Position
 
@@ -176,9 +177,9 @@ Sentences from the [NMEA 0183 standard](https://gpsd.gitlab.io/gpsd/NMEA.html) a
 
 ## Proprietary
 
-- [ ] PASHR — RT300 Inertial Attitude (Hemisphere/Ashtech)
+- [x] PASHR — RT300 Inertial Attitude (Hemisphere/Ashtech)
 - [ ] PCDIN — NMEA 2000 via SeaSmart bridge
-- [ ] PGRME — Garmin Estimated Position Error
+- [x] PGRME — Garmin Estimated Position Error
 - [ ] PGRMT — Garmin Sensor Status
 - [ ] PHTRO — Vessel Pitch and Roll (Xsens)
 - [ ] PKLDS — Keel Depth Sentence
@@ -190,5 +191,5 @@ Sentences from the [NMEA 0183 standard](https://gpsd.gitlab.io/gpsd/NMEA.html) a
 - [ ] PKWDWPL — Waypoint (unknown vendor)
 - [ ] PMTK — MediaTek GPS Command
 - [ ] PRDID — RDI Doppler Instrument Data
-- [ ] PSKPDPT — Skipper Depth
+- [x] PSKPDPT — Skipper Depth
 - [ ] PSONCMS — SMC IMU Data (SBG Systems)

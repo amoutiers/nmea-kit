@@ -30,6 +30,12 @@ mod mtw;
 mod mwd;
 #[cfg(feature = "mwv")]
 mod mwv;
+#[cfg(feature = "pashr")]
+mod pashr;
+#[cfg(feature = "pgrme")]
+mod pgrme;
+#[cfg(feature = "pskpdpt")]
+mod pskpdpt;
 #[cfg(feature = "rmb")]
 mod rmb;
 #[cfg(feature = "rmc")]
@@ -85,6 +91,12 @@ pub use mtw::*;
 pub use mwd::*;
 #[cfg(feature = "mwv")]
 pub use mwv::*;
+#[cfg(feature = "pashr")]
+pub use pashr::*;
+#[cfg(feature = "pgrme")]
+pub use pgrme::*;
+#[cfg(feature = "pskpdpt")]
+pub use pskpdpt::*;
 #[cfg(feature = "rmb")]
 pub use rmb::*;
 #[cfg(feature = "rmc")]

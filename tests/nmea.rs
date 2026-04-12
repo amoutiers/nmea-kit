@@ -28,6 +28,12 @@ mod mtw;
 mod mwd;
 #[path = "nmea/mwv.rs"]
 mod mwv;
+#[path = "nmea/pashr.rs"]
+mod pashr;
+#[path = "nmea/pgrme.rs"]
+mod pgrme;
+#[path = "nmea/pskpdpt.rs"]
+mod pskpdpt;
 #[path = "nmea/rmb.rs"]
 mod rmb;
 #[path = "nmea/rmc.rs"]

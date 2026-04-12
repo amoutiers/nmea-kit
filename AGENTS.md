@@ -4,12 +4,12 @@ Bidirectional NMEA 0183 parser/encoder + AIS decoder. Zero dependencies. MIT/Apa
 
 | Key | Value |
 |---|---|
-| Crate | `nmea-kit` v0.4.0 |
+| Crate | `nmea-kit` v0.5.0 |
 | Edition | 2024, MSRV 1.85.0 |
 | Dependencies | 0 |
-| NMEA sentences | 27 (bidirectional) |
+| NMEA sentences | 30 (bidirectional) |
 | AIS message types | 16 (read-only) |
-| Tests | 331, 0 failures |
+| Tests | 348, 0 failures |
 | Unsafe blocks | 0 |
 
 For contribution workflow, test rules, and the sentence-type checklist see [CONTRIBUTING.md](CONTRIBUTING.md).
@@ -29,10 +29,12 @@ encode_frame(prefix: char, talker: &str, sentence_type: &str, fields: &[&str]) -
 use nmea_kit::{NmeaSentence, NmeaEncodable};
 
 NmeaSentence::parse(&frame) -> NmeaSentence   // enum variant per type
-value.to_sentence(talker: &str) -> String      // NmeaEncodable trait method
+value.to_sentence(talker: &str) -> String      // NmeaEncodable — standard sentences
+value.to_proprietary_sentence() -> String      // NmeaEncodable — proprietary sentences
 
 // Individual sentence types
-use nmea_kit::nmea::sentences::{Mwd, Rmc, Dbt, ...};
+use nmea_kit::nmea::sentences::{Mwd, Rmc, Dbt, ...};     // standard
+use nmea_kit::nmea::sentences::{Pashr, Pskpdpt, ...};    // proprietary
 
 Type::parse(fields: &[&str]) -> Option<Self>   // always Some for known types
 value.encode() -> Vec<String>                   // fields in wire order
@@ -63,8 +65,8 @@ parser.reset()                                  // clear fragment buffers
 ```rust
 pub struct NmeaFrame<'a> {
     pub prefix: char,               // '$' for NMEA, '!' for AIS
-    pub talker: &'a str,            // e.g. "GP", "WI", "AI"
-    pub sentence_type: &'a str,     // e.g. "RMC", "MWD", "VDM"
+    pub talker: &'a str,            // e.g. "GP", "WI", "AI" — "" for proprietary
+    pub sentence_type: &'a str,     // "RMC" (standard) or "PASHR" (proprietary)
     pub fields: Vec<&'a str>,       // comma-split payload
     pub tag_block: Option<&'a str>, // IEC 61162-450 content if present
 }
@@ -174,6 +176,20 @@ Every sentence type follows the same pattern using `FieldReader`/`FieldWriter`:
 - `to_sentence(&self, talker: &str) -> String` — default impl on `NmeaEncodable` trait
 
 Fixed indicator fields (T, M, N, K, f, F) are handled with `r.skip()` on parse and `w.fixed('T')` on encode.
+
+### Proprietary sentences (`$P...`)
+
+Per NMEA 0183, addresses starting with `P` are proprietary. The frame parser detects
+these and sets `talker = ""`, `sentence_type = full address` (e.g. `"PASHR"`, `"PSKPDPT"`).
+This prevents collisions with standard 3-char types (e.g. `$PSKPDPT` won't match `DPT`).
+
+Proprietary types additionally set:
+- `PROPRIETARY_ID` — the full wire address (`"PASHR"`, `"PSKPDPT"`, etc.)
+- `to_proprietary_sentence()` — encodes without a separate talker
+
+Dispatch uses a two-path match in the `nmea_sentences!` macro: standard types match on
+`sentence_type` when `talker` is non-empty, proprietary types match on the full address
+when `talker` is empty.
 
 ### AIS message implementation
 

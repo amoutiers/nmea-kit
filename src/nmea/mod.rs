@@ -9,18 +9,29 @@ pub use sentences::*;
 use crate::NmeaFrame;
 
 macro_rules! nmea_sentences {
-    ( $( [$feat:literal, $variant:ident, $wire:literal] ),* $(,)? ) => {
+    (
+        standard: [ $( [$feat:literal, $variant:ident, $wire:literal] ),* $(,)? ],
+        proprietary: [ $( [$pfeat:literal, $pvariant:ident, $pwire:literal] ),* $(,)? ]
+    ) => {
         /// Unified enum covering all supported NMEA 0183 sentence types.
         ///
         /// Use `NmeaSentence::parse(&frame)` to dispatch a parsed frame to the
         /// appropriate typed struct. Unknown sentence types are captured in the
         /// `Unknown` variant.
+        ///
+        /// Proprietary sentences (`$P...`) are dispatched separately from standard
+        /// sentences, so there is no risk of collision between e.g. `$PSKPDPT` and
+        /// standard `$IIDPT`.
         #[non_exhaustive]
         #[derive(Debug, Clone, PartialEq)]
         pub enum NmeaSentence {
             $(
                 #[cfg(feature = $feat)]
                 $variant(sentences::$variant),
+            )*
+            $(
+                #[cfg(feature = $pfeat)]
+                $pvariant(sentences::$pvariant),
             )*
             Unknown {
                 sentence_type: String,
@@ -31,9 +42,11 @@ macro_rules! nmea_sentences {
         impl NmeaSentence {
             /// Parse a frame into a typed sentence variant.
             ///
-            /// Dispatches on `frame.sentence_type`. Returns `Unknown` for unrecognized
-            /// types **and** for recognized types that fail to parse (preserving the
-            /// sentence_type and raw fields for diagnostics).
+            /// Standard sentences are dispatched on `frame.sentence_type` (3-char code).
+            /// Proprietary sentences (where `frame.talker` is empty) are dispatched on
+            /// the full address in `frame.sentence_type` (e.g. `"PASHR"`, `"PSKPDPT"`).
+            ///
+            /// Returns `Unknown` for unrecognized types.
             pub fn parse(frame: &NmeaFrame<'_>) -> Self {
                 macro_rules! try_parse {
                     ($parser:expr, $v:ident) => {
@@ -43,12 +56,25 @@ macro_rules! nmea_sentences {
                         }
                     };
                 }
-                match frame.sentence_type {
-                    $(
-                        #[cfg(feature = $feat)]
-                        $wire => try_parse!(sentences::$variant::parse, $variant),
-                    )*
-                    _ => Self::from_frame(frame),
+
+                if frame.talker.is_empty() {
+                    // Proprietary path: sentence_type is the full address
+                    match frame.sentence_type {
+                        $(
+                            #[cfg(feature = $pfeat)]
+                            $pwire => try_parse!(sentences::$pvariant::parse, $pvariant),
+                        )*
+                        _ => Self::from_frame(frame),
+                    }
+                } else {
+                    // Standard path: sentence_type is the 3-char code
+                    match frame.sentence_type {
+                        $(
+                            #[cfg(feature = $feat)]
+                            $wire => try_parse!(sentences::$variant::parse, $variant),
+                        )*
+                        _ => Self::from_frame(frame),
+                    }
                 }
             }
 
@@ -64,42 +90,52 @@ macro_rules! nmea_sentences {
 }
 
 nmea_sentences![
-    // Position
-    ["rmc", Rmc, "RMC"],
-    // Satellites
-    ["gbs", Gbs, "GBS"],
-    ["gst", Gst, "GST"],
-    ["gga", Gga, "GGA"],
-    ["gll", Gll, "GLL"],
-    ["gns", Gns, "GNS"],
-    // Wind
-    ["mwd", Mwd, "MWD"],
-    ["mwv", Mwv, "MWV"],
-    // Heading
-    ["hdt", Hdt, "HDT"],
-    ["hdg", Hdg, "HDG"],
-    ["hdm", Hdm, "HDM"],
-    ["rot", Rot, "ROT"],
-    ["ths", Ths, "THS"],
-    // Navigation
-    ["rmb", Rmb, "RMB"],
-    // Rudder
-    ["rsa", Rsa, "RSA"],
-    // Speed
-    ["vbw", Vbw, "VBW"],
-    ["vlw", Vlw, "VLW"],
-    ["vtg", Vtg, "VTG"],
-    ["vhw", Vhw, "VHW"],
-    // Depth
-    ["dpt", Dpt, "DPT"],
-    ["dbt", Dbt, "DBT"],
-    ["dbs", Dbs, "DBS"],
-    ["dbk", Dbk, "DBK"],
-    // Environment
-    ["mtw", Mtw, "MTW"],
-    ["xdr", Xdr, "XDR"],
-    // Communication
-    ["txt", Txt, "TXT"],
-    // Time
-    ["zda", Zda, "ZDA"],
+    standard: [
+        // Position
+        ["rmc", Rmc, "RMC"],
+        // Satellites
+        ["gbs", Gbs, "GBS"],
+        ["gst", Gst, "GST"],
+        ["gga", Gga, "GGA"],
+        ["gll", Gll, "GLL"],
+        ["gns", Gns, "GNS"],
+        // Wind
+        ["mwd", Mwd, "MWD"],
+        ["mwv", Mwv, "MWV"],
+        // Heading
+        ["hdt", Hdt, "HDT"],
+        ["hdg", Hdg, "HDG"],
+        ["hdm", Hdm, "HDM"],
+        ["rot", Rot, "ROT"],
+        ["ths", Ths, "THS"],
+        // Navigation
+        ["rmb", Rmb, "RMB"],
+        // Rudder
+        ["rsa", Rsa, "RSA"],
+        // Speed
+        ["vbw", Vbw, "VBW"],
+        ["vlw", Vlw, "VLW"],
+        ["vtg", Vtg, "VTG"],
+        ["vhw", Vhw, "VHW"],
+        // Depth
+        ["dpt", Dpt, "DPT"],
+        ["dbt", Dbt, "DBT"],
+        ["dbs", Dbs, "DBS"],
+        ["dbk", Dbk, "DBK"],
+        // Environment
+        ["mtw", Mtw, "MTW"],
+        ["xdr", Xdr, "XDR"],
+        // Communication
+        ["txt", Txt, "TXT"],
+        // Time
+        ["zda", Zda, "ZDA"],
+    ],
+    proprietary: [
+        // Proprietary — Ashtech/Trimble
+        ["pashr", Pashr, "PASHR"],
+        // Proprietary — Garmin
+        ["pgrme", Pgrme, "PGRME"],
+        // Proprietary — Skipper
+        ["pskpdpt", Pskpdpt, "PSKPDPT"],
+    ]
 ];

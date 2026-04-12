@@ -7,14 +7,24 @@ use crate::FrameError;
 /// - IEC 61162-450 tag block stripping
 /// - XOR checksum validation
 /// - Talker ID + sentence type extraction
+/// - Proprietary sentence detection (`$P...`)
 /// - Field splitting by `,`
+///
+/// # Proprietary sentences
+///
+/// Per NMEA 0183, addresses starting with `P` are proprietary. For these,
+/// `talker` is `""` and `sentence_type` is the full address (e.g. `"PASHR"`,
+/// `"PSKPDPT"`). For standard sentences, `talker` is the 2-char talker ID
+/// and `sentence_type` is the 3-char type code.
 #[derive(Debug, Clone, PartialEq)]
 pub struct NmeaFrame<'a> {
     /// Sentence prefix: `$` for NMEA, `!` for AIS.
     pub prefix: char,
-    /// Talker identifier (typically 2 letters, e.g. "GP", "WI", "AI"). Some devices use numeric IDs (e.g. "04").
+    /// Talker identifier (typically 2 letters, e.g. "GP", "WI", "AI").
+    /// Empty (`""`) for proprietary sentences (`$P...`).
     pub talker: &'a str,
-    /// Sentence type (3 characters, e.g. "RMC", "MWD", "VDM").
+    /// Sentence type. For standard sentences: 3 characters (e.g. "RMC", "MWD").
+    /// For proprietary sentences: the full address (e.g. "PASHR", "PSKPDPT").
     pub sentence_type: &'a str,
     /// Comma-separated payload fields (after talker+type, before checksum).
     pub fields: Vec<&'a str>,
@@ -27,6 +37,10 @@ pub struct NmeaFrame<'a> {
 /// Handles both `$` (instrument) and `!` (AIS) sentences.
 /// Strips optional IEC 61162-450 tag blocks (`\...\` prefix).
 /// Validates XOR checksum when present.
+///
+/// Proprietary sentences (address starting with `P`) are detected
+/// automatically: `talker` will be `""` and `sentence_type` will
+/// contain the full address (e.g. `"PASHR"`, `"PSKPDPT"`).
 ///
 /// # Examples
 ///
@@ -84,12 +98,17 @@ pub fn parse_frame(line: &str) -> Result<NmeaFrame<'_>, FrameError> {
     let addr_end = body.find(',').unwrap_or(body.len());
     let addr = &body[..addr_end];
 
-    // Talker = first 2 chars, sentence type = remaining (usually 3 chars)
     if addr.len() < 3 {
         return Err(FrameError::TooShort);
     }
-    let talker = &addr[..addr.len() - 3];
-    let sentence_type = &addr[addr.len() - 3..];
+
+    // Proprietary sentences: address starts with 'P' (reserved per NMEA 0183).
+    // Standard sentences: first 2 chars = talker, last 3 chars = sentence type.
+    let (talker, sentence_type) = if addr.starts_with('P') {
+        ("", addr)
+    } else {
+        (&addr[..addr.len() - 3], &addr[addr.len() - 3..])
+    };
 
     // Split remaining fields by comma
     let fields_str = if addr_end < body.len() {

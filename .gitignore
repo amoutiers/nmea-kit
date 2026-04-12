@@ -1,2 +1,4 @@
 /target/
 external_fixtures/
+.claude/
+CLAUDE.md

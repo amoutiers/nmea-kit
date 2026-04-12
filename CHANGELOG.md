@@ -2,6 +2,25 @@
 
 All notable changes to nmea-kit are documented here.
 
+## [0.5.0] — 2026-04-12
+
+### Added
+- Proprietary sentence support — `parse_frame` now detects `$P...` addresses per NMEA 0183, setting `talker = ""` and `sentence_type` to the full address (e.g. `"PASHR"`, `"PSKPDPT"`). Standard and proprietary dispatch paths are separate, preventing collisions.
+- `NmeaEncodable::PROPRIETARY_ID` constant and `to_proprietary_sentence()` method
+- Two-path `nmea_sentences!` macro (`standard:` / `proprietary:` sections)
+- PASHR — Roll, Pitch, Heading (Ashtech/Trimble proprietary)
+- PGRME — Garmin Estimated Position Error (proprietary)
+- PSKPDPT — Skipper Depth (proprietary)
+- `FragmentCollector` payload size limits: `MAX_PAYLOAD_SIZE = 256` chars and `MAX_FRAGMENTS = 5`, grounded in ITU-R M.1371-5 (1152-bit / 5-slot TDMA ceiling)
+
+### Fixed
+- Removed `unwrap()` in RTE waypoint parsing loop (replaced with `while let`)
+
+### Changed
+- CONTRIBUTING.md documents proprietary sentence workflow
+
+NMEA sentence coverage expanded from 27 to 30 types (27 standard + 3 proprietary).
+
 ## [0.4.0] — 2026-04-11
 
 ### Added
@@ -96,6 +115,7 @@ AIS coverage expanded from 9 to 16 message types.
 - Zero external dependencies
 - CI: tests, clippy, rustfmt, doc checks on stable + MSRV 1.85.0
 
+[0.5.0]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.5.0
 [0.4.0]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.4.0
 [0.3.1]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.3.1
 [0.3.0]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.3.0

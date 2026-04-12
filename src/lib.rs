@@ -24,7 +24,7 @@
 //!
 //! ## Features
 //!
-//! - `nmea` (default) — all 27 NMEA sentence types
+//! - `nmea` (default) — all 30 NMEA sentence types
 //! - `ais` (default) — 16 AIS message types (read-only decode)
 //! - `ais` (default) — AIS message decoding
 //! - `dbs`, `dbt`, `dpt`, … — individual sentence types
@@ -49,6 +49,9 @@ mod frame;
     feature = "mtw",
     feature = "mwd",
     feature = "mwv",
+    feature = "pashr",
+    feature = "pgrme",
+    feature = "pskpdpt",
     feature = "rmb",
     feature = "rmc",
     feature = "rot",
@@ -87,6 +90,9 @@ pub use frame::*;
     feature = "mtw",
     feature = "mwd",
     feature = "mwv",
+    feature = "pashr",
+    feature = "pgrme",
+    feature = "pskpdpt",
     feature = "rmb",
     feature = "rmc",
     feature = "rot",
@@ -119,6 +125,9 @@ pub use nmea::NmeaSentence;
     feature = "mtw",
     feature = "mwd",
     feature = "mwv",
+    feature = "pashr",
+    feature = "pgrme",
+    feature = "pskpdpt",
     feature = "rmb",
     feature = "rmc",
     feature = "rot",
