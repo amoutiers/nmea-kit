@@ -14,8 +14,12 @@ mod gga;
 mod gll;
 #[path = "nmea/gns.rs"]
 mod gns;
+#[path = "nmea/gsa.rs"]
+mod gsa;
 #[path = "nmea/gst.rs"]
 mod gst;
+#[path = "nmea/gsv.rs"]
+mod gsv;
 #[path = "nmea/hdg.rs"]
 mod hdg;
 #[path = "nmea/hdm.rs"]

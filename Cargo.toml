@@ -29,7 +29,7 @@ depth       = ["dbt", "dbs", "dbk", "dpt"]
 # Umbrella — all sentence types
 nmea = [
     "positioning", "speed", "heading", "wind", "depth",
-    "gbs", "gst", "mtw", "pashr", "pgrme", "pskpdpt", "rmb", "rot", "rsa", "txt", "vlw", "xdr", "zda",
+    "gbs", "gsa", "gsv", "gst", "mtw", "pashr", "pgrme", "pskpdpt", "rmb", "rot", "rsa", "txt", "vlw", "xdr", "zda",
 ]
 ais = []
 
@@ -42,6 +42,8 @@ gbs = []
 gga = []
 gll = []
 gns = []
+gsa = []
+gsv = []
 gst = []
 hdg = []
 hdm = []

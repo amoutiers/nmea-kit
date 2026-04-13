@@ -95,6 +95,8 @@ nmea_sentences![
         ["rmc", Rmc, "RMC"],
         // Satellites
         ["gbs", Gbs, "GBS"],
+        ["gsa", Gsa, "GSA"],
+        ["gsv", Gsv, "GSV"],
         ["gst", Gst, "GST"],
         ["gga", Gga, "GGA"],
         ["gll", Gll, "GLL"],

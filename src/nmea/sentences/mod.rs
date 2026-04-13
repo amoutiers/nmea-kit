@@ -16,8 +16,12 @@ mod gga;
 mod gll;
 #[cfg(feature = "gns")]
 mod gns;
+#[cfg(feature = "gsa")]
+mod gsa;
 #[cfg(feature = "gst")]
 mod gst;
+#[cfg(feature = "gsv")]
+mod gsv;
 #[cfg(feature = "hdg")]
 mod hdg;
 #[cfg(feature = "hdm")]
@@ -77,8 +81,12 @@ pub use gga::*;
 pub use gll::*;
 #[cfg(feature = "gns")]
 pub use gns::*;
+#[cfg(feature = "gsa")]
+pub use gsa::*;
 #[cfg(feature = "gst")]
 pub use gst::*;
+#[cfg(feature = "gsv")]
+pub use gsv::*;
 #[cfg(feature = "hdg")]
 pub use hdg::*;
 #[cfg(feature = "hdm")]
