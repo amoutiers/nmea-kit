@@ -2,6 +2,14 @@
 
 All notable changes to nmea-kit are documented here.
 
+## [0.5.1] — 2026-04-13
+
+### Added
+- GSA (GPS DOP and Active Satellites) sentence type
+- GSV (Satellites in View) sentence type
+
+NMEA sentence coverage expanded from 30 to 32 types.
+
 ## [0.5.0] — 2026-04-12
 
 ### Added
@@ -115,6 +123,7 @@ AIS coverage expanded from 9 to 16 message types.
 - Zero external dependencies
 - CI: tests, clippy, rustfmt, doc checks on stable + MSRV 1.85.0
 
+[0.5.1]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.5.1
 [0.5.0]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.5.0
 [0.4.0]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.4.0
 [0.3.1]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.3.1

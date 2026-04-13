@@ -5,12 +5,12 @@ Bidirectional NMEA 0183 parser/encoder with AIS message decoding, written in Rus
 | | |
 |---|---|
 | **Crate** | `nmea-kit` |
-| **Version** | 0.5.0 |
+| **Version** | 0.5.1 |
 | **MSRV** | 1.85.0 |
 | **Edition** | 2024 |
 | **Dependencies** | 0 |
 | **License** | MIT OR Apache-2.0 |
-| **NMEA sentences** | 30 (bidirectional: parse + encode) |
+| **NMEA sentences** | 32 (bidirectional: parse + encode) |
 | **AIS message types** | 16 (read-only decode) |
 
 - **Shared frame layer** — handles `$` (NMEA) and `!` (AIS) framing, IEC 61162-450 tag blocks
@@ -92,7 +92,7 @@ flowchart TD
 | Category | Sentences |
 |----------|-----------|
 | Position | RMC, GGA, GLL, GNS |
-| Satellites | GBS, GST |
+| Satellites | GBS, GSA, GSV, GST |
 | Wind | MWD, MWV |
 | Heading | HDT, HDG, HDM, THS |
 | Course & Speed | VBW, VLW, VTG, VHW |
@@ -149,14 +149,14 @@ nmea-kit = "0.5"
 
 | Feature | Default | Enables |
 |---------|---------|---------|
-| `nmea` | yes | All 30 NMEA sentence types |
+| `nmea` | yes | All 32 NMEA sentence types |
 | `ais` | yes | AIS message decoding |
 | `positioning` | via `nmea` | GGA, GLL, RMC, GNS |
 | `speed` | via `nmea` | VTG, VHW, VBW, RMC |
 | `heading` | via `nmea` | HDG, HDM, HDT, THS |
 | `wind` | via `nmea` | MWD, MWV |
 | `depth` | via `nmea` | DBT, DBS, DBK, DPT |
-| `dbk`, `dbs`, `dbt`, `dpt`, `gbs`, `gga`, `gll`, `gns`, `gst`, `hdg`, `hdm`, `hdt`, `mtw`, `mwd`, `mwv`, `pashr`, `pgrme`, `pskpdpt`, `rmb`, `rmc`, `rot`, `rsa`, `ths`, `txt`, `vbw`, `vhw`, `vlw`, `vtg`, `xdr`, `zda` | via `nmea` | Individual sentence types |
+| `dbk`, `dbs`, `dbt`, `dpt`, `gbs`, `gga`, `gll`, `gns`, `gsa`, `gsv`, `gst`, `hdg`, `hdm`, `hdt`, `mtw`, `mwd`, `mwv`, `pashr`, `pgrme`, `pskpdpt`, `rmb`, `rmc`, `rot`, `rsa`, `ths`, `txt`, `vbw`, `vhw`, `vlw`, `vtg`, `xdr`, `zda` | via `nmea` | Individual sentence types |
 
 Use a group feature for common use cases:
 

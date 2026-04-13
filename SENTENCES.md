@@ -17,9 +17,9 @@ Sources : go-nmea, gpsd.
 
 - [x] GBS — GPS Satellite Fault Detection
 - [ ] GRS — GPS Range Residuals
-- [ ] GSA — GPS DOP and Active Satellites
+- [x] GSA — GPS DOP and Active Satellites
 - [x] GST — GPS Pseudorange Noise Statistics
-- [ ] GSV — Satellites in View
+- [x] GSV — Satellites in View
 
 ## Heading
 
