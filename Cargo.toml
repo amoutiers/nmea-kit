@@ -1,6 +1,6 @@
 [package]
 name = "nmea-kit"
-version = "0.5.1"
+version = "0.5.2"
 edition = "2024"
 rust-version = "1.85.0"
 description = "Bidirectional NMEA 0183 parser and encoder with AIS decoding"
@@ -29,11 +29,12 @@ depth       = ["dbt", "dbs", "dbk", "dpt"]
 # Umbrella — all sentence types
 nmea = [
     "positioning", "speed", "heading", "wind", "depth",
-    "gbs", "gsa", "gsv", "gst", "mtw", "pashr", "pgrme", "pskpdpt", "rmb", "rot", "rsa", "txt", "vlw", "xdr", "zda",
+    "apb", "gbs", "gsa", "gsv", "gst", "mtw", "pashr", "pgrme", "pskpdpt", "rmb", "rot", "rsa", "txt", "vlw", "xdr", "xte", "zda",
 ]
 ais = []
 
 # Individual NMEA sentence types
+apb = []
 dbk = []
 dbs = []
 dbt = []
@@ -65,6 +66,7 @@ vlw = []
 vbw = []
 vtg = []
 xdr = []
+xte = []
 zda = []
 
 [lints.clippy]

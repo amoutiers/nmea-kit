@@ -19,9 +19,9 @@ fn dispatch_unknown() {
 
 #[test]
 fn unsupported_becomes_unknown() {
-    let frame = parse_frame("$GPAPB,A,A,0.10,R,N,V,V,011,M,DEST,011,M,011,M*3C").expect("valid");
+    let frame = parse_frame("$GPZZZ,1,2,3").expect("valid");
     match NmeaSentence::parse(&frame) {
-        NmeaSentence::Unknown { sentence_type, .. } => assert_eq!(sentence_type, "APB"),
-        other => panic!("expected Unknown for APB, got {other:?}"),
+        NmeaSentence::Unknown { sentence_type, .. } => assert_eq!(sentence_type, "ZZZ"),
+        other => panic!("expected Unknown for ZZZ, got {other:?}"),
     }
 }

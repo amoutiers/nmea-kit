@@ -111,7 +111,9 @@ nmea_sentences![
         ["rot", Rot, "ROT"],
         ["ths", Ths, "THS"],
         // Navigation
+        ["apb", Apb, "APB"],
         ["rmb", Rmb, "RMB"],
+        ["xte", Xte, "XTE"],
         // Rudder
         ["rsa", Rsa, "RSA"],
         // Speed

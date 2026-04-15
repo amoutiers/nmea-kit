@@ -2,15 +2,13 @@
 
 Bidirectional NMEA 0183 parser/encoder with AIS message decoding, written in Rust.
 
-| | |
-|---|---|
 | **Crate** | `nmea-kit` |
-| **Version** | 0.5.1 |
+| **Version** | 0.5.2 |
 | **MSRV** | 1.85.0 |
 | **Edition** | 2024 |
 | **Dependencies** | 0 |
 | **License** | MIT OR Apache-2.0 |
-| **NMEA sentences** | 32 (bidirectional: parse + encode) |
+| **NMEA sentences** | 34 (bidirectional: parse + encode) |
 | **AIS message types** | 16 (read-only decode) |
 
 - **Shared frame layer** — handles `$` (NMEA) and `!` (AIS) framing, IEC 61162-450 tag blocks
@@ -89,56 +87,56 @@ flowchart TD
 
 ### NMEA 0183 sentences (bidirectional) — [full coverage list](SENTENCES.md)
 
-| Category | Sentences |
-|----------|-----------|
-| Position | RMC, GGA, GLL, GNS |
-| Satellites | GBS, GSA, GSV, GST |
-| Wind | MWD, MWV |
-| Heading | HDT, HDG, HDM, THS |
-| Course & Speed | VBW, VLW, VTG, VHW |
-| Depth | DPT, DBT, DBS, DBK |
-| Steering | ROT, RSA |
-| Environment | MTW, XDR¹ |
-| Waypoints & Routes | RMB |
-| Communication | TXT |
-| Time | ZDA |
-| Proprietary | PASHR, PGRME, PSKPDPT |
+| Category           | Sentences             |
+| ------------------ | --------------------- |
+| Position           | RMC, GGA, GLL, GNS    |
+| Satellites         | GBS, GSA, GSV, GST    |
+| Wind               | MWD, MWV              |
+| Heading            | HDT, HDG, HDM, THS    |
+| Course & Speed     | VBW, VLW, VTG, VHW    |
+| Depth              | DPT, DBT, DBS, DBK    |
+| Steering           | ROT, RSA              |
+| Environment        | MTW, XDR¹             |
+| Waypoints & Routes | APB, RMB, XTE         |
+| Communication      | TXT                   |
+| Time               | ZDA                   |
+| Proprietary        | PASHR, PGRME, PSKPDPT |
 
 ¹ `Xdr` has an additional `to_sentences() -> Vec<String>` method that automatically splits many measurements into multiple sentences to stay within the 82-character NMEA line limit.
 
 ### AIS messages (read-only) — [full type list](SENTENCES.md#ais-message-types-decoded-from-aivdmaivdo)
 
-| Type(s) | Struct | Description |
-|---------|--------|-------------|
-| 1, 2, 3 | `PositionReport` | Class A position report |
-| 4 | `BaseStationReport` | Base station UTC + position |
-| 5 | `StaticVoyageData` | Static and voyage data (Class A) |
-| 6 | `BinaryAddressed` | Addressed binary message (DAC/FID + data) |
-| 7, 13 | `BinaryAck` | Binary / safety acknowledge |
-| 8 | `BinaryBroadcast` | Binary broadcast message (DAC/FID + data) |
-| 9 | `SarAircraftReport` | Standard SAR aircraft position |
-| 11 | `UtcDateResponse` | UTC/date response (mobile station) |
-| 12 | `SafetyAddressed` | Addressed safety-related message |
-| 14 | `SafetyBroadcast` | Safety-related broadcast message |
-| 15 | `Interrogation` | Interrogation (request data from vessel) |
-| 18 | `PositionReport` | Class B standard position |
-| 19 | `PositionReport` | Class B+ extended position |
-| 21 | `AidToNavigation` | Aid-to-navigation report (buoys, beacons) |
-| 24 | `StaticDataReport` | Static data report (Class B) |
-| 27 | `LongRangePosition` | Long range position (satellite AIS, 1/10° precision) |
+| Type(s) | Struct              | Description                                          |
+| ------- | ------------------- | ---------------------------------------------------- |
+| 1, 2, 3 | `PositionReport`    | Class A position report                              |
+| 4       | `BaseStationReport` | Base station UTC + position                          |
+| 5       | `StaticVoyageData`  | Static and voyage data (Class A)                     |
+| 6       | `BinaryAddressed`   | Addressed binary message (DAC/FID + data)            |
+| 7, 13   | `BinaryAck`         | Binary / safety acknowledge                          |
+| 8       | `BinaryBroadcast`   | Binary broadcast message (DAC/FID + data)            |
+| 9       | `SarAircraftReport` | Standard SAR aircraft position                       |
+| 11      | `UtcDateResponse`   | UTC/date response (mobile station)                   |
+| 12      | `SafetyAddressed`   | Addressed safety-related message                     |
+| 14      | `SafetyBroadcast`   | Safety-related broadcast message                     |
+| 15      | `Interrogation`     | Interrogation (request data from vessel)             |
+| 18      | `PositionReport`    | Class B standard position                            |
+| 19      | `PositionReport`    | Class B+ extended position                           |
+| 21      | `AidToNavigation`   | Aid-to-navigation report (buoys, beacons)            |
+| 24      | `StaticDataReport`  | Static data report (Class B)                         |
+| 27      | `LongRangePosition` | Long range position (satellite AIS, 1/10° precision) |
 
 ### Key improvements over existing crates
 
-| Issue | `nmea` 0.7 / `ais` 0.12 | `nmea-kit` |
-|-------|--------------------------|------------|
-| NMEA sentence coverage | ~10 types, rest manual | 30 types, all typed |
-| AIS message coverage | ~5 types | 16 types (1-9, 11-15, 18-19, 21, 24, 27) |
-| Encoding | Read-only | Bidirectional (parse + encode) |
-| Error distinction | Can't tell unsupported vs malformed | Frame errors vs content errors |
-| AIS lat/lon precision | `f32` (11m error) | `f64` |
-| AIS sentinels | 91/181/511 leak to caller | Filtered to `None` at decode |
-| Tag blocks | Manual stripping | Built into frame layer |
-| Dependencies | `nom` (AIS) | Zero |
+| Issue                  | `nmea` 0.7 / `ais` 0.12             | `nmea-kit`                               |
+| ---------------------- | ----------------------------------- | ---------------------------------------- |
+| NMEA sentence coverage | ~10 types, rest manual              | 34 types, all typed                      |
+| AIS message coverage   | ~5 types                            | 16 types (1-9, 11-15, 18-19, 21, 24, 27) |
+| Encoding               | Read-only                           | Bidirectional (parse + encode)           |
+| Error distinction      | Can't tell unsupported vs malformed | Frame errors vs content errors           |
+| AIS lat/lon precision  | `f32` (11m error)                   | `f64`                                    |
+| AIS sentinels          | 91/181/511 leak to caller           | Filtered to `None` at decode             |
+| Tag blocks             | Manual stripping                    | Built into frame layer                   |
+| Dependencies           | `nom` (AIS)                         | Zero                                     |
 
 ## Features
 
@@ -147,16 +145,16 @@ flowchart TD
 nmea-kit = "0.5"
 ```
 
-| Feature | Default | Enables |
-|---------|---------|---------|
-| `nmea` | yes | All 32 NMEA sentence types |
-| `ais` | yes | AIS message decoding |
-| `positioning` | via `nmea` | GGA, GLL, RMC, GNS |
-| `speed` | via `nmea` | VTG, VHW, VBW, RMC |
-| `heading` | via `nmea` | HDG, HDM, HDT, THS |
-| `wind` | via `nmea` | MWD, MWV |
-| `depth` | via `nmea` | DBT, DBS, DBK, DPT |
-| `dbk`, `dbs`, `dbt`, `dpt`, `gbs`, `gga`, `gll`, `gns`, `gsa`, `gsv`, `gst`, `hdg`, `hdm`, `hdt`, `mtw`, `mwd`, `mwv`, `pashr`, `pgrme`, `pskpdpt`, `rmb`, `rmc`, `rot`, `rsa`, `ths`, `txt`, `vbw`, `vhw`, `vlw`, `vtg`, `xdr`, `zda` | via `nmea` | Individual sentence types |
+| Feature                                                                                                                                                                                                                                | Default    | Enables                    |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- | -------------------------- |
+| `nmea`                                                                                                                                                                                                                                 | yes        | All 34 NMEA sentence types |
+| `ais`                                                                                                                                                                                                                                  | yes        | AIS message decoding       |
+| `positioning`                                                                                                                                                                                                                          | via `nmea` | GGA, GLL, RMC, GNS         |
+| `speed`                                                                                                                                                                                                                                | via `nmea` | VTG, VHW, VBW, RMC         |
+| `heading`                                                                                                                                                                                                                              | via `nmea` | HDG, HDM, HDT, THS         |
+| `wind`                                                                                                                                                                                                                                 | via `nmea` | MWD, MWV                   |
+| `depth`                                                                                                                                                                                                                                | via `nmea` | DBT, DBS, DBK, DPT         |
+| `apb`, `dbk`, `dbs`, `dbt`, `dpt`, `gbs`, `gga`, `gll`, `gns`, `gsa`, `gsv`, `gst`, `hdg`, `hdm`, `hdt`, `mtw`, `mwd`, `mwv`, `pashr`, `pgrme`, `pskpdpt`, `rmb`, `rmc`, `rot`, `rsa`, `ths`, `txt`, `vbw`, `vhw`, `vlw`, `vtg`, `xdr`, `xte`, `zda` | via `nmea` | Individual sentence types  |
 
 Use a group feature for common use cases:
 
@@ -195,12 +193,12 @@ Apply the N/S / E/W sign separately (negate for S or W).
 
 ## Documentation
 
-| File | Purpose |
-|------|---------|
+| File                               | Purpose                                                           |
+| ---------------------------------- | ----------------------------------------------------------------- |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | Getting started, TDD workflow, test rules, adding a sentence type |
-| [SENTENCES.md](SENTENCES.md) | Full NMEA / AIS coverage matrix |
-| [CHANGELOG.md](CHANGELOG.md) | Release history |
-| [AGENTS.md](AGENTS.md) | API surface, struct fields, and patterns (optimized for LLMs) |
+| [SENTENCES.md](SENTENCES.md)       | Full NMEA / AIS coverage matrix                                   |
+| [CHANGELOG.md](CHANGELOG.md)       | Release history                                                   |
+| [AGENTS.md](AGENTS.md)             | API surface, struct fields, and patterns (optimized for LLMs)     |
 
 ## License
 

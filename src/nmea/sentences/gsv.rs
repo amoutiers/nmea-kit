@@ -3,12 +3,12 @@ use crate::nmea::field::{FieldReader, FieldWriter, NmeaEncodable};
 /// Per-satellite information block within a GSV sentence.
 #[derive(Debug, Clone, PartialEq)]
 pub struct SatInfo {
-    /// Satellite PRN number.
-    pub prn: Option<u16>,
+    /// Satellite PRN number (up to ~400 for multi-constellation).
+    pub prn: Option<u32>,
     /// Elevation in degrees (0–90).
     pub elevation: Option<i8>,
     /// Azimuth in degrees (0–359).
-    pub azimuth: Option<u16>,
+    pub azimuth: Option<u32>,
     /// Signal-to-noise ratio in dB-Hz (0–99, `None` when not tracking).
     pub snr: Option<u8>,
 }
@@ -39,23 +39,18 @@ impl Gsv {
         let msg_num = r.u8();
         let sats_in_view = r.u8();
 
-        // Remaining fields after the first 3: groups of 4 (prn, elev, az, snr),
-        // with an optional trailing signal_id field.
+        // Satellite groups are 4 fields each; remainder of 1 means signal_id is present.
         let remaining = fields.len().saturating_sub(3);
         let num_groups = remaining / 4;
         let has_signal_id = remaining % 4 == 1;
 
         let mut sats = Vec::with_capacity(num_groups);
         for _ in 0..num_groups {
-            let prn_val = r.u32().map(|v| v as u16);
-            let elev = r.i8();
-            let az_val = r.u32().map(|v| v as u16);
-            let snr = r.u8();
             sats.push(SatInfo {
-                prn: prn_val,
-                elevation: elev,
-                azimuth: az_val,
-                snr,
+                prn: r.u32(),
+                elevation: r.i8(),
+                azimuth: r.u32(),
+                snr: r.u8(),
             });
         }
 
@@ -80,9 +75,9 @@ impl NmeaEncodable for Gsv {
         w.u8(self.msg_num);
         w.u8(self.sats_in_view);
         for sat in &self.sats {
-            w.u32(sat.prn.map(|v| v as u32));
+            w.u32(sat.prn);
             w.i8(sat.elevation);
-            w.u32(sat.azimuth.map(|v| v as u32));
+            w.u32(sat.azimuth);
             w.u8(sat.snr);
         }
         if self.signal_id.is_some() {

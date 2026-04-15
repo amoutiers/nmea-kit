@@ -2,6 +2,12 @@
 
 All notable changes to nmea-kit are documented here.
 
+## [0.5.2] — 2026-04-15
+
+### Added
+- APB (Autopilot Sentence B) sentence type
+- XTE (Cross-Track Error, Measured) sentence type
+
 ## [0.5.1] — 2026-04-13
 
 ### Added
@@ -123,6 +129,7 @@ AIS coverage expanded from 9 to 16 message types.
 - Zero external dependencies
 - CI: tests, clippy, rustfmt, doc checks on stable + MSRV 1.85.0
 
+[0.5.2]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.5.2
 [0.5.1]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.5.1
 [0.5.0]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.5.0
 [0.4.0]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.4.0

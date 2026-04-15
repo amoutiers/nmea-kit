@@ -54,7 +54,7 @@ Sources : go-nmea, gpsd.
 ## Steering
 
 - [ ] APA — Autopilot Sentence "A"
-- [ ] APB — Autopilot Sentence "B"
+- [x] APB — Autopilot Sentence "B"
 - [ ] HSC — Heading Steering Command
 - [x] ROT — Rate of Turn
 - [x] RSA — Rudder Sensor Angle
@@ -73,7 +73,7 @@ Sources : go-nmea, gpsd.
 - [ ] WCV — Waypoint Closure Velocity
 - [ ] WNC — Distance, Waypoint to Waypoint
 - [ ] WPL — Waypoint Location
-- [ ] XTE — Cross-Track Error, Measured
+- [x] XTE — Cross-Track Error, Measured
 - [ ] XTR — Cross-Track Error, Dead Reckoning
 - [ ] ZFO — UTC & Time from Origin Waypoint
 - [ ] ZTG — UTC & Time to Destination Waypoint

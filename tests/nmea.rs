@@ -1,3 +1,5 @@
+#[path = "nmea/apb.rs"]
+mod apb;
 #[path = "nmea/dbk.rs"]
 mod dbk;
 #[path = "nmea/dbs.rs"]
@@ -62,5 +64,7 @@ mod vlw;
 mod vtg;
 #[path = "nmea/xdr.rs"]
 mod xdr;
+#[path = "nmea/xte.rs"]
+mod xte;
 #[path = "nmea/zda.rs"]
 mod zda;

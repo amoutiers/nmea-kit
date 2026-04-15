@@ -24,9 +24,8 @@
 //!
 //! ## Features
 //!
-//! - `nmea` (default) — all 30 NMEA sentence types
+//! - `nmea` (default) — all 34 NMEA sentence types
 //! - `ais` (default) — 16 AIS message types (read-only decode)
-//! - `ais` (default) — AIS message decoding
 //! - `dbs`, `dbt`, `dpt`, … — individual sentence types
 
 mod error;
@@ -34,6 +33,7 @@ mod frame;
 
 #[cfg(any(
     feature = "nmea",
+    feature = "apb",
     feature = "dbk",
     feature = "dbs",
     feature = "dbt",
@@ -65,6 +65,7 @@ mod frame;
     feature = "vlw",
     feature = "vtg",
     feature = "xdr",
+    feature = "xte",
     feature = "zda",
 ))]
 pub mod nmea;
@@ -77,6 +78,7 @@ pub use frame::*;
 
 #[cfg(any(
     feature = "nmea",
+    feature = "apb",
     feature = "dbk",
     feature = "dbs",
     feature = "dbt",
@@ -108,12 +110,14 @@ pub use frame::*;
     feature = "vlw",
     feature = "vtg",
     feature = "xdr",
+    feature = "xte",
     feature = "zda",
 ))]
 pub use nmea::NmeaSentence;
 
 #[cfg(any(
     feature = "nmea",
+    feature = "apb",
     feature = "dbk",
     feature = "dbs",
     feature = "dbt",
@@ -145,6 +149,7 @@ pub use nmea::NmeaSentence;
     feature = "vlw",
     feature = "vtg",
     feature = "xdr",
+    feature = "xte",
     feature = "zda",
 ))]
 pub use nmea::NmeaEncodable;

@@ -1,5 +1,7 @@
 //! NMEA 0183 sentence type definitions.
 
+#[cfg(feature = "apb")]
+mod apb;
 #[cfg(feature = "dbk")]
 mod dbk;
 #[cfg(feature = "dbs")]
@@ -62,9 +64,13 @@ mod vlw;
 mod vtg;
 #[cfg(feature = "xdr")]
 mod xdr;
+#[cfg(feature = "xte")]
+mod xte;
 #[cfg(feature = "zda")]
 mod zda;
 
+#[cfg(feature = "apb")]
+pub use apb::*;
 #[cfg(feature = "dbk")]
 pub use dbk::*;
 #[cfg(feature = "dbs")]
@@ -127,5 +133,7 @@ pub use vlw::*;
 pub use vtg::*;
 #[cfg(feature = "xdr")]
 pub use xdr::*;
+#[cfg(feature = "xte")]
+pub use xte::*;
 #[cfg(feature = "zda")]
 pub use zda::*;
