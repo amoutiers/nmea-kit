@@ -46,6 +46,8 @@ mod rmb;
 mod rmc;
 #[path = "nmea/rot.rs"]
 mod rot;
+#[path = "nmea/rpm.rs"]
+mod rpm;
 #[path = "nmea/rsa.rs"]
 mod rsa;
 #[path = "nmea/ths.rs"]
@@ -56,6 +58,8 @@ mod txt;
 mod unknown;
 #[path = "nmea/vbw.rs"]
 mod vbw;
+#[path = "nmea/vdr.rs"]
+mod vdr;
 #[path = "nmea/vhw.rs"]
 mod vhw;
 #[path = "nmea/vlw.rs"]

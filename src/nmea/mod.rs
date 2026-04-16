@@ -121,6 +121,8 @@ nmea_sentences![
         ["vlw", Vlw, "VLW"],
         ["vtg", Vtg, "VTG"],
         ["vhw", Vhw, "VHW"],
+        ["rpm", Rpm, "RPM"],
+        ["vdr", Vdr, "VDR"],
         // Depth
         ["dpt", Dpt, "DPT"],
         ["dbt", Dbt, "DBT"],

@@ -48,6 +48,8 @@ mod rmb;
 mod rmc;
 #[cfg(feature = "rot")]
 mod rot;
+#[cfg(feature = "rpm")]
+mod rpm;
 #[cfg(feature = "rsa")]
 mod rsa;
 #[cfg(feature = "ths")]
@@ -56,6 +58,8 @@ mod ths;
 mod txt;
 #[cfg(feature = "vbw")]
 mod vbw;
+#[cfg(feature = "vdr")]
+mod vdr;
 #[cfg(feature = "vhw")]
 mod vhw;
 #[cfg(feature = "vlw")]
@@ -117,6 +121,8 @@ pub use rmb::*;
 pub use rmc::*;
 #[cfg(feature = "rot")]
 pub use rot::*;
+#[cfg(feature = "rpm")]
+pub use rpm::*;
 #[cfg(feature = "rsa")]
 pub use rsa::*;
 #[cfg(feature = "ths")]
@@ -125,6 +131,8 @@ pub use ths::*;
 pub use txt::*;
 #[cfg(feature = "vbw")]
 pub use vbw::*;
+#[cfg(feature = "vdr")]
+pub use vdr::*;
 #[cfg(feature = "vhw")]
 pub use vhw::*;
 #[cfg(feature = "vlw")]

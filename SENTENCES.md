@@ -151,8 +151,8 @@ Sources : go-nmea, gpsd.
 
 ## Vessel Systems
 
-- [ ] RPM — Revolutions
-- [ ] VDR — Set and Drift
+- [x] RPM — Revolutions
+- [x] VDR — Set and Drift
 
 ## Communication
 
