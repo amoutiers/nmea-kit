@@ -112,6 +112,7 @@ nmea_sentences![
         ["ths", Ths, "THS"],
         // Navigation
         ["apb", Apb, "APB"],
+        ["bwc", Bwc, "BWC"],
         ["rmb", Rmb, "RMB"],
         ["xte", Xte, "XTE"],
         // Rudder
@@ -129,6 +130,7 @@ nmea_sentences![
         ["dbs", Dbs, "DBS"],
         ["dbk", Dbk, "DBK"],
         // Environment
+        ["mda", Mda, "MDA"],
         ["mtw", Mtw, "MTW"],
         ["xdr", Xdr, "XDR"],
         // Communication

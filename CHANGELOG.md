@@ -2,6 +2,28 @@
 
 All notable changes to nmea-kit are documented here.
 
+## [0.5.5] — 2026-04-19
+
+### Added
+- MDA (Meteorological Composite) sentence type — barometric pressure, air/water temperature, humidity, dew point, wind direction and speed
+- BWC (Bearing & Distance to Waypoint, Great Circle) sentence type
+
+NMEA sentence coverage expanded from 34 to 36 types.
+
+### Fixed
+- `rpm` and `vdr` features were missing from the three `any(...)` cfg gates in `src/lib.rs`, making standalone `--features rpm` or `--features vdr` builds fail to expose `NmeaSentence` and `NmeaEncodable`
+
+## [0.5.4] — 2026-04-19
+
+### Changed
+- Bump version to 0.5.4 (maintenance)
+
+## [0.5.3] — 2026-04-18
+
+### Added
+- RPM (Revolutions) sentence type
+- VDR (Set and Drift) sentence type
+
 ## [0.5.2] — 2026-04-15
 
 ### Added

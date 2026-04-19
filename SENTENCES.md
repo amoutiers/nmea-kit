@@ -64,7 +64,7 @@ Sources : go-nmea, gpsd.
 - [ ] AAM — Waypoint Arrival Alarm
 - [ ] BEC — Bearing & Distance to Waypoint, Dead Reckoning
 - [ ] BOD — Bearing, Waypoint to Waypoint
-- [ ] BWC — Bearing & Distance to Waypoint, Great Circle
+- [x] BWC — Bearing & Distance to Waypoint, Great Circle
 - [ ] BWR — Bearing & Distance to Waypoint, Rhumb Line
 - [ ] BWW — Bearing, Waypoint to Waypoint
 - [ ] R00 — Waypoints in Active Route
@@ -80,7 +80,7 @@ Sources : go-nmea, gpsd.
 
 ## Environment
 
-- [ ] MDA — Meteorological Composite
+- [x] MDA — Meteorological Composite
 - [ ] MTA — Air Temperature
 - [x] MTW — Mean Temperature of Water
 - [x] XDR — Transducer Measurement

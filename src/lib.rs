@@ -24,7 +24,7 @@
 //!
 //! ## Features
 //!
-//! - `nmea` (default) — all 34 NMEA sentence types
+//! - `nmea` (default) — all 36 NMEA sentence types
 //! - `ais` (default) — 16 AIS message types (read-only decode)
 //! - `dbs`, `dbt`, `dpt`, … — individual sentence types
 
@@ -34,6 +34,7 @@ mod frame;
 #[cfg(any(
     feature = "nmea",
     feature = "apb",
+    feature = "bwc",
     feature = "dbk",
     feature = "dbs",
     feature = "dbt",
@@ -48,6 +49,7 @@ mod frame;
     feature = "hdg",
     feature = "hdm",
     feature = "hdt",
+    feature = "mda",
     feature = "mtw",
     feature = "mwd",
     feature = "mwv",
@@ -57,10 +59,12 @@ mod frame;
     feature = "rmb",
     feature = "rmc",
     feature = "rot",
+    feature = "rpm",
     feature = "rsa",
     feature = "ths",
     feature = "txt",
     feature = "vbw",
+    feature = "vdr",
     feature = "vhw",
     feature = "vlw",
     feature = "vtg",
@@ -108,6 +112,10 @@ pub use frame::*;
     feature = "vbw",
     feature = "vhw",
     feature = "vlw",
+    feature = "bwc",
+    feature = "mda",
+    feature = "rpm",
+    feature = "vdr",
     feature = "vtg",
     feature = "xdr",
     feature = "xte",
@@ -118,6 +126,7 @@ pub use nmea::NmeaSentence;
 #[cfg(any(
     feature = "nmea",
     feature = "apb",
+    feature = "bwc",
     feature = "dbk",
     feature = "dbs",
     feature = "dbt",
@@ -132,6 +141,7 @@ pub use nmea::NmeaSentence;
     feature = "hdg",
     feature = "hdm",
     feature = "hdt",
+    feature = "mda",
     feature = "mtw",
     feature = "mwd",
     feature = "mwv",
@@ -141,10 +151,12 @@ pub use nmea::NmeaSentence;
     feature = "rmb",
     feature = "rmc",
     feature = "rot",
+    feature = "rpm",
     feature = "rsa",
     feature = "ths",
     feature = "txt",
     feature = "vbw",
+    feature = "vdr",
     feature = "vhw",
     feature = "vlw",
     feature = "vtg",

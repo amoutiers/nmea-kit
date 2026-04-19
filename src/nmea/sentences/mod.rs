@@ -2,6 +2,8 @@
 
 #[cfg(feature = "apb")]
 mod apb;
+#[cfg(feature = "bwc")]
+mod bwc;
 #[cfg(feature = "dbk")]
 mod dbk;
 #[cfg(feature = "dbs")]
@@ -30,6 +32,8 @@ mod hdg;
 mod hdm;
 #[cfg(feature = "hdt")]
 mod hdt;
+#[cfg(feature = "mda")]
+mod mda;
 #[cfg(feature = "mtw")]
 mod mtw;
 #[cfg(feature = "mwd")]
@@ -75,6 +79,8 @@ mod zda;
 
 #[cfg(feature = "apb")]
 pub use apb::*;
+#[cfg(feature = "bwc")]
+pub use bwc::*;
 #[cfg(feature = "dbk")]
 pub use dbk::*;
 #[cfg(feature = "dbs")]
@@ -103,6 +109,8 @@ pub use hdg::*;
 pub use hdm::*;
 #[cfg(feature = "hdt")]
 pub use hdt::*;
+#[cfg(feature = "mda")]
+pub use mda::*;
 #[cfg(feature = "mtw")]
 pub use mtw::*;
 #[cfg(feature = "mwd")]
