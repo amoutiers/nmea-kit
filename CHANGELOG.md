@@ -2,6 +2,17 @@
 
 All notable changes to nmea-kit are documented here.
 
+## [0.5.6] — 2026-04-21
+
+### Added
+- VWR (Relative Wind Speed and Angle) sentence type — wind angle, L/R indicator, speed in knots/m/s/km·h
+- DTM (Datum Reference) sentence type — local datum code, subdivision, lat/lon/altitude offsets, reference datum
+
+### Fixed
+- Corrected bad checksum in DTM pynmeagps fixture (`*4F` → `*6F`)
+
+NMEA sentence coverage expanded from 36 to 38 types.
+
 ## [0.5.5] — 2026-04-19
 
 ### Added

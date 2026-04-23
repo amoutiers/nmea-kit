@@ -92,6 +92,7 @@ macro_rules! nmea_sentences {
 nmea_sentences![
     standard: [
         // Position
+        ["dtm", Dtm, "DTM"],
         ["rmc", Rmc, "RMC"],
         // Satellites
         ["gbs", Gbs, "GBS"],
@@ -104,6 +105,7 @@ nmea_sentences![
         // Wind
         ["mwd", Mwd, "MWD"],
         ["mwv", Mwv, "MWV"],
+        ["vwr", Vwr, "VWR"],
         // Heading
         ["hdt", Hdt, "HDT"],
         ["hdg", Hdg, "HDG"],

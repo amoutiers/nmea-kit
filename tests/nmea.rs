@@ -10,6 +10,8 @@ mod dbs;
 mod dbt;
 #[path = "nmea/dpt.rs"]
 mod dpt;
+#[path = "nmea/dtm.rs"]
+mod dtm;
 #[path = "nmea/gbs.rs"]
 mod gbs;
 #[path = "nmea/gga.rs"]
@@ -70,6 +72,8 @@ mod vhw;
 mod vlw;
 #[path = "nmea/vtg.rs"]
 mod vtg;
+#[path = "nmea/vwr.rs"]
+mod vwr;
 #[path = "nmea/xdr.rs"]
 mod xdr;
 #[path = "nmea/xte.rs"]

@@ -5,7 +5,7 @@ Sources : go-nmea, gpsd.
 
 ## Position
 
-- [ ] DTM — Datum Reference
+- [x] DTM — Datum Reference
 - [x] GGA — Global Positioning System Fix Data
 - [x] GLL — Geographic Position, Latitude/Longitude
 - [x] GNS — GNSS Fix Data
@@ -41,7 +41,7 @@ Sources : go-nmea, gpsd.
 
 - [x] MWD — Wind Direction & Speed
 - [x] MWV — Wind Speed and Angle
-- [ ] VWR — Relative Wind Speed and Angle
+- [x] VWR — Relative Wind Speed and Angle
 - [ ] VWT — True Wind Speed and Angle
 
 ## Depth

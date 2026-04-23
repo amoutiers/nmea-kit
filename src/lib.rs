@@ -24,7 +24,7 @@
 //!
 //! ## Features
 //!
-//! - `nmea` (default) — all 36 NMEA sentence types
+//! - `nmea` (default) — all 38 NMEA sentence types
 //! - `ais` (default) — 16 AIS message types (read-only decode)
 //! - `dbs`, `dbt`, `dpt`, … — individual sentence types
 
@@ -39,6 +39,7 @@ mod frame;
     feature = "dbs",
     feature = "dbt",
     feature = "dpt",
+    feature = "dtm",
     feature = "gbs",
     feature = "gga",
     feature = "gll",
@@ -68,6 +69,7 @@ mod frame;
     feature = "vhw",
     feature = "vlw",
     feature = "vtg",
+    feature = "vwr",
     feature = "xdr",
     feature = "xte",
     feature = "zda",
@@ -83,10 +85,12 @@ pub use frame::*;
 #[cfg(any(
     feature = "nmea",
     feature = "apb",
+    feature = "bwc",
     feature = "dbk",
     feature = "dbs",
     feature = "dbt",
     feature = "dpt",
+    feature = "dtm",
     feature = "gbs",
     feature = "gga",
     feature = "gll",
@@ -97,6 +101,7 @@ pub use frame::*;
     feature = "hdg",
     feature = "hdm",
     feature = "hdt",
+    feature = "mda",
     feature = "mtw",
     feature = "mwd",
     feature = "mwv",
@@ -106,17 +111,16 @@ pub use frame::*;
     feature = "rmb",
     feature = "rmc",
     feature = "rot",
+    feature = "rpm",
     feature = "rsa",
     feature = "ths",
     feature = "txt",
     feature = "vbw",
+    feature = "vdr",
     feature = "vhw",
     feature = "vlw",
-    feature = "bwc",
-    feature = "mda",
-    feature = "rpm",
-    feature = "vdr",
     feature = "vtg",
+    feature = "vwr",
     feature = "xdr",
     feature = "xte",
     feature = "zda",
@@ -131,6 +135,7 @@ pub use nmea::NmeaSentence;
     feature = "dbs",
     feature = "dbt",
     feature = "dpt",
+    feature = "dtm",
     feature = "gbs",
     feature = "gga",
     feature = "gll",
@@ -160,6 +165,7 @@ pub use nmea::NmeaSentence;
     feature = "vhw",
     feature = "vlw",
     feature = "vtg",
+    feature = "vwr",
     feature = "xdr",
     feature = "xte",
     feature = "zda",

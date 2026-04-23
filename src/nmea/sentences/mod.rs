@@ -12,6 +12,8 @@ mod dbs;
 mod dbt;
 #[cfg(feature = "dpt")]
 mod dpt;
+#[cfg(feature = "dtm")]
+mod dtm;
 #[cfg(feature = "gbs")]
 mod gbs;
 #[cfg(feature = "gga")]
@@ -70,6 +72,8 @@ mod vhw;
 mod vlw;
 #[cfg(feature = "vtg")]
 mod vtg;
+#[cfg(feature = "vwr")]
+mod vwr;
 #[cfg(feature = "xdr")]
 mod xdr;
 #[cfg(feature = "xte")]
@@ -89,6 +93,8 @@ pub use dbs::*;
 pub use dbt::*;
 #[cfg(feature = "dpt")]
 pub use dpt::*;
+#[cfg(feature = "dtm")]
+pub use dtm::*;
 #[cfg(feature = "gbs")]
 pub use gbs::*;
 #[cfg(feature = "gga")]
@@ -147,6 +153,8 @@ pub use vhw::*;
 pub use vlw::*;
 #[cfg(feature = "vtg")]
 pub use vtg::*;
+#[cfg(feature = "vwr")]
+pub use vwr::*;
 #[cfg(feature = "xdr")]
 pub use xdr::*;
 #[cfg(feature = "xte")]
