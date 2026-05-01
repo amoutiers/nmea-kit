@@ -115,7 +115,9 @@ nmea_sentences![
         // Navigation
         ["apb", Apb, "APB"],
         ["bwc", Bwc, "BWC"],
+        ["bwr", Bwr, "BWR"],
         ["rmb", Rmb, "RMB"],
+        ["wpl", Wpl, "WPL"],
         ["xte", Xte, "XTE"],
         // Rudder
         ["rsa", Rsa, "RSA"],

@@ -2,14 +2,29 @@
 
 All notable changes to nmea-kit are documented here.
 
-## [0.5.6] — 2026-04-21
+## [Unreleased]
+
+## [0.5.7] — 2026-05-01
+
+### Added
+- WPL (Waypoint Location) sentence type — waypoint lat/lon + identifier
+- BWR (Bearing & Distance to Waypoint — Rhumb Line) sentence type — rhumb-line counterpart to the existing great-circle BWC
+- `FieldReader::u16` / `i16` / `i32` and matching `FieldWriter::u16` / `i16` / `i32` methods, removing the need to round-trip through `f32` or manual `String::parse` for sentences with these ranges.
+
+### Changed
+- Deduplicated the three identical `#[cfg(any(feature = "..."))]` blocks in `src/lib.rs` into a single `nmea_item!` declarative macro. Adding a new sentence now requires editing one feature list, not three.
+- `NmeaEncodable::SENTENCE_TYPE` and `PROPRIETARY_ID` are now `&'static str` (previously `&str` with elided lifetime). All impl sites use string literals so no downstream changes are needed.
+
+NMEA sentence coverage expanded from 38 to 40 types.
+
+## [0.5.6] — 2026-04-23
 
 ### Added
 - VWR (Relative Wind Speed and Angle) sentence type — wind angle, L/R indicator, speed in knots/m/s/km·h
 - DTM (Datum Reference) sentence type — local datum code, subdivision, lat/lon/altitude offsets, reference datum
 
 ### Fixed
-- Corrected bad checksum in DTM pynmeagps fixture (`*4F` → `*6F`)
+- Bad checksum in DTM pynmeagps fixture (`*4F` → `*6F`) — would have caused DTM integration tests to fail on first run after the sentence was wired in.
 
 NMEA sentence coverage expanded from 36 to 38 types.
 
@@ -27,7 +42,7 @@ NMEA sentence coverage expanded from 34 to 36 types.
 ## [0.5.4] — 2026-04-19
 
 ### Changed
-- Bump version to 0.5.4 (maintenance)
+- Maintenance republish of 0.5.3 with no source changes.
 
 ## [0.5.3] — 2026-04-18
 
@@ -162,6 +177,12 @@ AIS coverage expanded from 9 to 16 message types.
 - Zero external dependencies
 - CI: tests, clippy, rustfmt, doc checks on stable + MSRV 1.85.0
 
+[Unreleased]: https://github.com/amoutiers/nmea-kit/compare/v0.5.7...HEAD
+[0.5.7]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.5.7
+[0.5.6]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.5.6
+[0.5.5]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.5.5
+[0.5.4]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.5.4
+[0.5.3]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.5.3
 [0.5.2]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.5.2
 [0.5.1]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.5.1
 [0.5.0]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.5.0

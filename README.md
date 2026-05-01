@@ -10,7 +10,7 @@ Bidirectional NMEA 0183 parser/encoder with AIS message decoding, written in Rus
 | **Edition** | 2024 |
 | **Dependencies** | 0 |
 | **License** | MIT OR Apache-2.0 |
-| **NMEA sentences** | 38 (bidirectional: parse + encode) |
+| **NMEA sentences** | 40 (bidirectional: parse + encode) |
 | **AIS message types** | 16 (read-only decode) |
 
 - **Shared frame layer** — handles `$` (NMEA) and `!` (AIS) framing, IEC 61162-450 tag blocks

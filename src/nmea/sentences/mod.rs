@@ -4,6 +4,8 @@
 mod apb;
 #[cfg(feature = "bwc")]
 mod bwc;
+#[cfg(feature = "bwr")]
+mod bwr;
 #[cfg(feature = "dbk")]
 mod dbk;
 #[cfg(feature = "dbs")]
@@ -74,6 +76,8 @@ mod vlw;
 mod vtg;
 #[cfg(feature = "vwr")]
 mod vwr;
+#[cfg(feature = "wpl")]
+mod wpl;
 #[cfg(feature = "xdr")]
 mod xdr;
 #[cfg(feature = "xte")]
@@ -85,6 +89,8 @@ mod zda;
 pub use apb::*;
 #[cfg(feature = "bwc")]
 pub use bwc::*;
+#[cfg(feature = "bwr")]
+pub use bwr::*;
 #[cfg(feature = "dbk")]
 pub use dbk::*;
 #[cfg(feature = "dbs")]
@@ -155,6 +161,8 @@ pub use vlw::*;
 pub use vtg::*;
 #[cfg(feature = "vwr")]
 pub use vwr::*;
+#[cfg(feature = "wpl")]
+pub use wpl::*;
 #[cfg(feature = "xdr")]
 pub use xdr::*;
 #[cfg(feature = "xte")]

@@ -65,14 +65,14 @@ Sources : go-nmea, gpsd.
 - [ ] BEC — Bearing & Distance to Waypoint, Dead Reckoning
 - [ ] BOD — Bearing, Waypoint to Waypoint
 - [x] BWC — Bearing & Distance to Waypoint, Great Circle
-- [ ] BWR — Bearing & Distance to Waypoint, Rhumb Line
+- [x] BWR — Bearing & Distance to Waypoint, Rhumb Line
 - [ ] BWW — Bearing, Waypoint to Waypoint
 - [ ] R00 — Waypoints in Active Route
 - [x] RMB — Recommended Minimum Navigation Information (to waypoint)
 - [ ] RTE — Routes
 - [ ] WCV — Waypoint Closure Velocity
 - [ ] WNC — Distance, Waypoint to Waypoint
-- [ ] WPL — Waypoint Location
+- [x] WPL — Waypoint Location
 - [x] XTE — Cross-Track Error, Measured
 - [ ] XTR — Cross-Track Error, Dead Reckoning
 - [ ] ZFO — UTC & Time from Origin Waypoint

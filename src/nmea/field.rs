@@ -82,6 +82,33 @@ impl<'a> FieldReader<'a> {
         val
     }
 
+    /// Read an optional u16 and advance.
+    pub fn u16(&mut self) -> Option<u16> {
+        let val = self.fields.get(self.idx).and_then(|f| {
+            if f.is_empty() { None } else { f.parse::<u16>().ok() }
+        });
+        self.idx += 1;
+        val
+    }
+
+    /// Read an optional i16 and advance.
+    pub fn i16(&mut self) -> Option<i16> {
+        let val = self.fields.get(self.idx).and_then(|f| {
+            if f.is_empty() { None } else { f.parse::<i16>().ok() }
+        });
+        self.idx += 1;
+        val
+    }
+
+    /// Read an optional i32 and advance.
+    pub fn i32(&mut self) -> Option<i32> {
+        let val = self.fields.get(self.idx).and_then(|f| {
+            if f.is_empty() { None } else { f.parse::<i32>().ok() }
+        });
+        self.idx += 1;
+        val
+    }
+
     /// Read an optional single character and advance.
     pub fn char(&mut self) -> Option<char> {
         let val = self
@@ -163,6 +190,30 @@ impl FieldWriter {
         });
     }
 
+    /// Write an optional u16. `None` → empty field.
+    pub fn u16(&mut self, value: Option<u16>) {
+        self.fields.push(match value {
+            Some(v) => v.to_string(),
+            None => String::new(),
+        });
+    }
+
+    /// Write an optional i16. `None` → empty field.
+    pub fn i16(&mut self, value: Option<i16>) {
+        self.fields.push(match value {
+            Some(v) => v.to_string(),
+            None => String::new(),
+        });
+    }
+
+    /// Write an optional i32. `None` → empty field.
+    pub fn i32(&mut self, value: Option<i32>) {
+        self.fields.push(match value {
+            Some(v) => v.to_string(),
+            None => String::new(),
+        });
+    }
+
     /// Write an optional char. `None` → empty field.
     pub fn char(&mut self, value: Option<char>) {
         self.fields.push(match value {
@@ -217,11 +268,11 @@ impl Default for FieldWriter {
 /// `to_sentence()`.
 pub trait NmeaEncodable {
     /// The 3-character sentence type identifier (e.g. `"MWD"`, `"RMC"`).
-    const SENTENCE_TYPE: &str;
+    const SENTENCE_TYPE: &'static str;
 
     /// Full proprietary address identifier (e.g. `"PASHR"`, `"PSKPDPT"`).
     /// Empty for standard sentences.
-    const PROPRIETARY_ID: &str = "";
+    const PROPRIETARY_ID: &'static str = "";
 
     /// Encode fields into a `Vec` of strings in wire order.
     fn encode(&self) -> Vec<String>;
