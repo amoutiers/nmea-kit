@@ -5,12 +5,12 @@ Bidirectional NMEA 0183 parser/encoder with AIS message decoding, written in Rus
 | | |
 | --- | --- |
 | **Crate** | `nmea-kit` |
-| **Version** | 0.5.6 |
+| **Version** | 0.5.8 |
 | **MSRV** | 1.85.0 |
 | **Edition** | 2024 |
 | **Dependencies** | 0 |
 | **License** | MIT OR Apache-2.0 |
-| **NMEA sentences** | 40 (bidirectional: parse + encode) |
+| **NMEA sentences** | 42 (bidirectional: parse + encode) |
 | **AIS message types** | 16 (read-only decode) |
 
 - **Shared frame layer** — handles `$` (NMEA) and `!` (AIS) framing, IEC 61162-450 tag blocks
@@ -99,7 +99,8 @@ flowchart TD
 | Depth              | DPT, DBT, DBS, DBK    |
 | Steering           | ROT, RSA              |
 | Environment        | MDA, MTW, XDR¹        |
-| Waypoints & Routes | APB, BWC, RMB, XTE    |
+| Waypoints & Routes | APB, BOD, BWC, RMB, XTE |
+| Radar              | RSD                   |
 | Communication      | TXT                   |
 | Time               | ZDA                   |
 | Proprietary        | PASHR, PGRME, PSKPDPT |
@@ -131,7 +132,7 @@ flowchart TD
 
 | Issue                  | `nmea` 0.7 / `ais` 0.12             | `nmea-kit`                               |
 | ---------------------- | ----------------------------------- | ---------------------------------------- |
-| NMEA sentence coverage | ~10 types, rest manual              | 38 types, all typed                      |
+| NMEA sentence coverage | ~10 types, rest manual              | 42 types, all typed                      |
 | AIS message coverage   | ~5 types                            | 16 types (1-9, 11-15, 18-19, 21, 24, 27) |
 | Encoding               | Read-only                           | Bidirectional (parse + encode)           |
 | Error distinction      | Can't tell unsupported vs malformed | Frame errors vs content errors           |
@@ -149,14 +150,14 @@ nmea-kit = "0.5"
 
 | Feature                                                                                                                                                                                                                                | Default    | Enables                    |
 | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- | -------------------------- |
-| `nmea`                                                                                                                                                                                                                                 | yes        | All 38 NMEA sentence types |
+| `nmea`                                                                                                                                                                                                         | yes        | All 42 NMEA sentence types |
 | `ais`                                                                                                                                                                                                                                  | yes        | AIS message decoding       |
 | `positioning`                                                                                                                                                                                                                          | via `nmea` | GGA, GLL, RMC, GNS         |
 | `speed`                                                                                                                                                                                                                                | via `nmea` | VTG, VHW, VBW, RMC         |
 | `heading`                                                                                                                                                                                                                              | via `nmea` | HDG, HDM, HDT, THS         |
 | `wind`                                                                                                                                                                                                                                 | via `nmea` | MWD, MWV                   |
 | `depth`                                                                                                                                                                                                                                | via `nmea` | DBT, DBS, DBK, DPT         |
-| `apb`, `bwc`, `dbk`, `dbs`, `dbt`, `dpt`, `dtm`, `gbs`, `gga`, `gll`, `gns`, `gsa`, `gsv`, `gst`, `hdg`, `hdm`, `hdt`, `mda`, `mtw`, `mwd`, `mwv`, `pashr`, `pgrme`, `pskpdpt`, `rmb`, `rmc`, `rot`, `rpm`, `rsa`, `ths`, `txt`, `vbw`, `vdr`, `vhw`, `vlw`, `vtg`, `vwr`, `xdr`, `xte`, `zda` | via `nmea` | Individual sentence types  |
+| `apb`, `bod`, `bwc`, `dbk`, `dbs`, `dbt`, `dpt`, `dtm`, `gbs`, `gga`, `gll`, `gns`, `gsa`, `gsv`, `gst`, `hdg`, `hdm`, `hdt`, `mda`, `mtw`, `mwd`, `mwv`, `pashr`, `pgrme`, `pskpdpt`, `rmb`, `rmc`, `rot`, `rpm`, `rsa`, `rsd`, `ths`, `txt`, `vbw`, `vdr`, `vhw`, `vlw`, `vtg`, `vwr`, `xdr`, `xte`, `zda` | via `nmea` | Individual sentence types  |
 
 Use a group feature for common use cases:
 

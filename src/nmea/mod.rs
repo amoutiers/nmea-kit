@@ -114,6 +114,7 @@ nmea_sentences![
         ["ths", Ths, "THS"],
         // Navigation
         ["apb", Apb, "APB"],
+        ["bod", Bod, "BOD"],
         ["bwc", Bwc, "BWC"],
         ["bwr", Bwr, "BWR"],
         ["rmb", Rmb, "RMB"],
@@ -137,6 +138,8 @@ nmea_sentences![
         ["mda", Mda, "MDA"],
         ["mtw", Mtw, "MTW"],
         ["xdr", Xdr, "XDR"],
+        // Radar
+        ["rsd", Rsd, "RSD"],
         // Communication
         ["txt", Txt, "TXT"],
         // Time

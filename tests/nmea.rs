@@ -1,5 +1,7 @@
 #[path = "nmea/apb.rs"]
 mod apb;
+#[path = "nmea/bod.rs"]
+mod bod;
 #[path = "nmea/bwc.rs"]
 mod bwc;
 #[path = "nmea/bwr.rs"]
@@ -58,6 +60,8 @@ mod rot;
 mod rpm;
 #[path = "nmea/rsa.rs"]
 mod rsa;
+#[path = "nmea/rsd.rs"]
+mod rsd;
 #[path = "nmea/ths.rs"]
 mod ths;
 #[path = "nmea/txt.rs"]

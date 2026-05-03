@@ -4,6 +4,14 @@ All notable changes to nmea-kit are documented here.
 
 ## [Unreleased]
 
+## [0.5.8] — 2026-05-03
+
+### Added
+- BOD (Bearing Origin to Destination) sentence type — true/magnetic bearings + origin/destination waypoint IDs
+- RSD (Radar System Data) sentence type — VRM, bearing lines, cursor position, range scale and display rotation
+
+NMEA sentence coverage expanded from 40 to 42 types.
+
 ## [0.5.7] — 2026-05-01
 
 ### Added
@@ -177,7 +185,8 @@ AIS coverage expanded from 9 to 16 message types.
 - Zero external dependencies
 - CI: tests, clippy, rustfmt, doc checks on stable + MSRV 1.85.0
 
-[Unreleased]: https://github.com/amoutiers/nmea-kit/compare/v0.5.7...HEAD
+[Unreleased]: https://github.com/amoutiers/nmea-kit/compare/v0.5.8...HEAD
+[0.5.8]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.5.8
 [0.5.7]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.5.7
 [0.5.6]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.5.6
 [0.5.5]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.5.5

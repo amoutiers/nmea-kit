@@ -38,6 +38,7 @@ macro_rules! nmea_item {
         #[cfg(any(
             feature = "nmea",
             feature = "apb",
+            feature = "bod",
             feature = "bwc",
             feature = "bwr",
             feature = "dbk",
@@ -67,6 +68,7 @@ macro_rules! nmea_item {
             feature = "rot",
             feature = "rpm",
             feature = "rsa",
+            feature = "rsd",
             feature = "ths",
             feature = "txt",
             feature = "vbw",

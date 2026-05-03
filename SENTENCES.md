@@ -63,7 +63,7 @@ Sources : go-nmea, gpsd.
 
 - [ ] AAM — Waypoint Arrival Alarm
 - [ ] BEC — Bearing & Distance to Waypoint, Dead Reckoning
-- [ ] BOD — Bearing, Waypoint to Waypoint
+- [x] BOD — Bearing, Waypoint to Waypoint
 - [x] BWC — Bearing & Distance to Waypoint, Great Circle
 - [x] BWR — Bearing & Distance to Waypoint, Rhumb Line
 - [ ] BWW — Bearing, Waypoint to Waypoint
@@ -91,7 +91,7 @@ Sources : go-nmea, gpsd.
 
 ## Targets
 
-- [ ] RSD — Radar System Data
+- [x] RSD — Radar System Data
 - [ ] TLB — Target Label
 - [ ] TLL — Target Latitude and Longitude
 - [ ] TTD — Tracked Target Data
