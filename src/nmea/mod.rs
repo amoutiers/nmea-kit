@@ -113,10 +113,12 @@ nmea_sentences![
         ["rot", Rot, "ROT"],
         ["ths", Ths, "THS"],
         // Navigation
+        ["aam", Aam, "AAM"],
         ["apb", Apb, "APB"],
         ["bod", Bod, "BOD"],
         ["bwc", Bwc, "BWC"],
         ["bwr", Bwr, "BWR"],
+        ["bww", Bww, "BWW"],
         ["rmb", Rmb, "RMB"],
         ["wpl", Wpl, "WPL"],
         ["xte", Xte, "XTE"],

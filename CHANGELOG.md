@@ -4,6 +4,14 @@ All notable changes to nmea-kit are documented here.
 
 ## [Unreleased]
 
+## [0.5.9] — 2026-05-05
+
+### Added
+- AAM (Waypoint Arrival Alarm) sentence type — arrival circle entered, perpendicular passed, circle radius + unit, waypoint ID
+- BWW (Bearing, Waypoint to Waypoint) sentence type — true/magnetic bearings + origin/destination waypoint IDs
+
+NMEA sentence coverage expanded from 42 to 44 types.
+
 ## [0.5.8] — 2026-05-03
 
 ### Added
@@ -185,7 +193,7 @@ AIS coverage expanded from 9 to 16 message types.
 - Zero external dependencies
 - CI: tests, clippy, rustfmt, doc checks on stable + MSRV 1.85.0
 
-[Unreleased]: https://github.com/amoutiers/nmea-kit/compare/v0.5.8...HEAD
+[0.5.9]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.5.9
 [0.5.8]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.5.8
 [0.5.7]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.5.7
 [0.5.6]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.5.6

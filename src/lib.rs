@@ -24,7 +24,7 @@
 //!
 //! ## Features
 //!
-//! - `nmea` (default) — all 38 NMEA sentence types
+//! - `nmea` (default) — all 44 NMEA sentence types
 //! - `ais` (default) — 16 AIS message types (read-only decode)
 //! - `dbs`, `dbt`, `dpt`, … — individual sentence types
 
@@ -37,10 +37,12 @@ macro_rules! nmea_item {
     ($item:item) => {
         #[cfg(any(
             feature = "nmea",
+            feature = "aam",
             feature = "apb",
             feature = "bod",
             feature = "bwc",
             feature = "bwr",
+            feature = "bww",
             feature = "dbk",
             feature = "dbs",
             feature = "dbt",
