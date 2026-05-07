@@ -140,8 +140,10 @@ nmea_sentences![
         ["mda", Mda, "MDA"],
         ["mtw", Mtw, "MTW"],
         ["xdr", Xdr, "XDR"],
-        // Radar
+        // Radar / Target tracking
         ["rsd", Rsd, "RSD"],
+        ["tll", Tll, "TLL"],
+        ["ttm", Ttm, "TTM"],
         // Communication
         ["txt", Txt, "TXT"],
         // Time

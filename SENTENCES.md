@@ -93,9 +93,9 @@ Sources : go-nmea, gpsd.
 
 - [x] RSD — Radar System Data
 - [ ] TLB — Target Label
-- [ ] TLL — Target Latitude and Longitude
+- [x] TLL — Target Latitude and Longitude
 - [ ] TTD — Tracked Target Data
-- [ ] TTM — Tracked Target Message
+- [x] TTM — Tracked Target Message
 
 ## AIS Sentences
 

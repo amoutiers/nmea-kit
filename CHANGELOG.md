@@ -2,7 +2,13 @@
 
 All notable changes to nmea-kit are documented here.
 
-## [Unreleased]
+## [0.5.10] — 2026-05-07
+
+### Added
+- TLL (Target Latitude and Longitude) sentence type — target number, lat/lon in DDMM format, name, UTC time, status (lost/acquiring/tracking), reference target flag
+- TTM (Tracked Target Message) sentence type — target number, range, bearing, speed, course, CPA distance/time, speed units, name, status, acquisition type
+
+NMEA sentence coverage expanded from 44 to 46 types.
 
 ## [0.5.9] — 2026-05-05
 
@@ -193,6 +199,7 @@ AIS coverage expanded from 9 to 16 message types.
 - Zero external dependencies
 - CI: tests, clippy, rustfmt, doc checks on stable + MSRV 1.85.0
 
+[0.5.10]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.5.10
 [0.5.9]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.5.9
 [0.5.8]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.5.8
 [0.5.7]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.5.7

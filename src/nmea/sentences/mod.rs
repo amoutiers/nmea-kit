@@ -70,6 +70,10 @@ mod rpm;
 mod rsa;
 #[cfg(feature = "ths")]
 mod ths;
+#[cfg(feature = "tll")]
+mod tll;
+#[cfg(feature = "ttm")]
+mod ttm;
 #[cfg(feature = "txt")]
 mod txt;
 #[cfg(feature = "vbw")]
@@ -163,6 +167,10 @@ pub use rsa::*;
 pub use rsd::*;
 #[cfg(feature = "ths")]
 pub use ths::*;
+#[cfg(feature = "tll")]
+pub use tll::*;
+#[cfg(feature = "ttm")]
+pub use ttm::*;
 #[cfg(feature = "txt")]
 pub use txt::*;
 #[cfg(feature = "vbw")]

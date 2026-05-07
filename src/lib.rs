@@ -72,6 +72,8 @@ macro_rules! nmea_item {
             feature = "rsa",
             feature = "rsd",
             feature = "ths",
+            feature = "tll",
+            feature = "ttm",
             feature = "txt",
             feature = "vbw",
             feature = "vdr",

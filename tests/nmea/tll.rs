@@ -1,0 +1,33 @@
+#![cfg(feature = "tll")]
+use nmea_kit::nmea::NmeaEncodable;
+use nmea_kit::nmea::sentences::Tll;
+use nmea_kit::parse_frame;
+
+#[test]
+fn decode_encode() {
+    let frame = parse_frame("$RATLL,,3647.422,N,01432.592,E,,,,*58").expect("valid");
+    let tll = Tll::parse(&frame.fields).expect("parse");
+    let sentence = tll.to_sentence("RA");
+    let frame2 = parse_frame(sentence.trim()).expect("re-parse");
+    let tll2 = Tll::parse(&frame2.fields).expect("parse");
+    assert_eq!(tll, tll2);
+}
+
+#[test]
+fn roundtrip() {
+    let original = Tll {
+        target_num: Some(1),
+        lat: Some(3647.422),
+        ns: Some('N'),
+        lon: Some(1432.592),
+        ew: Some('E'),
+        name: Some("TGT01".to_string()),
+        time: Some("120000".to_string()),
+        status: Some('T'),
+        ref_target: None,
+    };
+    let sentence = original.to_sentence("RA");
+    let frame = parse_frame(sentence.trim()).expect("re-parse");
+    let parsed = Tll::parse(&frame.fields).expect("parse");
+    assert_eq!(original, parsed);
+}

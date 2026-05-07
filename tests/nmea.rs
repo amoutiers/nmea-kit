@@ -68,6 +68,10 @@ mod rsa;
 mod rsd;
 #[path = "nmea/ths.rs"]
 mod ths;
+#[path = "nmea/tll.rs"]
+mod tll;
+#[path = "nmea/ttm.rs"]
+mod ttm;
 #[path = "nmea/txt.rs"]
 mod txt;
 #[path = "nmea/unknown.rs"]

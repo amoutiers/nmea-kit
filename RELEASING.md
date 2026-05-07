@@ -8,12 +8,10 @@ Templates for CHANGELOG entries and GitHub release descriptions. Keep them in sy
 2. Cutting a release:
    - Bump version in `Cargo.toml`.
    - Rename `[Unreleased]` → `[X.Y.Z] — YYYY-MM-DD` (date = day you actually publish, not when you wrote the bullets).
-   - Add a fresh empty `## [Unreleased]` block at the top.
    - Add the version link footnote at the bottom.
    - Commit, tag `vX.Y.Z`, push tag.
-   - `cargo publish`.
    - `gh release create vX.Y.Z` with the body filled from the template below (paste the entry, drop the date heading).
-3. If a version is published only to crates.io and not tagged on GitHub, say so in its CHANGELOG entry: `*(crates.io only — no GitHub release)*`.
+3. **Do not run `cargo publish` locally.** The crate is published to crates.io automatically via [GitHub Trusted Publishing](https://crates.io/docs/trusted-publishing) when the tag is pushed. Monitor the GitHub Actions workflow after pushing the tag.
 
 ## CHANGELOG entry template
 
