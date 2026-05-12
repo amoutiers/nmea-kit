@@ -88,6 +88,10 @@ mod vlw;
 mod vtg;
 #[path = "nmea/vwr.rs"]
 mod vwr;
+#[path = "nmea/vwt.rs"]
+mod vwt;
+#[path = "nmea/wcv.rs"]
+mod wcv;
 #[path = "nmea/wpl.rs"]
 mod wpl;
 #[path = "nmea/xdr.rs"]

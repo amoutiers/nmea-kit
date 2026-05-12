@@ -42,7 +42,7 @@ Sources : go-nmea, gpsd.
 - [x] MWD — Wind Direction & Speed
 - [x] MWV — Wind Speed and Angle
 - [x] VWR — Relative Wind Speed and Angle
-- [ ] VWT — True Wind Speed and Angle
+- [x] VWT — True Wind Speed and Angle
 
 ## Depth
 
@@ -70,7 +70,7 @@ Sources : go-nmea, gpsd.
 - [ ] R00 — Waypoints in Active Route
 - [x] RMB — Recommended Minimum Navigation Information (to waypoint)
 - [ ] RTE — Routes
-- [ ] WCV — Waypoint Closure Velocity
+- [x] WCV — Waypoint Closure Velocity
 - [ ] WNC — Distance, Waypoint to Waypoint
 - [x] WPL — Waypoint Location
 - [x] XTE — Cross-Track Error, Measured

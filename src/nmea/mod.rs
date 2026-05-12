@@ -106,6 +106,7 @@ nmea_sentences![
         ["mwd", Mwd, "MWD"],
         ["mwv", Mwv, "MWV"],
         ["vwr", Vwr, "VWR"],
+        ["vwt", Vwt, "VWT"],
         // Heading
         ["hdt", Hdt, "HDT"],
         ["hdg", Hdg, "HDG"],
@@ -120,6 +121,7 @@ nmea_sentences![
         ["bwr", Bwr, "BWR"],
         ["bww", Bww, "BWW"],
         ["rmb", Rmb, "RMB"],
+        ["wcv", Wcv, "WCV"],
         ["wpl", Wpl, "WPL"],
         ["xte", Xte, "XTE"],
         // Rudder

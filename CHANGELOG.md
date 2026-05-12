@@ -2,6 +2,14 @@
 
 All notable changes to nmea-kit are documented here.
 
+## [0.6.0] — 2026-05-12
+
+### Added
+- VWT (True Wind Speed and Angle) sentence type — true wind angle (port/starboard), speed in knots, m/s, and km/h
+- WCV (Waypoint Closure Velocity) sentence type — closure velocity in knots, waypoint identifier, mode indicator
+
+NMEA sentence coverage expanded from 46 to 48 types.
+
 ## [0.5.10] — 2026-05-07
 
 ### Added
@@ -199,6 +207,7 @@ AIS coverage expanded from 9 to 16 message types.
 - Zero external dependencies
 - CI: tests, clippy, rustfmt, doc checks on stable + MSRV 1.85.0
 
+[0.6.0]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.6.0
 [0.5.10]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.5.10
 [0.5.9]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.5.9
 [0.5.8]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.5.8

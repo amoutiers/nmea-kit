@@ -88,6 +88,10 @@ mod vlw;
 mod vtg;
 #[cfg(feature = "vwr")]
 mod vwr;
+#[cfg(feature = "vwt")]
+mod vwt;
+#[cfg(feature = "wcv")]
+mod wcv;
 #[cfg(feature = "wpl")]
 mod wpl;
 #[cfg(feature = "xdr")]
@@ -185,6 +189,10 @@ pub use vlw::*;
 pub use vtg::*;
 #[cfg(feature = "vwr")]
 pub use vwr::*;
+#[cfg(feature = "vwt")]
+pub use vwt::*;
+#[cfg(feature = "wcv")]
+pub use wcv::*;
 #[cfg(feature = "wpl")]
 pub use wpl::*;
 #[cfg(feature = "xdr")]

@@ -81,6 +81,8 @@ macro_rules! nmea_item {
             feature = "vlw",
             feature = "vtg",
             feature = "vwr",
+            feature = "vwt",
+            feature = "wcv",
             feature = "wpl",
             feature = "xdr",
             feature = "xte",
