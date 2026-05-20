@@ -2,6 +2,14 @@
 
 All notable changes to nmea-kit are documented here.
 
+## [0.6.1] — 2026-05-20
+
+### Added
+- ACK (Acknowledge Alarm) sentence type — alert identifier
+- HBT (Heartbeat Supervision) sentence type — repeat interval, equipment operation status, sequential message identifier
+
+NMEA sentence coverage expanded from 48 to 50 types.
+
 ## [0.6.0] — 2026-05-12
 
 ### Added
@@ -207,6 +215,7 @@ AIS coverage expanded from 9 to 16 message types.
 - Zero external dependencies
 - CI: tests, clippy, rustfmt, doc checks on stable + MSRV 1.85.0
 
+[0.6.1]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.6.1
 [0.6.0]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.6.0
 [0.5.10]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.5.10
 [0.5.9]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.5.9

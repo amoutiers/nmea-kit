@@ -1,5 +1,7 @@
 #[path = "nmea/aam.rs"]
 mod aam;
+#[path = "nmea/ack.rs"]
+mod ack;
 #[path = "nmea/apb.rs"]
 mod apb;
 #[path = "nmea/bod.rs"]
@@ -34,6 +36,8 @@ mod gsa;
 mod gst;
 #[path = "nmea/gsv.rs"]
 mod gsv;
+#[path = "nmea/hbt.rs"]
+mod hbt;
 #[path = "nmea/hdg.rs"]
 mod hdg;
 #[path = "nmea/hdm.rs"]

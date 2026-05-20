@@ -135,7 +135,7 @@ Sources : go-nmea, gpsd.
 
 ## Safety & Alarms
 
-- [ ] ACK — Acknowledge Alarm
+- [x] ACK — Acknowledge Alarm
 - [ ] ACN — Alert Command
 - [ ] ALA — Alert
 - [ ] ALC — Cyclic Alert List
@@ -147,7 +147,7 @@ Sources : go-nmea, gpsd.
 - [ ] DSE — DSC Extended
 - [ ] EVE — Event
 - [ ] FIR — Fire Detection
-- [ ] HBT — Heartbeat Supervision
+- [x] HBT — Heartbeat Supervision
 
 ## Vessel Systems
 

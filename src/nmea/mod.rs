@@ -146,8 +146,12 @@ nmea_sentences![
         ["rsd", Rsd, "RSD"],
         ["tll", Tll, "TLL"],
         ["ttm", Ttm, "TTM"],
+        // Alert
+        ["ack", Ack, "ACK"],
         // Communication
         ["txt", Txt, "TXT"],
+        // Heartbeat
+        ["hbt", Hbt, "HBT"],
         // Time
         ["zda", Zda, "ZDA"],
     ],
