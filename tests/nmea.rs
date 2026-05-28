@@ -4,6 +4,8 @@ mod aam;
 mod ack;
 #[path = "nmea/apb.rs"]
 mod apb;
+#[path = "nmea/bec.rs"]
+mod bec;
 #[path = "nmea/bod.rs"]
 mod bod;
 #[path = "nmea/bwc.rs"]
@@ -70,6 +72,8 @@ mod rpm;
 mod rsa;
 #[path = "nmea/rsd.rs"]
 mod rsd;
+#[path = "nmea/rte.rs"]
+mod rte;
 #[path = "nmea/ths.rs"]
 mod ths;
 #[path = "nmea/tll.rs"]

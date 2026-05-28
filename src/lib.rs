@@ -24,7 +24,7 @@
 //!
 //! ## Features
 //!
-//! - `nmea` (default) — all 50 NMEA sentence types
+//! - `nmea` (default) — all 52 NMEA sentence types
 //! - `ais` (default) — 16 AIS message types (read-only decode)
 //! - `dbs`, `dbt`, `dpt`, … — individual sentence types
 
@@ -40,6 +40,7 @@ macro_rules! nmea_item {
             feature = "ack",
             feature = "aam",
             feature = "apb",
+            feature = "bec",
             feature = "bod",
             feature = "bwc",
             feature = "bwr",
@@ -73,6 +74,7 @@ macro_rules! nmea_item {
             feature = "rpm",
             feature = "rsa",
             feature = "rsd",
+            feature = "rte",
             feature = "ths",
             feature = "tll",
             feature = "ttm",

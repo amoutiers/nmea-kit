@@ -2,6 +2,14 @@
 
 All notable changes to nmea-kit are documented here.
 
+## [0.6.2] — 2026-05-28
+
+### Added
+- BEC (Bearing and Distance to Waypoint, Dead Reckoning) sentence type — UTC time, lat/lon, true and magnetic bearing, distance in nautical miles, waypoint identifier
+- RTE (Routes) sentence type — sentence count, sequence number, mode (complete/working), route name, variable-length list of waypoint identifiers
+
+NMEA sentence coverage expanded from 50 to 52 types.
+
 ## [0.6.1] — 2026-05-20
 
 ### Added
@@ -215,6 +223,7 @@ AIS coverage expanded from 9 to 16 message types.
 - Zero external dependencies
 - CI: tests, clippy, rustfmt, doc checks on stable + MSRV 1.85.0
 
+[0.6.2]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.6.2
 [0.6.1]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.6.1
 [0.6.0]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.6.0
 [0.5.10]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.5.10

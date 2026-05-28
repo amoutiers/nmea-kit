@@ -62,14 +62,14 @@ Sources : go-nmea, gpsd.
 ## Waypoints & Routes
 
 - [x] AAM — Waypoint Arrival Alarm
-- [ ] BEC — Bearing & Distance to Waypoint, Dead Reckoning
+- [x] BEC — Bearing & Distance to Waypoint, Dead Reckoning
 - [x] BOD — Bearing, Waypoint to Waypoint
 - [x] BWC — Bearing & Distance to Waypoint, Great Circle
 - [x] BWR — Bearing & Distance to Waypoint, Rhumb Line
 - [x] BWW — Bearing, Waypoint to Waypoint
 - [ ] R00 — Waypoints in Active Route
 - [x] RMB — Recommended Minimum Navigation Information (to waypoint)
-- [ ] RTE — Routes
+- [x] RTE — Routes
 - [x] WCV — Waypoint Closure Velocity
 - [ ] WNC — Distance, Waypoint to Waypoint
 - [x] WPL — Waypoint Location

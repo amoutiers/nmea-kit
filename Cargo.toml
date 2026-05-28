@@ -1,6 +1,6 @@
 [package]
 name = "nmea-kit"
-version = "0.6.1"
+version = "0.6.2"
 edition = "2024"
 rust-version = "1.85.0"
 description = "Bidirectional NMEA 0183 parser and encoder with AIS decoding"
@@ -29,7 +29,7 @@ depth       = ["dbt", "dbs", "dbk", "dpt"]
 # Umbrella — all sentence types
 nmea = [
     "positioning", "speed", "heading", "wind", "depth",
-    "ack", "aam", "apb", "bod", "bwc", "bwr", "bww", "dtm", "gbs", "gsa", "gsv", "gst", "hbt", "mda", "mtw", "pashr", "pgrme", "pskpdpt", "rmb", "rot", "rpm", "rsa", "rsd", "tll", "ttm", "txt", "vdr", "vlw", "vwr", "vwt", "wcv", "wpl", "xdr", "xte", "zda",
+    "ack", "aam", "apb", "bec", "bod", "bwc", "bwr", "bww", "dtm", "gbs", "gsa", "gsv", "gst", "hbt", "mda", "mtw", "pashr", "pgrme", "pskpdpt", "rmb", "rot", "rpm", "rsa", "rsd", "rte", "tll", "ttm", "txt", "vdr", "vlw", "vwr", "vwt", "wcv", "wpl", "xdr", "xte", "zda",
 ]
 ais = []
 
@@ -37,6 +37,7 @@ ais = []
 ack = []
 aam = []
 apb = []
+bec = []
 bod = []
 bwc = []
 bwr = []
@@ -68,6 +69,7 @@ rmb = []
 rmc = []
 rot = []
 rpm = []
+rte = []
 rsa = []
 rsd = []
 ths = []

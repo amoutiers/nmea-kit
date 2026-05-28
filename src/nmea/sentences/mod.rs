@@ -6,6 +6,8 @@ mod ack;
 mod aam;
 #[cfg(feature = "apb")]
 mod apb;
+#[cfg(feature = "bec")]
+mod bec;
 #[cfg(feature = "bod")]
 mod bod;
 #[cfg(feature = "bwc")]
@@ -72,6 +74,8 @@ mod rot;
 mod rpm;
 #[cfg(feature = "rsa")]
 mod rsa;
+#[cfg(feature = "rte")]
+mod rte;
 #[cfg(feature = "ths")]
 mod ths;
 #[cfg(feature = "tll")]
@@ -111,6 +115,8 @@ pub use ack::*;
 pub use aam::*;
 #[cfg(feature = "apb")]
 pub use apb::*;
+#[cfg(feature = "bec")]
+pub use bec::*;
 #[cfg(feature = "bod")]
 pub use bod::*;
 #[cfg(feature = "bwc")]
@@ -177,6 +183,8 @@ pub use rpm::*;
 pub use rsa::*;
 #[cfg(feature = "rsd")]
 pub use rsd::*;
+#[cfg(feature = "rte")]
+pub use rte::*;
 #[cfg(feature = "ths")]
 pub use ths::*;
 #[cfg(feature = "tll")]

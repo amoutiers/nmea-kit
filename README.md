@@ -5,12 +5,12 @@ Bidirectional NMEA 0183 parser/encoder with AIS message decoding, written in Rus
 | | |
 | --- | --- |
 | **Crate** | `nmea-kit` |
-| **Version** | 0.6.1 |
+| **Version** | 0.6.2 |
 | **MSRV** | 1.85.0 |
 | **Edition** | 2024 |
 | **Dependencies** | 0 |
 | **License** | MIT OR Apache-2.0 |
-| **NMEA sentences** | 50 (bidirectional: parse + encode) |
+| **NMEA sentences** | 52 (bidirectional: parse + encode) |
 | **AIS message types** | 16 (read-only decode) |
 
 - **Shared frame layer** — handles `$` (NMEA) and `!` (AIS) framing, IEC 61162-450 tag blocks
@@ -133,7 +133,7 @@ flowchart TD
 
 | Issue                  | `nmea` 0.7 / `ais` 0.12             | `nmea-kit`                               |
 | ---------------------- | ----------------------------------- | ---------------------------------------- |
-| NMEA sentence coverage | ~10 types, rest manual              | 50 types, all typed                      |
+| NMEA sentence coverage | ~10 types, rest manual              | 52 types, all typed                      |
 | AIS message coverage   | ~5 types                            | 16 types (1-9, 11-15, 18-19, 21, 24, 27) |
 | Encoding               | Read-only                           | Bidirectional (parse + encode)           |
 | Error distinction      | Can't tell unsupported vs malformed | Frame errors vs content errors           |
@@ -151,7 +151,7 @@ nmea-kit = "0.5"
 
 | Feature                                                                                                                                                                                                                                | Default    | Enables                    |
 | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- | -------------------------- |
-| `nmea`                                                                                                                                                                                                         | yes        | All 50 NMEA sentence types |
+| `nmea`                                                                                                                                                                                                         | yes        | All 52 NMEA sentence types |
 | `ais`                                                                                                                                                                                                                                  | yes        | AIS message decoding       |
 | `positioning`                                                                                                                                                                                                                          | via `nmea` | GGA, GLL, RMC, GNS         |
 | `speed`                                                                                                                                                                                                                                | via `nmea` | VTG, VHW, VBW, RMC         |

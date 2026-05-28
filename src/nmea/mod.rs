@@ -116,11 +116,13 @@ nmea_sentences![
         // Navigation
         ["aam", Aam, "AAM"],
         ["apb", Apb, "APB"],
+        ["bec", Bec, "BEC"],
         ["bod", Bod, "BOD"],
         ["bwc", Bwc, "BWC"],
         ["bwr", Bwr, "BWR"],
         ["bww", Bww, "BWW"],
         ["rmb", Rmb, "RMB"],
+        ["rte", Rte, "RTE"],
         ["wcv", Wcv, "WCV"],
         ["wpl", Wpl, "WPL"],
         ["xte", Xte, "XTE"],
