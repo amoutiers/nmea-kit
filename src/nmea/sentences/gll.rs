@@ -43,9 +43,9 @@ impl NmeaEncodable for Gll {
 
     fn encode(&self) -> Vec<String> {
         let mut w = FieldWriter::new();
-        w.f64(self.lat);
+        w.lat(self.lat);
         w.char(self.ns);
-        w.f64(self.lon);
+        w.lon(self.lon);
         w.char(self.ew);
         w.string(self.time.as_deref());
         w.char(self.status);
@@ -96,6 +96,16 @@ mod tests {
         assert_eq!(gll.time, Some("103607.00".to_string()));
         assert_eq!(gll.status, Some('A'));
         assert_eq!(gll.mode, Some('A'));
+    }
+
+    #[test]
+    fn gll_encode_pads_longitude_degrees() {
+        let frame = parse_frame("$GPGLL,5958.613,N,02325.928,E,120000,A*29")
+            .expect("valid GLL");
+        let gll = Gll::parse(&frame.fields).expect("parse GLL");
+        let sentence = gll.to_sentence("GP");
+        // Longitude 023°25.928' must keep its 3-digit (5-char integer) degree field.
+        assert!(sentence.contains(",02325.928,"), "leading zero lost: {sentence}");
     }
 
     #[test]

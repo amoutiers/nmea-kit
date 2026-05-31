@@ -63,9 +63,9 @@ impl NmeaEncodable for Rmc {
         let mut w = FieldWriter::new();
         w.string(self.time.as_deref());
         w.char(self.status);
-        w.f64(self.lat);
+        w.lat(self.lat);
         w.char(self.ns);
-        w.f64(self.lon);
+        w.lon(self.lon);
         w.char(self.ew);
         w.f32(self.sog);
         w.f32(self.cog);

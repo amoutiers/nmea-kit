@@ -59,9 +59,9 @@ impl NmeaEncodable for Tll {
     fn encode(&self) -> Vec<String> {
         let mut w = FieldWriter::new();
         w.u8(self.target_num);
-        w.f64(self.lat);
+        w.lat(self.lat);
         w.char(self.ns);
-        w.f64(self.lon);
+        w.lon(self.lon);
         w.char(self.ew);
         w.string(self.name.as_deref());
         w.string(self.time.as_deref());

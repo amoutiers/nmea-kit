@@ -62,9 +62,9 @@ impl NmeaEncodable for Gns {
     fn encode(&self) -> Vec<String> {
         let mut w = FieldWriter::new();
         w.string(self.time.as_deref());
-        w.f64(self.lat);
+        w.lat(self.lat);
         w.char(self.ns);
-        w.f64(self.lon);
+        w.lon(self.lon);
         w.char(self.ew);
         w.string(self.mode.as_deref());
         w.u8(self.num_sats);

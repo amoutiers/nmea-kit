@@ -65,9 +65,9 @@ impl NmeaEncodable for Gga {
     fn encode(&self) -> Vec<String> {
         let mut w = FieldWriter::new();
         w.string(self.time.as_deref());
-        w.f64(self.lat);
+        w.lat(self.lat);
         w.char(self.ns);
-        w.f64(self.lon);
+        w.lon(self.lon);
         w.char(self.ew);
         w.u8(self.quality);
         w.u8(self.num_sats);

@@ -42,9 +42,9 @@ impl NmeaEncodable for Wpl {
 
     fn encode(&self) -> Vec<String> {
         let mut w = FieldWriter::new();
-        w.f64(self.lat);
+        w.lat(self.lat);
         w.char(self.ns);
-        w.f64(self.lon);
+        w.lon(self.lon);
         w.char(self.ew);
         w.string(self.ident.as_deref());
         w.finish()
