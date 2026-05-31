@@ -77,7 +77,7 @@ impl FragmentCollector {
         let msg_id_str = fields[2];
         let channel = fields[3].chars().next().unwrap_or('A');
         let payload = fields[4];
-        let fill_bits: u8 = fields[5].parse().unwrap_or(0);
+        let fill_bits: u8 = fields[5].parse().ok().filter(|&n| n <= 5)?;
 
         if total == 0 || frag_num == 0 || frag_num > total || total > MAX_FRAGMENTS {
             return None;
@@ -219,5 +219,14 @@ mod tests {
     fn zero_total_rejected() {
         let mut c = FragmentCollector::new();
         assert!(c.process(&["0", "1", "", "A", "payload", "0"]).is_none());
+    }
+
+    #[test]
+    fn invalid_fill_bits_rejected() {
+        let mut c = FragmentCollector::new();
+        // fill_bits 7 is out of range (valid 0-5) -> reject.
+        assert!(
+            c.process(&["1", "1", "", "A", "13u@Dt002s000000000000000000", "7"]).is_none()
+        );
     }
 }
