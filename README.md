@@ -5,12 +5,12 @@ Bidirectional NMEA 0183 parser/encoder with AIS message decoding, written in Rus
 | | |
 | --- | --- |
 | **Crate** | `nmea-kit` |
-| **Version** | 0.6.2 |
+| **Version** | 0.7.0 |
 | **MSRV** | 1.85.0 |
 | **Edition** | 2024 |
 | **Dependencies** | 0 |
 | **License** | MIT OR Apache-2.0 |
-| **NMEA sentences** | 52 (bidirectional: parse + encode) |
+| **NMEA sentences** | 54 (bidirectional: parse + encode) |
 | **AIS message types** | 16 (read-only decode) |
 
 - **Shared frame layer** — handles `$` (NMEA) and `!` (AIS) framing, IEC 61162-450 tag blocks
@@ -76,7 +76,7 @@ flowchart TD
     frame --> ais_in["! AIVDM/AIVDO"]
     known --> typed["Typed struct\nMwd, Rmc…"]
     unknown --> raw_fields["Raw fields\npass-through"]
-    ais_in --> ais_msg["AisMessage enum\nTypes 1-5, 14, 18, 19, 21, 24, 27"]
+    ais_in --> ais_msg["AisMessage enum\nTypes 1-9, 11-15, 18-19, 21, 24, 27"]
 ```
 
 **Frame layer** validates checksum, strips tag blocks, extracts talker ID and sentence type. Shared by both NMEA and AIS.
@@ -95,11 +95,11 @@ flowchart TD
 | Satellites         | GBS, GSA, GSV, GST    |
 | Wind               | MWD, MWV, VWR, VWT    |
 | Heading            | HDT, HDG, HDM, THS    |
-| Course & Speed     | VBW, VLW, VTG, VHW    |
+| Course & Speed     | RPM, VBW, VDR, VLW, VTG, VHW    |
 | Depth              | DPT, DBT, DBS, DBK    |
 | Steering           | ROT, RSA              |
 | Environment        | MDA, MTW, XDR¹        |
-| Waypoints & Routes | AAM, APB, BOD, BWC, BWW, RMB, WCV, WPL, XTE |
+| Waypoints & Routes | AAM, APB, BEC, BOD, BWC, BWR, BWW, RMB, RTE, WCV, WPL, XTE |
 | Radar / Targets    | RSD, TLL, TTM         |
 | Safety & Alarms    | ACK, HBT              |
 | Communication      | TXT                   |
@@ -127,13 +127,13 @@ flowchart TD
 | 19      | `PositionReport`    | Class B+ extended position                           |
 | 21      | `AidToNavigation`   | Aid-to-navigation report (buoys, beacons)            |
 | 24      | `StaticDataReport`  | Static data report (Class B)                         |
-| 27      | `LongRangePosition` | Long range position (satellite AIS, 1/10° precision) |
+| 27      | `LongRangePosition` | Long range position (satellite AIS, 1/10 minute precision) |
 
 ### Key improvements over existing crates
 
 | Issue                  | `nmea` 0.7 / `ais` 0.12             | `nmea-kit`                               |
 | ---------------------- | ----------------------------------- | ---------------------------------------- |
-| NMEA sentence coverage | ~10 types, rest manual              | 52 types, all typed                      |
+| NMEA sentence coverage | ~10 types, rest manual              | 54 types, all typed                      |
 | AIS message coverage   | ~5 types                            | 16 types (1-9, 11-15, 18-19, 21, 24, 27) |
 | Encoding               | Read-only                           | Bidirectional (parse + encode)           |
 | Error distinction      | Can't tell unsupported vs malformed | Frame errors vs content errors           |
@@ -146,12 +146,12 @@ flowchart TD
 
 ```toml
 [dependencies]
-nmea-kit = "0.5"
+nmea-kit = "0.7"
 ```
 
 | Feature                                                                                                                                                                                                                                | Default    | Enables                    |
 | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- | -------------------------- |
-| `nmea`                                                                                                                                                                                                         | yes        | All 52 NMEA sentence types |
+| `nmea`                                                                                                                                                                                                         | yes        | All 54 NMEA sentence types |
 | `ais`                                                                                                                                                                                                                                  | yes        | AIS message decoding       |
 | `positioning`                                                                                                                                                                                                                          | via `nmea` | GGA, GLL, RMC, GNS         |
 | `speed`                                                                                                                                                                                                                                | via `nmea` | VTG, VHW, VBW, RMC         |
@@ -164,19 +164,19 @@ Use a group feature for common use cases:
 
 ```toml
 # Only positioning sentences (GGA, GLL, RMC, GNS), no AIS
-nmea-kit = { version = "0.5", default-features = false, features = ["positioning"] }
+nmea-kit = { version = "0.7", default-features = false, features = ["positioning"] }
 ```
 
 Cherry-pick individual sentences you need:
 
 ```toml
-nmea-kit = { version = "0.5", default-features = false, features = ["rmc", "mwd"] }
+nmea-kit = { version = "0.7", default-features = false, features = ["rmc", "mwd"] }
 ```
 
 NMEA-only (no AIS, all sentences):
 
 ```toml
-nmea-kit = { version = "0.5", default-features = false, features = ["nmea"] }
+nmea-kit = { version = "0.7", default-features = false, features = ["nmea"] }
 ```
 
 ## Coordinate conversion

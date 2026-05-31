@@ -21,6 +21,9 @@ All notable changes to nmea-kit are documented here.
 - AIS 6-bit armor gap characters (`0x58`–`0x5F`) are now rejected; `extract_i32` no longer overflows at `len == 32`.
 - Removed the last panic-family macro (`unreachable!`) from library code.
 
+### Note
+- NMEA sentence coverage is **54** (51 standard + 3 proprietary). Earlier changelog running tallies under-counted by 2; this is the authoritative total.
+
 ## [0.6.2] — 2026-05-28
 
 ### Added

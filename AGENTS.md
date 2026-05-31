@@ -7,7 +7,7 @@ Bidirectional NMEA 0183 parser/encoder + AIS decoder. Zero dependencies. MIT/Apa
 | Crate | `nmea-kit` v0.7.0 |
 | Edition | 2024, MSRV 1.85.0 |
 | Dependencies | 0 |
-| NMEA sentences | 52 (bidirectional) |
+| NMEA sentences | 54 (bidirectional) |
 | AIS message types | 16 (read-only) |
 | Tests | 516, 0 failures |
 | Unsafe blocks | 0 |
@@ -29,8 +29,7 @@ encode_frame(prefix: char, talker: &str, sentence_type: &str, fields: &[&str]) -
 use nmea_kit::{NmeaSentence, NmeaEncodable};
 
 NmeaSentence::parse(&frame) -> NmeaSentence   // enum variant per type
-value.to_sentence(talker: &str) -> String      // NmeaEncodable — standard sentences
-value.to_proprietary_sentence() -> String      // NmeaEncodable — proprietary sentences
+value.to_sentence(talker: &str) -> String      // NmeaEncodable; proprietary types ignore talker
 
 // Individual sentence types
 use nmea_kit::nmea::sentences::{Mwd, Rmc, Dbt, ...};     // standard
@@ -88,6 +87,7 @@ pub struct Rmc {
     pub mag_var: Option<f32>,
     pub mag_var_ew: Option<char>,
     pub pos_mode: Option<char>,     // 'A'=autonomous, 'D'=differential
+    pub nav_status: Option<char>,   // NMEA 4.1 nav status: 'S'/'C'/'U'/'V'
 }
 
 pub struct Mwd {
@@ -137,6 +137,7 @@ pub enum AisMessage {
     AidToNavigation(AidToNavigation),    // Type 21
     StaticReport(StaticDataReport),      // Type 24
     LongRangePosition(LongRangePosition),// Type 27
+    Unknown { msg_type: u8 },              // unsupported message type
 }
 ```
 
@@ -184,8 +185,8 @@ these and sets `talker = ""`, `sentence_type = full address` (e.g. `"PASHR"`, `"
 This prevents collisions with standard 3-char types (e.g. `$PSKPDPT` won't match `DPT`).
 
 Proprietary types additionally set:
-- `PROPRIETARY_ID` — the full wire address (`"PASHR"`, `"PSKPDPT"`, etc.)
-- `to_proprietary_sentence()` — encodes without a separate talker
+- `SENTENCE_TYPE` — the full wire address (`"PASHR"`, `"PSKPDPT"`, etc.)
+- `const PROPRIETARY: bool = true` — makes `to_sentence(talker)` ignore the talker and emit the full address
 
 Dispatch uses a two-path match in the `nmea_sentences!` macro: standard types match on
 `sentence_type` when `talker` is non-empty, proprietary types match on the full address
