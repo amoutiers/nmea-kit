@@ -102,6 +102,12 @@ pub fn parse_frame(line: &str) -> Result<NmeaFrame<'_>, FrameError> {
         return Err(FrameError::TooShort);
     }
 
+    // Address is ASCII by spec; guard the byte-index slices below against
+    // multi-byte UTF-8 that would otherwise panic on a non-char-boundary.
+    if !addr.is_ascii() {
+        return Err(FrameError::NonAsciiAddress);
+    }
+
     // Proprietary sentences: address starts with 'P' (reserved per NMEA 0183).
     // Standard sentences: first 2 chars = talker, last 3 chars = sentence type.
     let (talker, sentence_type) = if addr.starts_with('P') {
@@ -293,6 +299,19 @@ mod tests {
     #[test]
     fn error_too_short() {
         assert_eq!(parse_frame("$GP*17"), Err(FrameError::TooShort));
+    }
+
+    #[test]
+    fn non_ascii_address_returns_err_not_panic() {
+        // Multi-byte UTF-8 in the address field must not panic the byte-index slice.
+        assert_eq!(
+            parse_frame("$é12,foo"),
+            Err(FrameError::NonAsciiAddress)
+        );
+        assert_eq!(
+            parse_frame("$Aé,1,2"),
+            Err(FrameError::NonAsciiAddress)
+        );
     }
 
     #[test]

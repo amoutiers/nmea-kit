@@ -14,6 +14,8 @@ pub enum FrameError {
     MalformedTagBlock,
     /// Sentence too short to contain talker + type (minimum 5 chars: e.g. "GPRMC").
     TooShort,
+    /// Address (talker + type) contains non-ASCII bytes (NMEA addresses are ASCII).
+    NonAsciiAddress,
 }
 
 impl core::fmt::Display for FrameError {
@@ -30,6 +32,7 @@ impl core::fmt::Display for FrameError {
             }
             Self::MalformedTagBlock => write!(f, "malformed IEC 61162-450 tag block"),
             Self::TooShort => write!(f, "sentence too short"),
+            Self::NonAsciiAddress => write!(f, "address field contains non-ASCII bytes"),
         }
     }
 }
