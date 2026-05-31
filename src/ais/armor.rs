@@ -15,12 +15,14 @@ pub fn decode_armor(payload: &str, fill_bits: u8) -> Option<Vec<u8>> {
     let mut bits = Vec::with_capacity(payload.len() * 6);
 
     for ch in payload.bytes() {
-        let mut val = ch.checked_sub(48)?; // byte below ASCII '0' is invalid
+        // Valid 6-bit armor alphabet: 0x30-0x57 ('0'-'W') and 0x60-0x77 ('`'-'w').
+        // The gap 0x58-0x5F and anything outside the range are invalid.
+        if !(0x30..=0x57).contains(&ch) && !(0x60..=0x77).contains(&ch) {
+            return None;
+        }
+        let mut val = ch - 48;
         if val > 40 {
             val -= 8; // skip the gap 0x58-0x5F
-        }
-        if val > 63 {
-            return None; // invalid character
         }
 
         // Extract 6 bits, MSB first
@@ -161,6 +163,16 @@ mod tests {
     fn decode_low_byte_rejected() {
         // Byte 0x20 (space) is below valid AIS range — must not panic
         assert!(decode_armor("\x20", 0).is_none());
+    }
+
+    #[test]
+    fn decode_rejects_gap_characters() {
+        // 0x58 'X' .. 0x5F '_' are the reserved gap and must be rejected.
+        assert!(decode_armor("X", 0).is_none(), "'X' (0x58) must be rejected");
+        assert!(decode_armor("_", 0).is_none(), "'_' (0x5F) must be rejected");
+        // Sanity: legitimate characters on each side of the gap still decode.
+        assert!(decode_armor("W", 0).is_some()); // 0x57, last before gap
+        assert!(decode_armor("`", 0).is_some()); // 0x60, first after gap
     }
 
     #[test]
