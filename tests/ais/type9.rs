@@ -31,3 +31,16 @@ fn type9_second_fixture_gpsd() {
         panic!("expected SarAircraft, got {msg:?}");
     }
 }
+
+#[test]
+fn type9_flag_offsets_gpsd() {
+    let mut parser = AisParser::new();
+    // This gpsd fixture has DTE set (bit 142 == 1).
+    let frame = parse_frame("!AIVDM,1,1,,B,91b55wi;hbOS@OdQAC062Ch2089h,0*30").expect("valid");
+    match parser.decode(&frame).expect("decoded") {
+        AisMessage::SarAircraft(sar) => {
+            assert!(sar.dte, "DTE@142 should be true for this fixture");
+        }
+        other => panic!("expected SarAircraft, got {other:?}"),
+    }
+}

@@ -42,9 +42,11 @@ impl SarAircraftReport {
         let lat_raw = extract_i32(bits, 89, 27)?;
         let cog_raw = extract_u32(bits, 116, 12)?;
         let ts_raw = extract_u32(bits, 128, 6)? as u8;
-        let dte = extract_u32(bits, 134, 1)? == 1; // Note: DTE=0 means "DTE ready"
-        let assigned = extract_u32(bits, 138, 1)? == 1;
-        let raim = extract_u32(bits, 139, 1)? == 1;
+        // ITU-R M.1371 Type 9: regional/reserved 134-141, DTE@142, spare 143-145,
+        // assigned@146, RAIM@147.
+        let dte = extract_u32(bits, 142, 1)? == 1; // Note: DTE=0 means "DTE ready"
+        let assigned = extract_u32(bits, 146, 1)? == 1;
+        let raim = extract_u32(bits, 147, 1)? == 1;
         Some(Self {
             mmsi,
             altitude: if alt_raw == 4095 {
