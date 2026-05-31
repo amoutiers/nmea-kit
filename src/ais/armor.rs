@@ -58,7 +58,9 @@ pub fn extract_i32(bits: &[u8], offset: usize, len: usize) -> Option<i32> {
     // Check sign bit
     if len > 0 && (raw >> (len - 1)) & 1 == 1 {
         // Negative: sign-extend
-        let mask = u32::MAX << len;
+        // For len == 32 the value already fills all bits, so the mask is empty
+        // (a 32-bit shift would overflow).
+        let mask = if len >= 32 { 0 } else { u32::MAX << len };
         Some((raw | mask) as i32)
     } else {
         Some(raw as i32)
@@ -180,5 +182,12 @@ mod tests {
         let bits = decode_armor("0", 0).expect("valid");
         assert_eq!(bits.len(), 6);
         assert_eq!(&bits, &[0, 0, 0, 0, 0, 0]);
+    }
+
+    #[test]
+    fn extract_i32_len_32_no_overflow() {
+        // 32 one-bits = -1 in two's complement; must not panic on the mask shift.
+        let bits = [1u8; 32];
+        assert_eq!(extract_i32(&bits, 0, 32), Some(-1));
     }
 }
