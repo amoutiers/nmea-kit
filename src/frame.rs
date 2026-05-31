@@ -123,10 +123,12 @@ pub fn parse_frame(line: &str) -> Result<NmeaFrame<'_>, FrameError> {
         ""
     };
 
-    let fields: Vec<&str> = if fields_str.is_empty() {
-        Vec::new()
+    // A present-but-empty remainder (address followed by a comma) is one empty
+    // field; only the absence of any comma after the address means zero fields.
+    let fields: Vec<&str> = if addr_end < body.len() {
+        fields_str.split(',').collect() // yields [""] when fields_str is ""
     } else {
-        fields_str.split(',').collect()
+        Vec::new()
     };
 
     Ok(NmeaFrame {
@@ -415,6 +417,13 @@ mod tests {
         assert!(frame.tag_block.is_some());
         assert_eq!(frame.prefix, '$');
         assert_eq!(frame.sentence_type, "RMC");
+    }
+
+    #[test]
+    fn single_trailing_comma_is_one_empty_field() {
+        // "$GPABC," (address + one trailing comma) is ONE empty field, not zero.
+        let f = parse_frame("$GPABC,*7B").expect("valid");
+        assert_eq!(f.fields, vec![""]);
     }
 
     #[test]
