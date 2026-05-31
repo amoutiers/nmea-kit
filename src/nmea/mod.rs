@@ -3,7 +3,7 @@
 mod field;
 pub mod sentences;
 
-pub use field::*;
+pub use field::{NmeaEncodable, ddmm_to_decimal, decimal_to_ddmm};
 pub use sentences::*;
 
 use crate::NmeaFrame;

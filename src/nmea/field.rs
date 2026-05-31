@@ -7,18 +7,18 @@
 ///
 /// Wraps a slice of `&str` fields and reads them in order,
 /// advancing an internal index after each read.
-pub struct FieldReader<'a> {
+pub(crate) struct FieldReader<'a> {
     fields: &'a [&'a str],
     idx: usize,
 }
 
 impl<'a> FieldReader<'a> {
-    pub fn new(fields: &'a [&'a str]) -> Self {
+    pub(crate) fn new(fields: &'a [&'a str]) -> Self {
         Self { fields, idx: 0 }
     }
 
     /// Read an optional f32 and advance.
-    pub fn f32(&mut self) -> Option<f32> {
+    pub(crate) fn f32(&mut self) -> Option<f32> {
         let val = self.fields.get(self.idx).and_then(|f| {
             if f.is_empty() {
                 None
@@ -31,7 +31,7 @@ impl<'a> FieldReader<'a> {
     }
 
     /// Read an optional f64 and advance.
-    pub fn f64(&mut self) -> Option<f64> {
+    pub(crate) fn f64(&mut self) -> Option<f64> {
         let val = self.fields.get(self.idx).and_then(|f| {
             if f.is_empty() {
                 None
@@ -44,7 +44,7 @@ impl<'a> FieldReader<'a> {
     }
 
     /// Read an optional u8 and advance.
-    pub fn u8(&mut self) -> Option<u8> {
+    pub(crate) fn u8(&mut self) -> Option<u8> {
         let val = self.fields.get(self.idx).and_then(|f| {
             if f.is_empty() {
                 None
@@ -57,7 +57,7 @@ impl<'a> FieldReader<'a> {
     }
 
     /// Read an optional u32 and advance.
-    pub fn u32(&mut self) -> Option<u32> {
+    pub(crate) fn u32(&mut self) -> Option<u32> {
         let val = self.fields.get(self.idx).and_then(|f| {
             if f.is_empty() {
                 None
@@ -70,7 +70,7 @@ impl<'a> FieldReader<'a> {
     }
 
     /// Read an optional i8 and advance.
-    pub fn i8(&mut self) -> Option<i8> {
+    pub(crate) fn i8(&mut self) -> Option<i8> {
         let val = self.fields.get(self.idx).and_then(|f| {
             if f.is_empty() {
                 None
@@ -83,7 +83,8 @@ impl<'a> FieldReader<'a> {
     }
 
     /// Read an optional u16 and advance.
-    pub fn u16(&mut self) -> Option<u16> {
+    #[expect(dead_code, reason = "reserved for future sentence types")]
+    pub(crate) fn u16(&mut self) -> Option<u16> {
         let val = self.fields.get(self.idx).and_then(|f| {
             if f.is_empty() { None } else { f.parse::<u16>().ok() }
         });
@@ -92,7 +93,8 @@ impl<'a> FieldReader<'a> {
     }
 
     /// Read an optional i16 and advance.
-    pub fn i16(&mut self) -> Option<i16> {
+    #[expect(dead_code, reason = "reserved for future sentence types")]
+    pub(crate) fn i16(&mut self) -> Option<i16> {
         let val = self.fields.get(self.idx).and_then(|f| {
             if f.is_empty() { None } else { f.parse::<i16>().ok() }
         });
@@ -101,7 +103,8 @@ impl<'a> FieldReader<'a> {
     }
 
     /// Read an optional i32 and advance.
-    pub fn i32(&mut self) -> Option<i32> {
+    #[expect(dead_code, reason = "reserved for future sentence types")]
+    pub(crate) fn i32(&mut self) -> Option<i32> {
         let val = self.fields.get(self.idx).and_then(|f| {
             if f.is_empty() { None } else { f.parse::<i32>().ok() }
         });
@@ -110,7 +113,7 @@ impl<'a> FieldReader<'a> {
     }
 
     /// Read an optional single character and advance.
-    pub fn char(&mut self) -> Option<char> {
+    pub(crate) fn char(&mut self) -> Option<char> {
         let val = self
             .fields
             .get(self.idx)
@@ -120,7 +123,7 @@ impl<'a> FieldReader<'a> {
     }
 
     /// Read an optional non-empty string and advance.
-    pub fn string(&mut self) -> Option<String> {
+    pub(crate) fn string(&mut self) -> Option<String> {
         let val = self.fields.get(self.idx).and_then(|f| {
             if f.is_empty() {
                 None
@@ -133,7 +136,7 @@ impl<'a> FieldReader<'a> {
     }
 
     /// Skip one field (fixed indicator) and advance.
-    pub fn skip(&mut self) {
+    pub(crate) fn skip(&mut self) {
         self.idx += 1;
     }
 }
@@ -141,17 +144,17 @@ impl<'a> FieldReader<'a> {
 /// Sequential field writer for NMEA sentence encoding.
 ///
 /// Builds a `Vec<String>` of field values in wire order.
-pub struct FieldWriter {
+pub(crate) struct FieldWriter {
     fields: Vec<String>,
 }
 
 impl FieldWriter {
-    pub fn new() -> Self {
+    pub(crate) fn new() -> Self {
         Self { fields: Vec::new() }
     }
 
     /// Write an optional f32. `None` → empty field. Non-finite → empty field. `-0.0` → `"0"`.
-    pub fn f32(&mut self, value: Option<f32>) {
+    pub(crate) fn f32(&mut self, value: Option<f32>) {
         self.fields.push(match value {
             Some(v) if !v.is_finite() => String::new(),
             Some(v) => format!("{}", if v == 0.0 { 0.0 } else { v }),
@@ -160,7 +163,8 @@ impl FieldWriter {
     }
 
     /// Write an optional f64. `None` → empty field. Non-finite → empty field. `-0.0` → `"0"`.
-    pub fn f64(&mut self, value: Option<f64>) {
+    #[cfg_attr(not(test), expect(dead_code, reason = "reserved for future sentence types"))]
+    pub(crate) fn f64(&mut self, value: Option<f64>) {
         self.fields.push(match value {
             Some(v) if !v.is_finite() => String::new(),
             Some(v) => format!("{}", if v == 0.0 { 0.0 } else { v }),
@@ -169,7 +173,7 @@ impl FieldWriter {
     }
 
     /// Write an optional u8. `None` → empty field.
-    pub fn u8(&mut self, value: Option<u8>) {
+    pub(crate) fn u8(&mut self, value: Option<u8>) {
         self.fields.push(match value {
             Some(v) => v.to_string(),
             None => String::new(),
@@ -177,7 +181,7 @@ impl FieldWriter {
     }
 
     /// Write an optional i8. `None` → empty field.
-    pub fn i8(&mut self, value: Option<i8>) {
+    pub(crate) fn i8(&mut self, value: Option<i8>) {
         self.fields.push(match value {
             Some(v) => v.to_string(),
             None => String::new(),
@@ -185,7 +189,7 @@ impl FieldWriter {
     }
 
     /// Write an optional u32. `None` → empty field.
-    pub fn u32(&mut self, value: Option<u32>) {
+    pub(crate) fn u32(&mut self, value: Option<u32>) {
         self.fields.push(match value {
             Some(v) => v.to_string(),
             None => String::new(),
@@ -193,7 +197,8 @@ impl FieldWriter {
     }
 
     /// Write an optional u16. `None` → empty field.
-    pub fn u16(&mut self, value: Option<u16>) {
+    #[expect(dead_code, reason = "reserved for future sentence types")]
+    pub(crate) fn u16(&mut self, value: Option<u16>) {
         self.fields.push(match value {
             Some(v) => v.to_string(),
             None => String::new(),
@@ -201,7 +206,8 @@ impl FieldWriter {
     }
 
     /// Write an optional i16. `None` → empty field.
-    pub fn i16(&mut self, value: Option<i16>) {
+    #[expect(dead_code, reason = "reserved for future sentence types")]
+    pub(crate) fn i16(&mut self, value: Option<i16>) {
         self.fields.push(match value {
             Some(v) => v.to_string(),
             None => String::new(),
@@ -209,7 +215,8 @@ impl FieldWriter {
     }
 
     /// Write an optional i32. `None` → empty field.
-    pub fn i32(&mut self, value: Option<i32>) {
+    #[expect(dead_code, reason = "reserved for future sentence types")]
+    pub(crate) fn i32(&mut self, value: Option<i32>) {
         self.fields.push(match value {
             Some(v) => v.to_string(),
             None => String::new(),
@@ -217,7 +224,7 @@ impl FieldWriter {
     }
 
     /// Write an optional char. `None` → empty field.
-    pub fn char(&mut self, value: Option<char>) {
+    pub(crate) fn char(&mut self, value: Option<char>) {
         self.fields.push(match value {
             Some(c) => c.to_string(),
             None => String::new(),
@@ -226,13 +233,13 @@ impl FieldWriter {
 
     /// Write an optional latitude in NMEA `DDMM.MMMM` form (integer part zero-padded
     /// to 4 digits). `None` → empty field.
-    pub fn lat(&mut self, value: Option<f64>) {
+    pub(crate) fn lat(&mut self, value: Option<f64>) {
         self.push_coord(value, 4);
     }
 
     /// Write an optional longitude in NMEA `DDDMM.MMMM` form (integer part zero-padded
     /// to 5 digits). `None` → empty field.
-    pub fn lon(&mut self, value: Option<f64>) {
+    pub(crate) fn lon(&mut self, value: Option<f64>) {
         self.push_coord(value, 5);
     }
 
@@ -253,17 +260,17 @@ impl FieldWriter {
     }
 
     /// Write a fixed indicator character (always emitted).
-    pub fn fixed(&mut self, c: char) {
+    pub(crate) fn fixed(&mut self, c: char) {
         self.fields.push(c.to_string());
     }
 
     /// Write an optional string. `None` → empty field.
-    pub fn string(&mut self, value: Option<&str>) {
+    pub(crate) fn string(&mut self, value: Option<&str>) {
         self.fields.push(value.unwrap_or("").to_string());
     }
 
     /// Consume and return the built field list.
-    pub fn finish(self) -> Vec<String> {
+    pub(crate) fn finish(self) -> Vec<String> {
         self.fields
     }
 }

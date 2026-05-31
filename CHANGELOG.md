@@ -5,6 +5,7 @@ All notable changes to nmea-kit are documented here.
 ## [0.7.0] - 2026-05-31
 
 ### Breaking
+- `FieldReader` / `FieldWriter` are no longer part of the public API (now `pub(crate)`) — they were unintended glob-re-export leakage.
 - `Gsv.signal_id`: `Option<u8>` → `Option<char>` (hex signal IDs were silently dropped).
 - `Rmc`: new field `nav_status: Option<char>` (NMEA 4.1).
 - `Gsa`: new field `system_id: Option<char>` (NMEA 4.11).
