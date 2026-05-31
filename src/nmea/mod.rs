@@ -51,31 +51,36 @@ macro_rules! nmea_sentences {
                 macro_rules! try_parse {
                     ($parser:expr, $v:ident) => {
                         match $parser(&frame.fields) {
-                            Some(v) => Self::$v(v),
-                            None => unreachable!("parse() always returns Some for known sentence types"),
+                            Some(v) => return Self::$v(v),
+                            // parse() is documented to always return Some for known
+                            // types; degrade to Unknown rather than panic if that
+                            // invariant is ever broken by a future change.
+                            None => return Self::from_frame(frame),
                         }
                     };
                 }
 
-                if frame.talker.is_empty() {
-                    // Proprietary path: sentence_type is the full address
-                    match frame.sentence_type {
-                        $(
-                            #[cfg(feature = $pfeat)]
-                            $pwire => try_parse!(sentences::$pvariant::parse, $pvariant),
-                        )*
-                        _ => Self::from_frame(frame),
-                    }
-                } else {
-                    // Standard path: sentence_type is the 3-char code
-                    match frame.sentence_type {
-                        $(
-                            #[cfg(feature = $feat)]
-                            $wire => try_parse!(sentences::$variant::parse, $variant),
-                        )*
-                        _ => Self::from_frame(frame),
-                    }
+                // Standard table first — matches the 3-char code for any frame.
+                // Proprietary wire codes (PASHR, PSKPDPT, …) never collide with a
+                // 3-char standard code, so a proprietary frame falls through.
+                match frame.sentence_type {
+                    $(
+                        #[cfg(feature = $feat)]
+                        $wire => try_parse!(sentences::$variant::parse, $variant),
+                    )*
+                    _ => {}
                 }
+
+                // Proprietary table — full address in `sentence_type`.
+                match frame.sentence_type {
+                    $(
+                        #[cfg(feature = $pfeat)]
+                        $pwire => try_parse!(sentences::$pvariant::parse, $pvariant),
+                    )*
+                    _ => {}
+                }
+
+                Self::from_frame(frame)
             }
 
             /// Build an `Unknown` variant preserving the frame's sentence type and fields.
@@ -166,3 +171,29 @@ nmea_sentences![
         ["pskpdpt", Pskpdpt, "PSKPDPT"],
     ]
 ];
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::parse_frame;
+
+    #[test]
+    fn talkerless_standard_address_dispatches() {
+        // A bare "$RMC,..." (no talker) parses with talker == "".
+        let frame = parse_frame("$RMC,175957.917,A,3857.1234,N,07705.1234,W,0.0,0.0,010100,,,A*60")
+            .expect("valid frame");
+        assert_eq!(frame.talker, "");
+        assert_eq!(frame.sentence_type, "RMC");
+        // It must dispatch to the standard Rmc variant, not Unknown.
+        assert!(matches!(NmeaSentence::parse(&frame), NmeaSentence::Rmc(_)));
+    }
+
+    #[test]
+    fn proprietary_still_dispatches() {
+        let frame = parse_frame("$PSKPDPT,0002.5,+00.0,0010,10,03,*77").expect("valid");
+        assert!(matches!(
+            NmeaSentence::parse(&frame),
+            NmeaSentence::Pskpdpt(_)
+        ));
+    }
+}
