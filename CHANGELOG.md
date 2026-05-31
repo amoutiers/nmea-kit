@@ -2,6 +2,25 @@
 
 All notable changes to nmea-kit are documented here.
 
+## [0.7.0] - 2026-05-31
+
+### Breaking
+- `Gsv.signal_id`: `Option<u8>` → `Option<char>` (hex signal IDs were silently dropped).
+- `Rmc`: new field `nav_status: Option<char>` (NMEA 4.1).
+- `Gsa`: new field `system_id: Option<char>` (NMEA 4.11).
+- `Rmb.dest_lat`/`dest_lon`, `Bwc.lat`/`lon`, `Bwr.lat`/`lon`, `Bec.lat`/`lon`: `Option<f32>` → `Option<f64>` (coordinate precision).
+- `NmeaEncodable`: removed `PROPRIETARY_ID` and `to_proprietary_sentence()`; added `const PROPRIETARY: bool`. Proprietary types now set `SENTENCE_TYPE` to the full address. Migrate `x.to_proprietary_sentence()` → `x.to_sentence("")`.
+
+### Fixed
+- `parse_frame` no longer panics on a non-ASCII address; returns `FrameError::NonAsciiAddress`.
+- AIS Type 27 latitude/longitude were scaled by 10 instead of 600 (1/10 minute) — positions were corrupted/dropped.
+- AIS Type 24 Part B `callsign` and `ship_type` were read at the wrong bit offsets (garbage output).
+- AIS Type 9 `dte`/`assigned`/`raim` flags were read at the wrong bit offsets.
+- GSV hex signal IDs and the RMC/GSA NMEA 4.x trailing fields were silently dropped on parse and lost on re-encode.
+- Position sentences now encode coordinates with zero-padded degrees (`00454.5784`, not `454.5784`).
+- AIS 6-bit armor gap characters (`0x58`–`0x5F`) are now rejected; `extract_i32` no longer overflows at `len == 32`.
+- Removed the last panic-family macro (`unreachable!`) from library code.
+
 ## [0.6.2] — 2026-05-28
 
 ### Added

@@ -170,8 +170,14 @@ mod tests {
     #[test]
     fn decode_rejects_gap_characters() {
         // 0x58 'X' .. 0x5F '_' are the reserved gap and must be rejected.
-        assert!(decode_armor("X", 0).is_none(), "'X' (0x58) must be rejected");
-        assert!(decode_armor("_", 0).is_none(), "'_' (0x5F) must be rejected");
+        assert!(
+            decode_armor("X", 0).is_none(),
+            "'X' (0x58) must be rejected"
+        );
+        assert!(
+            decode_armor("_", 0).is_none(),
+            "'_' (0x5F) must be rejected"
+        );
         // Sanity: legitimate characters on each side of the gap still decode.
         assert!(decode_armor("W", 0).is_some()); // 0x57, last before gap
         assert!(decode_armor("`", 0).is_some()); // 0x60, first after gap

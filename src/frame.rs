@@ -304,14 +304,8 @@ mod tests {
     #[test]
     fn non_ascii_address_returns_err_not_panic() {
         // Multi-byte UTF-8 in the address field must not panic the byte-index slice.
-        assert_eq!(
-            parse_frame("$é12,foo"),
-            Err(FrameError::NonAsciiAddress)
-        );
-        assert_eq!(
-            parse_frame("$Aé,1,2"),
-            Err(FrameError::NonAsciiAddress)
-        );
+        assert_eq!(parse_frame("$é12,foo"), Err(FrameError::NonAsciiAddress));
+        assert_eq!(parse_frame("$Aé,1,2"), Err(FrameError::NonAsciiAddress));
     }
 
     #[test]

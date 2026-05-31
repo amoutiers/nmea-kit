@@ -2,7 +2,7 @@ use crate::nmea::field::{FieldReader, FieldWriter, NmeaEncodable};
 
 /// RMC — Recommended Minimum Navigation Information.
 ///
-/// Wire: `time,status,lat,NS,lon,EW,sog,cog,date,magvar,magvarEW,mode`
+/// Wire: `time,status,lat,NS,lon,EW,sog,cog,date,magvar,magvarEW,mode,navstatus`
 #[derive(Debug, Clone, PartialEq)]
 pub struct Rmc {
     /// UTC time of fix (HHMMSS.SSS format).
