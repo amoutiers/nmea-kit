@@ -13,6 +13,7 @@ pub struct PositionReport {
     pub msg_type: u8,
     pub mmsi: u32,
     pub nav_status: Option<NavigationStatus>,
+    /// Rate of turn — raw ITU ROT_AIS indicator (not deg/min). None if not available.
     pub rate_of_turn: Option<f32>,
     pub sog: Option<f32>,
     pub position_accuracy: bool,

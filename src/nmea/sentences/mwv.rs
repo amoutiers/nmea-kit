@@ -7,7 +7,7 @@ use crate::nmea::field::{FieldReader, FieldWriter, NmeaEncodable};
 pub struct Mwv {
     /// Wind angle in degrees (0-360).
     pub wind_angle: Option<f32>,
-    /// Reference type ('R' = relative, 'T' = true).
+    /// Reference type ('R' = relative, 'T' = theoretical/true per NMEA).
     pub reference: Option<char>,
     /// Wind speed (unit in `speed_units` field).
     pub wind_speed: Option<f32>,

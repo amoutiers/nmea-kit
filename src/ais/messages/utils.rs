@@ -43,7 +43,7 @@ pub(crate) fn decode_heading(raw: u32) -> Option<u16> {
     if raw == 511 { None } else { Some(raw as u16) }
 }
 
-/// Decode rate of turn. -128 = not available.
+/// Decode rate of turn. Returns the raw ITU-R M.1371 ROT_AIS indicator value (not deg/min). -128 = not available.
 pub(crate) fn decode_rot(raw: i32) -> Option<f32> {
     if raw == -128 { None } else { Some(raw as f32) }
 }
