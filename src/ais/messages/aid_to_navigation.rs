@@ -72,6 +72,9 @@ mod tests {
         set_bits(&mut bits, 43, 6, 32); // ' '
         set_bits(&mut bits, 49, 6, 1); // 'A'
         let aton = AidToNavigation::decode(&bits).expect("decode");
-        assert_eq!(aton.name, " A", "leading space must be preserved (trailing-only trim)");
+        assert_eq!(
+            aton.name, " A",
+            "leading space must be preserved (trailing-only trim)"
+        );
     }
 }

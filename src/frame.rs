@@ -437,9 +437,18 @@ mod tests {
     #[test]
     fn checksum_format_strictness() {
         // Malformed checksum FORMATS are rejected (length/sign), regardless of XOR value.
-        assert_eq!(parse_frame("$GPRMC,A*+1F"), Err(FrameError::MalformedChecksum));
-        assert_eq!(parse_frame("$GPRMC,A*A"), Err(FrameError::MalformedChecksum));
-        assert_eq!(parse_frame("$GPRMC,A*1FA"), Err(FrameError::MalformedChecksum));
+        assert_eq!(
+            parse_frame("$GPRMC,A*+1F"),
+            Err(FrameError::MalformedChecksum)
+        );
+        assert_eq!(
+            parse_frame("$GPRMC,A*A"),
+            Err(FrameError::MalformedChecksum)
+        );
+        assert_eq!(
+            parse_frame("$GPRMC,A*1FA"),
+            Err(FrameError::MalformedChecksum)
+        );
         // Lowercase 2-digit hex is still accepted (real devices emit it).
         let lower = "$GNRMC,103607.00,A,5327.03942,N,10214.42462,W,0.046,,060321,,,A,V*0e";
         let upper = "$GNRMC,103607.00,A,5327.03942,N,10214.42462,W,0.046,,060321,,,A,V*0E";
