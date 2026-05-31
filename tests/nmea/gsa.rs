@@ -42,6 +42,7 @@ fn roundtrip() {
         pdop: Some(2.5),
         hdop: Some(1.3),
         vdop: Some(2.1),
+        system_id: None,
     };
     let sentence = original.to_sentence("GP");
     let frame = parse_frame(sentence.trim()).expect("re-parse");

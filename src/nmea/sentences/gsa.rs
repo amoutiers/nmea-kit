@@ -17,6 +17,8 @@ pub struct Gsa {
     pub hdop: Option<f32>,
     /// Vertical dilution of precision.
     pub vdop: Option<f32>,
+    /// GNSS system id (NMEA 4.11+): hex digit, 1=GPS, 2=GLONASS, 3=Galileo, 4=BeiDou, …
+    pub system_id: Option<char>,
 }
 
 impl Gsa {
@@ -43,6 +45,7 @@ impl Gsa {
         let pdop = r.f32();
         let hdop = r.f32();
         let vdop = r.f32();
+        let system_id = r.char();
         Some(Self {
             mode,
             fix_type,
@@ -50,6 +53,7 @@ impl Gsa {
             pdop,
             hdop,
             vdop,
+            system_id,
         })
     }
 }
@@ -67,6 +71,7 @@ impl NmeaEncodable for Gsa {
         w.f32(self.pdop);
         w.f32(self.hdop);
         w.f32(self.vdop);
+        w.char(self.system_id);
         w.finish()
     }
 }
@@ -85,6 +90,7 @@ mod tests {
             pdop: None,
             hdop: None,
             vdop: None,
+            system_id: None,
         }
         .to_sentence("GP");
         let frame = parse_frame(f.trim()).expect("valid");
@@ -117,6 +123,7 @@ mod tests {
             pdop: Some(2.5),
             hdop: Some(1.3),
             vdop: Some(2.1),
+            system_id: None,
         };
         let sentence = original.to_sentence("GP");
         let frame = parse_frame(sentence.trim()).expect("re-parse");
@@ -140,6 +147,20 @@ mod tests {
         assert!((gsa.pdop.expect("pdop") - 2.5).abs() < 0.01);
         assert!((gsa.hdop.expect("hdop") - 1.3).abs() < 0.01);
         assert!((gsa.vdop.expect("vdop") - 2.1).abs() < 0.01);
+    }
+
+    #[test]
+    fn gsa_system_id_4_11() {
+        // NMEA 4.11 GSA appends a GNSS system id; '4' (BeiDou) must round-trip.
+        let frame = parse_frame("$GNGSA,A,3,13,12,22,19,08,21,,,,,,,1.05,0.64,0.83,4*0B")
+            .expect("valid GN GSA frame");
+        let gsa = Gsa::parse(&frame.fields).expect("parse GSA");
+        assert_eq!(gsa.system_id, Some('4'));
+
+        let sentence = gsa.to_sentence("GN");
+        let frame2 = parse_frame(sentence.trim()).expect("re-parse");
+        let gsa2 = Gsa::parse(&frame2.fields).expect("re-parse");
+        assert_eq!(gsa2.system_id, Some('4'));
     }
 
     #[test]
