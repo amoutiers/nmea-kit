@@ -29,10 +29,34 @@ impl SafetyBroadcast {
         let mmsi = extract_u32(bits, 8, 30)?;
         let char_count = bits.len().saturating_sub(40) / 6;
         let text = if char_count > 0 {
-            extract_string(bits, 40, char_count)?.trim().to_string()
+            extract_string(bits, 40, char_count)?
         } else {
             String::new()
         };
         Some(Self { mmsi, text })
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// Build a Vec<u8> of individual bits: 40 zero bits (header), then 6-bit text chars.
+    fn build_bits(text_6bit: &[u8]) -> Vec<u8> {
+        let mut b = vec![0u8; 40];
+        for &c in text_6bit {
+            for i in 0..6 {
+                b.push((c >> (5 - i)) & 1);
+            }
+        }
+        b
+    }
+
+    #[test]
+    fn safety_text_preserves_leading_space() {
+        // 6-bit chars: 32 = ' ', 1 = 'A'  ->  " A"
+        let bits = build_bits(&[32, 1]);
+        let msg = SafetyBroadcast::decode(&bits).expect("decode");
+        assert_eq!(msg.text, " A", "leading space must be preserved (trailing-only trim)");
     }
 }

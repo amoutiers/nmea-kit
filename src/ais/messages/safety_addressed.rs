@@ -30,7 +30,7 @@ impl SafetyAddressed {
         let retransmit = extract_u32(bits, 70, 1)? == 1;
         let char_count = bits.len().saturating_sub(72) / 6;
         let text = if char_count > 0 {
-            extract_string(bits, 72, char_count)?.trim().to_string()
+            extract_string(bits, 72, char_count)?
         } else {
             String::new()
         };
