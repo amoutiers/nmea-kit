@@ -29,6 +29,8 @@ pub struct Rmc {
     pub mag_var_ew: Option<char>,
     /// Positioning mode indicator (NMEA 2.3+): 'A'=autonomous, 'D'=differential, etc.
     pub pos_mode: Option<char>,
+    /// Navigational status (NMEA 4.1+): 'S'=safe, 'C'=caution, 'U'=unsafe, 'V'=not valid.
+    pub nav_status: Option<char>,
 }
 
 impl Rmc {
@@ -49,6 +51,7 @@ impl Rmc {
             mag_var: r.f32(),
             mag_var_ew: r.char(),
             pos_mode: r.char(),
+            nav_status: r.char(),
         })
     }
 }
@@ -70,6 +73,7 @@ impl NmeaEncodable for Rmc {
         w.f32(self.mag_var);
         w.char(self.mag_var_ew);
         w.char(self.pos_mode);
+        w.char(self.nav_status);
         w.finish()
     }
 }
@@ -138,6 +142,21 @@ mod tests {
     }
 
     #[test]
+    fn rmc_nav_status_4_1() {
+        // NMEA 4.1 RMC field 12 (nav status). The 'V' must be parsed and re-encoded.
+        let frame =
+            parse_frame("$GNRMC,103607.00,A,5327.03942,N,10214.42462,W,0.046,,060321,,,A,V*0E")
+                .expect("valid GN RMC frame");
+        let rmc = Rmc::parse(&frame.fields).expect("parse RMC");
+        assert_eq!(rmc.nav_status, Some('V'));
+
+        let sentence = rmc.to_sentence("GN");
+        let frame2 = parse_frame(sentence.trim()).expect("re-parse");
+        let rmc2 = Rmc::parse(&frame2.fields).expect("re-parse");
+        assert_eq!(rmc2.nav_status, Some('V'));
+    }
+
+    #[test]
     fn rmc_encode_roundtrip() {
         let rmc = Rmc {
             time: Some("120000.00".to_string()),
@@ -152,6 +171,7 @@ mod tests {
             mag_var: Some(3.1),
             mag_var_ew: Some('E'),
             pos_mode: Some('A'),
+            nav_status: None,
         };
         let sentence = rmc.to_sentence("GP");
         let frame = parse_frame(sentence.trim()).expect("re-parse RMC");

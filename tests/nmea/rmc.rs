@@ -39,6 +39,7 @@ fn roundtrip() {
         mag_var: Some(3.1),
         mag_var_ew: Some('E'),
         pos_mode: Some('A'),
+        nav_status: None,
     };
     let sentence = original.to_sentence("GP");
     let frame = parse_frame(sentence.trim()).expect("re-parse");
