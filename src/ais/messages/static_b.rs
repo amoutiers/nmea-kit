@@ -42,8 +42,8 @@ impl StaticDataReport {
                 if bits.len() < 168 {
                     return None;
                 }
-                let callsign = extract_string(bits, 40, 7)?;
-                let ship_type = extract_u32(bits, 82, 8)? as u8;
+                let ship_type = extract_u32(bits, 40, 8)? as u8;
+                let callsign = extract_string(bits, 90, 7)?;
                 Some(Self::PartB {
                     mmsi,
                     callsign,

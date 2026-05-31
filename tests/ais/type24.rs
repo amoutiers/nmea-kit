@@ -27,3 +27,22 @@ fn type_24_class_b_static_gpsd() {
         other => panic!("expected StaticReport(PartB), got {other:?}"),
     }
 }
+
+#[test]
+fn type_24_part_b_values_gpsd() {
+    let mut parser = AisParser::new();
+    let frame_b = parse_frame("!AIVDM,1,1,,A,H42O55lti4hhhilD3nink000?050,0*40")
+        .expect("valid Type 24 Part B");
+    match parser.decode(&frame_b).expect("Part B should decode") {
+        AisMessage::StaticReport(StaticDataReport::PartB {
+            mmsi,
+            callsign,
+            ship_type,
+        }) => {
+            assert_eq!(mmsi, 271041815);
+            assert_eq!(ship_type, 60, "ship_type @40");
+            assert_eq!(callsign, "TC6163", "callsign @90");
+        }
+        other => panic!("expected StaticReport(PartB), got {other:?}"),
+    }
+}
