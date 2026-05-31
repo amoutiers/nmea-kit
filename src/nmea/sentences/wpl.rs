@@ -38,7 +38,7 @@ impl Wpl {
 }
 
 impl NmeaEncodable for Wpl {
-    const SENTENCE_TYPE: &'static str = "WPL";
+    const SENTENCE_TYPE: &str = "WPL";
 
     fn encode(&self) -> Vec<String> {
         let mut w = FieldWriter::new();

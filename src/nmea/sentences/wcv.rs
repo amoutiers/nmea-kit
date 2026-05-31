@@ -27,7 +27,7 @@ impl Wcv {
 }
 
 impl NmeaEncodable for Wcv {
-    const SENTENCE_TYPE: &'static str = "WCV";
+    const SENTENCE_TYPE: &str = "WCV";
 
     fn encode(&self) -> Vec<String> {
         let mut w = FieldWriter::new();

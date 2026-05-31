@@ -33,7 +33,7 @@ impl Aam {
 }
 
 impl NmeaEncodable for Aam {
-    const SENTENCE_TYPE: &'static str = "AAM";
+    const SENTENCE_TYPE: &str = "AAM";
 
     fn encode(&self) -> Vec<String> {
         let mut w = FieldWriter::new();

@@ -57,7 +57,7 @@ impl Bec {
 }
 
 impl NmeaEncodable for Bec {
-    const SENTENCE_TYPE: &'static str = "BEC";
+    const SENTENCE_TYPE: &str = "BEC";
 
     fn encode(&self) -> Vec<String> {
         let mut w = FieldWriter::new();

@@ -41,7 +41,7 @@ impl Vwt {
 }
 
 impl NmeaEncodable for Vwt {
-    const SENTENCE_TYPE: &'static str = "VWT";
+    const SENTENCE_TYPE: &str = "VWT";
 
     fn encode(&self) -> Vec<String> {
         let mut w = FieldWriter::new();

@@ -41,7 +41,7 @@ impl Rte {
 }
 
 impl NmeaEncodable for Rte {
-    const SENTENCE_TYPE: &'static str = "RTE";
+    const SENTENCE_TYPE: &str = "RTE";
 
     fn encode(&self) -> Vec<String> {
         let mut w = FieldWriter::new();

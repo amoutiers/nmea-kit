@@ -36,7 +36,7 @@ impl Bod {
 }
 
 impl NmeaEncodable for Bod {
-    const SENTENCE_TYPE: &'static str = "BOD";
+    const SENTENCE_TYPE: &str = "BOD";
 
     fn encode(&self) -> Vec<String> {
         let mut w = FieldWriter::new();

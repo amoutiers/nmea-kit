@@ -30,7 +30,7 @@ impl Hbt {
 }
 
 impl NmeaEncodable for Hbt {
-    const SENTENCE_TYPE: &'static str = "HBT";
+    const SENTENCE_TYPE: &str = "HBT";
 
     fn encode(&self) -> Vec<String> {
         let mut w = FieldWriter::new();

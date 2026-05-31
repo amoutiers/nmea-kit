@@ -78,7 +78,7 @@ impl Ttm {
 }
 
 impl NmeaEncodable for Ttm {
-    const SENTENCE_TYPE: &'static str = "TTM";
+    const SENTENCE_TYPE: &str = "TTM";
 
     fn encode(&self) -> Vec<String> {
         let mut w = FieldWriter::new();

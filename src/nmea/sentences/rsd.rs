@@ -70,7 +70,7 @@ impl Rsd {
 }
 
 impl NmeaEncodable for Rsd {
-    const SENTENCE_TYPE: &'static str = "RSD";
+    const SENTENCE_TYPE: &str = "RSD";
 
     fn encode(&self) -> Vec<String> {
         let mut w = FieldWriter::new();

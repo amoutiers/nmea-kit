@@ -54,7 +54,7 @@ impl Tll {
 }
 
 impl NmeaEncodable for Tll {
-    const SENTENCE_TYPE: &'static str = "TLL";
+    const SENTENCE_TYPE: &str = "TLL";
 
     fn encode(&self) -> Vec<String> {
         let mut w = FieldWriter::new();

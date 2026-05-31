@@ -61,7 +61,7 @@ impl Bwr {
 }
 
 impl NmeaEncodable for Bwr {
-    const SENTENCE_TYPE: &'static str = "BWR";
+    const SENTENCE_TYPE: &str = "BWR";
 
     fn encode(&self) -> Vec<String> {
         let mut w = FieldWriter::new();

@@ -149,6 +149,9 @@ pub fn parse_frame(line: &str) -> Result<NmeaFrame<'_>, FrameError> {
 ///
 /// Computes XOR checksum and appends `*XX\r\n`.
 ///
+/// Fields must not contain the `,` or `*` delimiters (except free-text such as TXT,
+/// which is inherently ambiguous on the wire); `encode_frame` does not escape them.
+///
 /// # Examples
 ///
 /// ```

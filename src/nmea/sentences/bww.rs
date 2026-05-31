@@ -42,7 +42,7 @@ impl Bww {
 }
 
 impl NmeaEncodable for Bww {
-    const SENTENCE_TYPE: &'static str = "BWW";
+    const SENTENCE_TYPE: &str = "BWW";
 
     fn encode(&self) -> Vec<String> {
         let mut w = FieldWriter::new();

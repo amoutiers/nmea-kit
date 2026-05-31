@@ -20,7 +20,7 @@ impl Ack {
 }
 
 impl NmeaEncodable for Ack {
-    const SENTENCE_TYPE: &'static str = "ACK";
+    const SENTENCE_TYPE: &str = "ACK";
 
     fn encode(&self) -> Vec<String> {
         let mut w = FieldWriter::new();
