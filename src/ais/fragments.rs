@@ -40,13 +40,23 @@ const MAX_PAYLOAD_SIZE: usize = 256;
 /// sufficient for the 1152-bit maximum.
 const MAX_FRAGMENTS: u8 = 5;
 
+/// Map an AIS channel character to a slot row (A/1 → 0, B/2 → 1).
+fn channel_index(channel: char) -> usize {
+    match channel {
+        'B' | '2' => 1,
+        _ => 0,
+    }
+}
+
 /// Multi-fragment reassembler.
 ///
-/// Maintains 10 slots (message IDs 0-9) for concurrent multi-fragment
-/// message assembly. Enforces payload size and fragment count limits to
-/// prevent unbounded memory growth from malformed input.
+/// Maintains 10 slots (message IDs 0-9) per channel for concurrent
+/// multi-fragment message assembly. Enforces payload size and fragment count
+/// limits to prevent unbounded memory growth from malformed input.
 pub struct FragmentCollector {
-    slots: [Option<FragmentSlot>; 10],
+    // Indexed [channel_index][message_id] so concurrent A/B messages with the
+    // same message id don't collide.
+    slots: [[Option<FragmentSlot>; 10]; 2],
 }
 
 impl FragmentCollector {
@@ -97,13 +107,14 @@ impl FragmentCollector {
         if msg_id > 9 {
             return None;
         }
+        let ch = channel_index(channel);
 
         if frag_num == 1 {
             // Start new assembly
             if payload.len() > MAX_PAYLOAD_SIZE {
                 return None;
             }
-            self.slots[msg_id] = Some(FragmentSlot {
+            self.slots[ch][msg_id] = Some(FragmentSlot {
                 total,
                 received: 1,
                 payload: payload.to_string(),
@@ -111,15 +122,20 @@ impl FragmentCollector {
             None
         } else {
             // Continue assembly
-            let slot = self.slots[msg_id].as_mut()?;
+            let slot = self.slots[ch][msg_id].as_mut()?;
+            // A re-sent fragment (same number as the last received) is idempotent:
+            // ignore it without discarding the in-progress assembly.
+            if frag_num == slot.received {
+                return None;
+            }
             if slot.total != total || slot.received + 1 != frag_num {
                 // Out of sequence — discard
-                self.slots[msg_id] = None;
+                self.slots[ch][msg_id] = None;
                 return None;
             }
 
             if slot.payload.len() + payload.len() > MAX_PAYLOAD_SIZE {
-                self.slots[msg_id] = None;
+                self.slots[ch][msg_id] = None;
                 return None;
             }
             slot.payload.push_str(payload);
@@ -127,7 +143,7 @@ impl FragmentCollector {
 
             if frag_num == total {
                 // Complete — take the slot
-                let completed = self.slots[msg_id].take()?;
+                let completed = self.slots[ch][msg_id].take()?;
                 Some(AisPayload {
                     payload: completed.payload,
                     fill_bits,
@@ -184,7 +200,7 @@ mod tests {
         let r = c.process(&["3", "3", "1", "A", "CCCC", "0"]);
         assert!(r.is_none());
         // Slot should be cleared
-        assert!(c.slots[1].is_none());
+        assert!(c.slots[0][1].is_none());
     }
 
     #[test]
@@ -206,7 +222,7 @@ mod tests {
         // Fragment 2 says total=3 — mismatch
         let r = c.process(&["3", "2", "0", "A", "BBBB", "0"]);
         assert!(r.is_none());
-        assert!(c.slots[0].is_none());
+        assert!(c.slots[0][0].is_none());
     }
 
     #[test]
@@ -229,5 +245,36 @@ mod tests {
             c.process(&["1", "1", "", "A", "13u@Dt002s000000000000000000", "7"])
                 .is_none()
         );
+    }
+
+    #[test]
+    fn concurrent_channels_same_id() {
+        let mut c = FragmentCollector::new();
+        // Two 2-fragment messages, both message-id 0, on channels A and B, interleaved.
+        assert!(c.process(&["2", "1", "0", "A", "53brRt", "0"]).is_none());
+        assert!(c.process(&["2", "1", "0", "B", "AAAA", "0"]).is_none());
+        let a = c
+            .process(&["2", "2", "0", "A", "`0000000001", "2"])
+            .expect("channel A completes");
+        assert!(a.payload.starts_with("53brRt"));
+        assert_eq!(a.channel, 'A');
+        let b = c
+            .process(&["2", "2", "0", "B", "BBBB", "0"])
+            .expect("channel B completes");
+        assert!(b.payload.starts_with("AAAA"));
+        assert_eq!(b.channel, 'B');
+    }
+
+    #[test]
+    fn duplicate_fragment_is_idempotent() {
+        let mut c = FragmentCollector::new();
+        assert!(c.process(&["3", "1", "1", "A", "AAAA", "0"]).is_none());
+        assert!(c.process(&["3", "2", "1", "A", "BBBB", "0"]).is_none());
+        // Re-sent fragment 2 must be ignored, NOT discard the whole assembly.
+        assert!(c.process(&["3", "2", "1", "A", "BBBB", "0"]).is_none());
+        let done = c
+            .process(&["3", "3", "1", "A", "CCCC", "0"])
+            .expect("completes despite the duplicate");
+        assert_eq!(done.payload, "AAAABBBBCCCC");
     }
 }
