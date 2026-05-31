@@ -150,18 +150,20 @@ impl FieldWriter {
         Self { fields: Vec::new() }
     }
 
-    /// Write an optional f32. `None` → empty field.
+    /// Write an optional f32. `None` → empty field. Non-finite → empty field. `-0.0` → `"0"`.
     pub fn f32(&mut self, value: Option<f32>) {
         self.fields.push(match value {
-            Some(v) => format!("{v}"),
+            Some(v) if !v.is_finite() => String::new(),
+            Some(v) => format!("{}", if v == 0.0 { 0.0 } else { v }),
             None => String::new(),
         });
     }
 
-    /// Write an optional f64. `None` → empty field.
+    /// Write an optional f64. `None` → empty field. Non-finite → empty field. `-0.0` → `"0"`.
     pub fn f64(&mut self, value: Option<f64>) {
         self.fields.push(match value {
-            Some(v) => format!("{v}"),
+            Some(v) if !v.is_finite() => String::new(),
+            Some(v) => format!("{}", if v == 0.0 { 0.0 } else { v }),
             None => String::new(),
         });
     }
@@ -443,6 +445,15 @@ mod tests {
         let original = 5132.5200_f64;
         let roundtrip = decimal_to_ddmm(ddmm_to_decimal(original));
         assert!((roundtrip - original).abs() < 0.0001);
+    }
+
+    #[test]
+    fn writer_non_finite_and_neg_zero() {
+        let mut w = FieldWriter::new();
+        w.f32(Some(f32::NAN));        // -> "" (not "NaN")
+        w.f64(Some(f64::INFINITY));   // -> "" (not "inf")
+        w.f64(Some(-0.0));            // -> "0" (not "-0")
+        assert_eq!(w.finish(), vec!["", "", "0"]);
     }
 
     #[test]
