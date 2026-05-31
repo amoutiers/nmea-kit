@@ -27,7 +27,7 @@ pub struct Gsv {
     /// Satellite information blocks (up to 4 per message).
     pub sats: Vec<SatInfo>,
     /// Signal ID (NMEA 4.11, optional last field).
-    pub signal_id: Option<u8>,
+    pub signal_id: Option<char>,
 }
 
 impl Gsv {
@@ -54,7 +54,7 @@ impl Gsv {
             });
         }
 
-        let signal_id = if has_signal_id { r.u8() } else { None };
+        let signal_id = if has_signal_id { r.char() } else { None };
 
         Some(Self {
             total_msgs,
@@ -81,7 +81,7 @@ impl NmeaEncodable for Gsv {
             w.u8(sat.snr);
         }
         if self.signal_id.is_some() {
-            w.u8(self.signal_id);
+            w.char(self.signal_id);
         }
         w.finish()
     }
@@ -167,6 +167,21 @@ mod tests {
         assert_eq!(gsv.sats[1].prn, Some(4));
         assert_eq!(gsv.sats[3].prn, Some(13));
         assert!(gsv.signal_id.is_none());
+    }
+
+    #[test]
+    fn gsv_hex_signal_id_roundtrip() {
+        // NMEA 4.11 signal ID is a hex digit; 'B' must survive parse + encode.
+        let frame = parse_frame("$GBGSV,2,2,06,14,55,175,46,40,29,043,18,B*06")
+            .expect("valid GSV with hex signal id");
+        let gsv = Gsv::parse(&frame.fields).expect("parse GSV");
+        assert_eq!(gsv.signal_id, Some('B'));
+
+        // Round-trip must preserve the 'B' field.
+        let sentence = gsv.to_sentence("GB");
+        let frame2 = parse_frame(sentence.trim()).expect("re-parse");
+        let gsv2 = Gsv::parse(&frame2.fields).expect("re-parse GSV");
+        assert_eq!(gsv2.signal_id, Some('B'));
     }
 
     #[test]
