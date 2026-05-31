@@ -8,11 +8,11 @@ pub struct Bec {
     /// UTC time of fix.
     pub time: Option<String>,
     /// Latitude in NMEA ddmm.mmm format.
-    pub lat: Option<f32>,
+    pub lat: Option<f64>,
     /// North/South indicator.
     pub ns: Option<char>,
     /// Longitude in NMEA dddmm.mmm format.
-    pub lon: Option<f32>,
+    pub lon: Option<f64>,
     /// East/West indicator.
     pub ew: Option<char>,
     /// True bearing to waypoint in degrees.
@@ -31,9 +31,9 @@ impl Bec {
     pub fn parse(fields: &[&str]) -> Option<Self> {
         let mut r = FieldReader::new(fields);
         let time = r.string();
-        let lat = r.f32();
+        let lat = r.f64();
         let ns = r.char();
-        let lon = r.f32();
+        let lon = r.f64();
         let ew = r.char();
         let bear_true = r.f32();
         r.skip(); // T
@@ -62,9 +62,9 @@ impl NmeaEncodable for Bec {
     fn encode(&self) -> Vec<String> {
         let mut w = FieldWriter::new();
         w.string(self.time.as_deref());
-        w.f32(self.lat);
+        w.lat(self.lat);
         w.char(self.ns);
-        w.f32(self.lon);
+        w.lon(self.lon);
         w.char(self.ew);
         w.f32(self.bear_true);
         w.fixed('T');

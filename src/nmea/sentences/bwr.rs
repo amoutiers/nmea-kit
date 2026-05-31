@@ -8,11 +8,11 @@ pub struct Bwr {
     /// UTC time of observation (hhmmss.ss format).
     pub time: Option<String>,
     /// Waypoint latitude in NMEA format (ddmm.mm).
-    pub lat: Option<f32>,
+    pub lat: Option<f64>,
     /// North/South indicator ('N' or 'S').
     pub ns: Option<char>,
     /// Waypoint longitude in NMEA format (dddmm.mm).
-    pub lon: Option<f32>,
+    pub lon: Option<f64>,
     /// East/West indicator ('E' or 'W').
     pub ew: Option<char>,
     /// Bearing true to waypoint in degrees.
@@ -33,9 +33,9 @@ impl Bwr {
     pub fn parse(fields: &[&str]) -> Option<Self> {
         let mut r = FieldReader::new(fields);
         let time = r.string();
-        let lat = r.f32();
+        let lat = r.f64();
         let ns = r.char();
-        let lon = r.f32();
+        let lon = r.f64();
         let ew = r.char();
         let bear_true = r.f32();
         r.skip(); // T
@@ -66,9 +66,9 @@ impl NmeaEncodable for Bwr {
     fn encode(&self) -> Vec<String> {
         let mut w = FieldWriter::new();
         w.string(self.time.as_deref());
-        w.f32(self.lat);
+        w.lat(self.lat);
         w.char(self.ns);
-        w.f32(self.lon);
+        w.lon(self.lon);
         w.char(self.ew);
         w.f32(self.bear_true);
         w.fixed('T');

@@ -8,11 +8,11 @@ pub struct Bwc {
     /// UTC time of observation (hhmmss.ss format).
     pub time: Option<String>,
     /// Waypoint latitude in NMEA format (ddmm.mm).
-    pub lat: Option<f32>,
+    pub lat: Option<f64>,
     /// North/South indicator ('N' or 'S').
     pub ns: Option<char>,
     /// Waypoint longitude in NMEA format (dddmm.mm).
-    pub lon: Option<f32>,
+    pub lon: Option<f64>,
     /// East/West indicator ('E' or 'W').
     pub ew: Option<char>,
     /// Bearing true to waypoint in degrees.
@@ -33,9 +33,9 @@ impl Bwc {
     pub fn parse(fields: &[&str]) -> Option<Self> {
         let mut r = FieldReader::new(fields);
         let time = r.string();
-        let lat = r.f32();
+        let lat = r.f64();
         let ns = r.char();
-        let lon = r.f32();
+        let lon = r.f64();
         let ew = r.char();
         let bear_true = r.f32();
         r.skip(); // T
@@ -66,9 +66,9 @@ impl NmeaEncodable for Bwc {
     fn encode(&self) -> Vec<String> {
         let mut w = FieldWriter::new();
         w.string(self.time.as_deref());
-        w.f32(self.lat);
+        w.lat(self.lat);
         w.char(self.ns);
-        w.f32(self.lon);
+        w.lon(self.lon);
         w.char(self.ew);
         w.f32(self.bear_true);
         w.fixed('T');
@@ -158,5 +158,17 @@ mod tests {
         assert!((bwc.bear_mag.expect("bear_mag") - 218.0).abs() < 0.1);
         assert!((bwc.dist.expect("dist") - 4.6).abs() < 0.1);
         assert_eq!(bwc.wpt, Some("EGLM".to_string()));
+    }
+
+    #[test]
+    fn bwc_lon_full_precision_and_padding() {
+        // 9-sig-digit longitude that f32 cannot hold exactly, with a leading-zero degree.
+        let frame = parse_frame("$GPBWC,220516,5130.02,N,00046.34678,W,213.8,T,218.0,M,0004.6,N,EGLM*18")
+            .expect("valid BWC");
+        let bwc = Bwc::parse(&frame.fields).expect("parse BWC");
+        let lon = bwc.lon.expect("lon");
+        assert!((lon - 46.34678).abs() < 1e-9, "f64 precision lost: {lon}");
+        let sentence = bwc.to_sentence("GP");
+        assert!(sentence.contains(",00046.34678,"), "leading zero lost: {sentence}");
     }
 }

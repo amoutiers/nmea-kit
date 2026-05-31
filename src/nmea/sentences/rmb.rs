@@ -16,11 +16,11 @@ pub struct Rmb {
     /// Destination waypoint identifier.
     pub wpt_dest: Option<String>,
     /// Destination latitude in NMEA format (ddmm.mm).
-    pub dest_lat: Option<f32>,
+    pub dest_lat: Option<f64>,
     /// North/South indicator ('N' or 'S').
     pub ns: Option<char>,
     /// Destination longitude in NMEA format (dddmm.mm).
-    pub dest_lon: Option<f32>,
+    pub dest_lon: Option<f64>,
     /// East/West indicator ('E' or 'W').
     pub ew: Option<char>,
     /// Range to destination in nautical miles.
@@ -46,9 +46,9 @@ impl Rmb {
             dirs: r.char(),
             wpt_origin: r.string(),
             wpt_dest: r.string(),
-            dest_lat: r.f32(),
+            dest_lat: r.f64(),
             ns: r.char(),
-            dest_lon: r.f32(),
+            dest_lon: r.f64(),
             ew: r.char(),
             range: r.f32(),
             bearing: r.f32(),
@@ -69,9 +69,9 @@ impl NmeaEncodable for Rmb {
         w.char(self.dirs);
         w.string(self.wpt_origin.as_deref());
         w.string(self.wpt_dest.as_deref());
-        w.f32(self.dest_lat);
+        w.lat(self.dest_lat);
         w.char(self.ns);
-        w.f32(self.dest_lon);
+        w.lon(self.dest_lon);
         w.char(self.ew);
         w.f32(self.range);
         w.f32(self.bearing);
