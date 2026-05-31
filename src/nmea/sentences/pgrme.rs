@@ -5,7 +5,7 @@ use crate::nmea::field::{FieldReader, FieldWriter, NmeaEncodable};
 /// Wire: `h_err,M,v_err,M,s_err,M`
 ///
 /// Proprietary sentence: `parse_frame` sets `talker = ""`, `sentence_type = "PGRME"`.
-/// Encode with `to_proprietary_sentence()`.
+/// Encode with `to_sentence("")` (talker is ignored for proprietary types).
 #[derive(Debug, Clone, PartialEq)]
 pub struct Pgrme {
     /// Horizontal position error in metres.
@@ -36,8 +36,8 @@ impl Pgrme {
 }
 
 impl NmeaEncodable for Pgrme {
-    const SENTENCE_TYPE: &str = "RME";
-    const PROPRIETARY_ID: &str = "PGRME";
+    const SENTENCE_TYPE: &str = "PGRME";
+    const PROPRIETARY: bool = true;
 
     fn encode(&self) -> Vec<String> {
         let mut w = FieldWriter::new();
@@ -63,7 +63,7 @@ mod tests {
             vertical: None,
             spherical: None,
         }
-        .to_proprietary_sentence();
+        .to_sentence("");
         let f = parse_frame(s.trim()).expect("valid");
         let p = Pgrme::parse(&f.fields).expect("parse");
         assert!(p.horizontal.is_none());
@@ -78,7 +78,7 @@ mod tests {
             vertical: Some(4.9),
             spherical: Some(6.0),
         };
-        let sentence = original.to_proprietary_sentence();
+        let sentence = original.to_sentence("");
         let frame = parse_frame(sentence.trim()).expect("re-parse");
         let parsed = Pgrme::parse(&frame.fields).expect("parse");
         assert_eq!(original, parsed);

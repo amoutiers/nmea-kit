@@ -290,36 +290,31 @@ impl Default for FieldWriter {
 ///
 /// # Proprietary sentences
 ///
-/// Proprietary types set [`PROPRIETARY_ID`](Self::PROPRIETARY_ID) to the full
-/// address (e.g. `"PASHR"`, `"PSKPDPT"`) and use
-/// [`to_proprietary_sentence()`](Self::to_proprietary_sentence) instead of
-/// `to_sentence()`.
+/// Proprietary types (`$P...`) set [`SENTENCE_TYPE`](Self::SENTENCE_TYPE) to the full
+/// address (e.g. `"PASHR"`, `"PSKPDPT"`) and [`PROPRIETARY`](Self::PROPRIETARY) to `true`.
+/// `to_sentence` then ignores the `talker` argument and emits the full address.
 pub trait NmeaEncodable {
-    /// The 3-character sentence type identifier (e.g. `"MWD"`, `"RMC"`).
+    /// The wire address: the 3-character type for standard sentences (e.g. `"RMC"`),
+    /// or the full address for proprietary sentences (e.g. `"PSKPDPT"`).
     const SENTENCE_TYPE: &'static str;
 
-    /// Full proprietary address identifier (e.g. `"PASHR"`, `"PSKPDPT"`).
-    /// Empty for standard sentences.
-    const PROPRIETARY_ID: &'static str = "";
+    /// `true` when [`SENTENCE_TYPE`](Self::SENTENCE_TYPE) is a full proprietary address.
+    /// [`to_sentence`](Self::to_sentence) then ignores the `talker` argument.
+    const PROPRIETARY: bool = false;
 
     /// Encode fields into a `Vec` of strings in wire order.
     fn encode(&self) -> Vec<String>;
 
-    /// Encode into a complete standard NMEA 0183 sentence with checksum and `\r\n`.
+    /// Encode into a complete NMEA 0183 sentence with checksum and `\r\n`.
+    ///
+    /// For standard sentences the `talker` is prepended to `SENTENCE_TYPE`. For
+    /// proprietary sentences (`PROPRIETARY == true`) the `talker` is ignored — a
+    /// proprietary address carries no talker — and `SENTENCE_TYPE` is the full address.
     fn to_sentence(&self, talker: &str) -> String {
         let fields = self.encode();
         let field_refs: Vec<&str> = fields.iter().map(|s| s.as_str()).collect();
+        let talker = if Self::PROPRIETARY { "" } else { talker };
         crate::encode_frame('$', talker, Self::SENTENCE_TYPE, &field_refs)
-    }
-
-    /// Encode into a complete proprietary NMEA 0183 sentence with checksum and `\r\n`.
-    ///
-    /// Uses [`PROPRIETARY_ID`](Self::PROPRIETARY_ID) as the full address
-    /// (no separate talker).
-    fn to_proprietary_sentence(&self) -> String {
-        let fields = self.encode();
-        let field_refs: Vec<&str> = fields.iter().map(|s| s.as_str()).collect();
-        crate::encode_frame('$', "", Self::PROPRIETARY_ID, &field_refs)
     }
 }
 

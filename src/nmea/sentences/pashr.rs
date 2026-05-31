@@ -5,7 +5,7 @@ use crate::nmea::field::{FieldReader, FieldWriter, NmeaEncodable};
 /// Wire: `time,heading,T,roll,pitch,heave,roll_accuracy,pitch_accuracy,heading_accuracy,gnss_quality,imu_alignment`
 ///
 /// Proprietary sentence: `parse_frame` sets `talker = ""`, `sentence_type = "PASHR"`.
-/// Encode with `to_proprietary_sentence()`.
+/// Encode with `to_sentence("")` (talker is ignored for proprietary types).
 #[derive(Debug, Clone, PartialEq)]
 pub struct Pashr {
     /// UTC time of fix (hhmmss.sss).
@@ -62,8 +62,8 @@ impl Pashr {
 }
 
 impl NmeaEncodable for Pashr {
-    const SENTENCE_TYPE: &str = "SHR";
-    const PROPRIETARY_ID: &str = "PASHR";
+    const SENTENCE_TYPE: &str = "PASHR";
+    const PROPRIETARY: bool = true;
 
     fn encode(&self) -> Vec<String> {
         let mut w = FieldWriter::new();
@@ -101,7 +101,7 @@ mod tests {
             gnss_quality: None,
             imu_alignment: None,
         }
-        .to_proprietary_sentence();
+        .to_sentence("");
         let f = parse_frame(s.trim()).expect("valid");
         let p = Pashr::parse(&f.fields).expect("parse");
         assert!(p.time.is_none());
@@ -122,7 +122,7 @@ mod tests {
             gnss_quality: Some(1),
             imu_alignment: Some(0),
         };
-        let sentence = original.to_proprietary_sentence();
+        let sentence = original.to_sentence("");
         let frame = parse_frame(sentence.trim()).expect("re-parse");
         let parsed = Pashr::parse(&frame.fields).expect("parse");
         assert_eq!(original, parsed);

@@ -5,7 +5,7 @@ use crate::nmea::field::{FieldReader, FieldWriter, NmeaEncodable};
 /// Wire: `depth,offset,range_scale,echo_strength,channel,transducer_location`
 ///
 /// Proprietary sentence: `parse_frame` sets `talker = ""`, `sentence_type = "PSKPDPT"`.
-/// Encode with `to_proprietary_sentence()`.
+/// Encode with `to_sentence("")` (talker is ignored for proprietary types).
 #[derive(Debug, Clone, PartialEq)]
 pub struct Pskpdpt {
     /// Water depth in metres.
@@ -45,8 +45,8 @@ impl Pskpdpt {
 }
 
 impl NmeaEncodable for Pskpdpt {
-    const SENTENCE_TYPE: &str = "DPT";
-    const PROPRIETARY_ID: &str = "PSKPDPT";
+    const SENTENCE_TYPE: &str = "PSKPDPT";
+    const PROPRIETARY: bool = true;
 
     fn encode(&self) -> Vec<String> {
         let mut w = FieldWriter::new();
@@ -75,7 +75,7 @@ mod tests {
             channel: None,
             transducer_location: None,
         }
-        .to_proprietary_sentence();
+        .to_sentence("");
         let f = parse_frame(s.trim()).expect("valid");
         let p = Pskpdpt::parse(&f.fields).expect("parse");
         assert!(p.depth.is_none());
@@ -92,7 +92,7 @@ mod tests {
             channel: Some(3),
             transducer_location: None,
         };
-        let sentence = original.to_proprietary_sentence();
+        let sentence = original.to_sentence("");
         let frame = parse_frame(sentence.trim()).expect("re-parse");
         let parsed = Pskpdpt::parse(&frame.fields).expect("parse");
         assert_eq!(original, parsed);
@@ -120,5 +120,28 @@ mod tests {
         assert_eq!(p.echo_strength, Some(10));
         assert_eq!(p.channel, Some(3));
         assert_eq!(p.transducer_location.as_deref(), Some("AFT"));
+    }
+
+    #[test]
+    fn pskpdpt_to_sentence_no_collision() {
+        use crate::NmeaSentence;
+        let p = Pskpdpt {
+            depth: Some(2.5),
+            offset: Some(0.0),
+            range_scale: Some(10),
+            echo_strength: Some(10),
+            channel: Some(3),
+            transducer_location: None,
+        };
+        // to_sentence ignores the talker for proprietary types.
+        let s = p.to_sentence("II");
+        assert!(s.starts_with("$PSKPDPT,"), "got {s}");
+        let frame = parse_frame(s.trim()).expect("re-parse");
+        assert_eq!(frame.sentence_type, "PSKPDPT");
+        // Dispatches to the proprietary Pskpdpt, never the standard Dpt.
+        assert!(matches!(
+            NmeaSentence::parse(&frame),
+            NmeaSentence::Pskpdpt(_)
+        ));
     }
 }
