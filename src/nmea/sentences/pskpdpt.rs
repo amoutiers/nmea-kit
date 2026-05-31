@@ -13,7 +13,7 @@ pub struct Pskpdpt {
     /// Transducer offset in metres.
     pub offset: Option<f32>,
     /// Maximum depth range scale in metres.
-    pub range_scale: Option<u32>,
+    pub range_scale: Option<f32>,
     /// Echo strength (0–100).
     pub echo_strength: Option<u8>,
     /// Channel number.
@@ -29,7 +29,7 @@ impl Pskpdpt {
         let mut r = FieldReader::new(fields);
         let depth = r.f32();
         let offset = r.f32();
-        let range_scale = r.u32();
+        let range_scale = r.f32();
         let echo_strength = r.u8();
         let channel = r.u8();
         let transducer_location = r.string();
@@ -52,7 +52,7 @@ impl NmeaEncodable for Pskpdpt {
         let mut w = FieldWriter::new();
         w.f32(self.depth);
         w.f32(self.offset);
-        w.u32(self.range_scale);
+        w.f32(self.range_scale);
         w.u8(self.echo_strength);
         w.u8(self.channel);
         w.string(self.transducer_location.as_deref());
@@ -87,7 +87,7 @@ mod tests {
         let original = Pskpdpt {
             depth: Some(2.5),
             offset: Some(0.0),
-            range_scale: Some(10),
+            range_scale: Some(10.0),
             echo_strength: Some(10),
             channel: Some(3),
             transducer_location: None,
@@ -104,7 +104,7 @@ mod tests {
         let p = Pskpdpt::parse(&frame.fields).expect("parse");
         assert!((p.depth.expect("depth") - 2.5).abs() < 0.01);
         assert!((p.offset.expect("offset") - 0.0).abs() < 0.01);
-        assert_eq!(p.range_scale, Some(10));
+        assert_eq!(p.range_scale, Some(10.0));
         assert_eq!(p.echo_strength, Some(10));
         assert_eq!(p.channel, Some(3));
         assert!(p.transducer_location.is_none());
@@ -116,10 +116,17 @@ mod tests {
         let p = Pskpdpt::parse(&frame.fields).expect("parse");
         assert!((p.depth.expect("depth") - 2.5).abs() < 0.01);
         assert!((p.offset.expect("offset") - (-1.1)).abs() < 0.01);
-        assert_eq!(p.range_scale, Some(10));
+        assert_eq!(p.range_scale, Some(10.0));
         assert_eq!(p.echo_strength, Some(10));
         assert_eq!(p.channel, Some(3));
         assert_eq!(p.transducer_location.as_deref(), Some("AFT"));
+    }
+
+    #[test]
+    fn pskpdpt_fractional_range_scale() {
+        let f = parse_frame("$PSKPDPT,0002.5,+00.0,0010.5,10,03,*6C").expect("valid");
+        let p = Pskpdpt::parse(&f.fields).expect("parse");
+        assert_eq!(p.range_scale, Some(10.5));
     }
 
     #[test]
@@ -128,7 +135,7 @@ mod tests {
         let p = Pskpdpt {
             depth: Some(2.5),
             offset: Some(0.0),
-            range_scale: Some(10),
+            range_scale: Some(10.0),
             echo_strength: Some(10),
             channel: Some(3),
             transducer_location: None,

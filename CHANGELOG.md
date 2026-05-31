@@ -10,6 +10,7 @@ All notable changes to nmea-kit are documented here.
 - `Gsa`: new field `system_id: Option<char>` (NMEA 4.11).
 - `Rmb.dest_lat`/`dest_lon`, `Bwc.lat`/`lon`, `Bwr.lat`/`lon`, `Bec.lat`/`lon`: `Option<f32>` → `Option<f64>` (coordinate precision).
 - `NmeaEncodable`: removed `PROPRIETARY_ID` and `to_proprietary_sentence()`; added `const PROPRIETARY: bool`. Proprietary types now set `SENTENCE_TYPE` to the full address. Migrate `x.to_proprietary_sentence()` → `x.to_sentence("")`.
+- `Pskpdpt.range_scale`: `Option<u32>` → `Option<f32>` (fractional range scales were silently dropped).
 
 ### Fixed
 - `parse_frame` no longer panics on a non-ASCII address; returns `FrameError::NonAsciiAddress`.

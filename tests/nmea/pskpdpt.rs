@@ -18,7 +18,7 @@ fn roundtrip() {
     let original = Pskpdpt {
         depth: Some(2.5),
         offset: Some(0.0),
-        range_scale: Some(10),
+        range_scale: Some(10.0),
         echo_strength: Some(10),
         channel: Some(3),
         transducer_location: None,
