@@ -226,7 +226,8 @@ mod tests {
         let mut c = FragmentCollector::new();
         // fill_bits 7 is out of range (valid 0-5) -> reject.
         assert!(
-            c.process(&["1", "1", "", "A", "13u@Dt002s000000000000000000", "7"]).is_none()
+            c.process(&["1", "1", "", "A", "13u@Dt002s000000000000000000", "7"])
+                .is_none()
         );
     }
 }

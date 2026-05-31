@@ -57,6 +57,9 @@ mod tests {
         // 6-bit chars: 32 = ' ', 1 = 'A'  ->  " A"
         let bits = build_bits(&[32, 1]);
         let msg = SafetyBroadcast::decode(&bits).expect("decode");
-        assert_eq!(msg.text, " A", "leading space must be preserved (trailing-only trim)");
+        assert_eq!(
+            msg.text, " A",
+            "leading space must be preserved (trailing-only trim)"
+        );
     }
 }
