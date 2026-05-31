@@ -222,6 +222,34 @@ impl FieldWriter {
         });
     }
 
+    /// Write an optional latitude in NMEA `DDMM.MMMM` form (integer part zero-padded
+    /// to 4 digits). `None` → empty field.
+    pub fn lat(&mut self, value: Option<f64>) {
+        self.push_coord(value, 4);
+    }
+
+    /// Write an optional longitude in NMEA `DDDMM.MMMM` form (integer part zero-padded
+    /// to 5 digits). `None` → empty field.
+    pub fn lon(&mut self, value: Option<f64>) {
+        self.push_coord(value, 5);
+    }
+
+    /// Format a coordinate by zero-padding the integer part to `int_width` digits and
+    /// keeping the fractional part as the shortest `f64` representation. Assumes a
+    /// non-negative magnitude — the N/S·E/W sign lives in a separate indicator field.
+    fn push_coord(&mut self, value: Option<f64>, int_width: usize) {
+        self.fields.push(match value {
+            Some(v) => {
+                let s = format!("{v}");
+                match s.split_once('.') {
+                    Some((int, frac)) => format!("{int:0>int_width$}.{frac}"),
+                    None => format!("{s:0>int_width$}"),
+                }
+            }
+            None => String::new(),
+        });
+    }
+
     /// Write a fixed indicator character (always emitted).
     pub fn fixed(&mut self, c: char) {
         self.fields.push(c.to_string());
@@ -420,5 +448,17 @@ mod tests {
         let original = 5132.5200_f64;
         let roundtrip = decimal_to_ddmm(ddmm_to_decimal(original));
         assert!((roundtrip - original).abs() < 0.0001);
+    }
+
+    #[test]
+    fn writer_lat_lon_zero_pads_degrees() {
+        let mut w = FieldWriter::new();
+        w.lon(Some(454.5784));   // 004°54.5784' → 5-digit integer part
+        w.lat(Some(837.038));    // 08°37.038'   → 4-digit integer part
+        w.lon(Some(1131.0));     // 011°31'      → no fractional part
+        w.lat(Some(4807.038));   // already 4 digits, unchanged
+        w.lat(None);             // empty field
+        let fields = w.finish();
+        assert_eq!(fields, vec!["00454.5784", "0837.038", "01131", "4807.038", ""]);
     }
 }
