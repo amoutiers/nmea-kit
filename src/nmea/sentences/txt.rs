@@ -20,12 +20,18 @@ impl Txt {
     /// Always returns `Some`; missing or malformed fields become `None`.
     pub fn parse(fields: &[&str]) -> Option<Self> {
         let mut r = FieldReader::new(fields);
-        Some(Self {
-            num_msg: r.u8(),
-            msg_num: r.u8(),
-            msg_type: r.u8(),
-            text: r.string(),
-        })
+        let num_msg = r.u8();
+        let msg_num = r.u8();
+        let msg_type = r.u8();
+        // Text is the final field but may itself contain commas, which parse_frame
+        // split into separate fields; rejoin everything from index 3 onward.
+        let text = if fields.len() > 3 {
+            let joined = fields[3..].join(",");
+            if joined.is_empty() { None } else { Some(joined) }
+        } else {
+            None
+        };
+        Some(Self { num_msg, msg_num, msg_type, text })
     }
 }
 
@@ -87,5 +93,13 @@ mod tests {
         assert_eq!(txt.msg_num, Some(1));
         assert_eq!(txt.msg_type, Some(2));
         assert_eq!(txt.text, Some("u-blox ag - www.u-blox.com".to_string()));
+    }
+
+    #[test]
+    fn txt_text_with_embedded_comma() {
+        // On the wire "...,02,Hello, World" -> parse_frame splits into ["Hello"," World"];
+        // Txt::parse must rejoin them into the full text.
+        let t = Txt::parse(&["01", "01", "02", "Hello", " World"]).expect("parse");
+        assert_eq!(t.text, Some("Hello, World".to_string()));
     }
 }
