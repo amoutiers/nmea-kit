@@ -158,7 +158,7 @@ nmea-kit = "0.7"
 | `heading`                                                                                                                                                                                                                              | via `nmea` | HDG, HDM, HDT, THS         |
 | `wind`                                                                                                                                                                                                                                 | via `nmea` | MWD, MWV                   |
 | `depth`                                                                                                                                                                                                                                | via `nmea` | DBT, DBS, DBK, DPT         |
-| `ack`, `aam`, `apb`, `bod`, `bwc`, `bwr`, `bww`, `dbk`, `dbs`, `dbt`, `dpt`, `dtm`, `gbs`, `gga`, `gll`, `gns`, `gsa`, `gsv`, `gst`, `hbt`, `hdg`, `hdm`, `hdt`, `mda`, `mtw`, `mwd`, `mwv`, `pashr`, `pgrme`, `pskpdpt`, `rmb`, `rmc`, `rot`, `rpm`, `rsa`, `rsd`, `ths`, `tll`, `ttm`, `txt`, `vbw`, `vdr`, `vhw`, `vlw`, `vtg`, `vwr`, `vwt`, `wcv`, `wpl`, `xdr`, `xte`, `zda` | via `nmea` | Individual sentence types  |
+| `ack`, `aam`, `apb`, `bec`, `bod`, `bwc`, `bwr`, `bww`, `dbk`, `dbs`, `dbt`, `dpt`, `dtm`, `gbs`, `gga`, `gll`, `gns`, `gsa`, `gsv`, `gst`, `hbt`, `hdg`, `hdm`, `hdt`, `mda`, `mtw`, `mwd`, `mwv`, `pashr`, `pgrme`, `pskpdpt`, `rmb`, `rmc`, `rot`, `rpm`, `rsa`, `rsd`, `rte`, `ths`, `tll`, `ttm`, `txt`, `vbw`, `vdr`, `vhw`, `vlw`, `vtg`, `vwr`, `vwt`, `wcv`, `wpl`, `xdr`, `xte`, `zda` | via `nmea` | Individual sentence types  |
 
 Use a group feature for common use cases:
 
