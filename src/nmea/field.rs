@@ -23,7 +23,7 @@ impl<'a> FieldReader<'a> {
             if f.is_empty() {
                 None
             } else {
-                f.parse::<f32>().ok()
+                f.parse::<f32>().ok().filter(|v| v.is_finite())
             }
         });
         self.idx += 1;
@@ -36,7 +36,7 @@ impl<'a> FieldReader<'a> {
             if f.is_empty() {
                 None
             } else {
-                f.parse::<f64>().ok()
+                f.parse::<f64>().ok().filter(|v| v.is_finite())
             }
         });
         self.idx += 1;
@@ -454,6 +454,16 @@ mod tests {
         w.f64(Some(f64::INFINITY));   // -> "" (not "inf")
         w.f64(Some(-0.0));            // -> "0" (not "-0")
         assert_eq!(w.finish(), vec!["", "", "0"]);
+    }
+
+    #[test]
+    fn reader_rejects_non_finite() {
+        let fields = &["NaN", "inf", "-inf", "12.5"];
+        let mut r = FieldReader::new(fields);
+        assert_eq!(r.f32(), None); // "NaN"
+        assert_eq!(r.f64(), None); // "inf"
+        assert_eq!(r.f64(), None); // "-inf"
+        assert_eq!(r.f32(), Some(12.5)); // finite still parses
     }
 
     #[test]
