@@ -40,7 +40,7 @@ impl AidToNavigation {
         }
         let mmsi = extract_u32(bits, 8, 30)?;
         let aid_type = extract_u32(bits, 38, 5)? as u8;
-        let name = extract_string(bits, 43, 20)?.trim().to_string();
+        let name = extract_string(bits, 43, 20)?;
         let lon_raw = extract_i32(bits, 164, 28)?;
         let lat_raw = extract_i32(bits, 192, 27)?;
         Some(Self {
@@ -50,5 +50,28 @@ impl AidToNavigation {
             lat: decode_latitude(lat_raw),
             lon: decode_longitude(lon_raw),
         })
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // Set `len` bits of `val` (MSB first) at `offset` in a per-bit buffer.
+    fn set_bits(buf: &mut [u8], offset: usize, len: usize, val: u32) {
+        for i in 0..len {
+            buf[offset + i] = ((val >> (len - 1 - i)) & 1) as u8;
+        }
+    }
+
+    #[test]
+    fn aton_name_preserves_leading_space() {
+        // Type 21 needs >= 272 bits. name @43, 20 chars: char0=32 (' '), char1=1 ('A').
+        let mut bits = vec![0u8; 272];
+        set_bits(&mut bits, 0, 6, 21); // msg_type 21
+        set_bits(&mut bits, 43, 6, 32); // ' '
+        set_bits(&mut bits, 49, 6, 1); // 'A'
+        let aton = AidToNavigation::decode(&bits).expect("decode");
+        assert_eq!(aton.name, " A", "leading space must be preserved (trailing-only trim)");
     }
 }
