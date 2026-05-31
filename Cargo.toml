@@ -90,5 +90,5 @@ xte = []
 zda = []
 
 [lints.clippy]
-unwrap_used = "warn"
-cognitive_complexity = "warn"
+unwrap_used = "deny"
+cognitive_complexity = "deny"
