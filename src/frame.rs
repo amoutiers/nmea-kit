@@ -82,6 +82,11 @@ pub fn parse_frame(line: &str) -> Result<NmeaFrame<'_>, FrameError> {
 
     // Validate checksum if present
     if let Some(cs_str) = checksum_str {
+        // NMEA checksum is exactly two hex digits (either case). Reject malformed
+        // forms ('+1F', single 'A', '1FA') that u8::from_str_radix would otherwise accept.
+        if cs_str.len() != 2 || !cs_str.bytes().all(|b| b.is_ascii_hexdigit()) {
+            return Err(FrameError::MalformedChecksum);
+        }
         let expected = u8::from_str_radix(cs_str, 16).map_err(|_| FrameError::MalformedChecksum)?;
         let computed = body.bytes().fold(0u8, |acc, b| acc ^ b);
         if expected != computed {
@@ -424,6 +429,19 @@ mod tests {
         // "$GPABC," (address + one trailing comma) is ONE empty field, not zero.
         let f = parse_frame("$GPABC,*7B").expect("valid");
         assert_eq!(f.fields, vec![""]);
+    }
+
+    #[test]
+    fn checksum_format_strictness() {
+        // Malformed checksum FORMATS are rejected (length/sign), regardless of XOR value.
+        assert_eq!(parse_frame("$GPRMC,A*+1F"), Err(FrameError::MalformedChecksum));
+        assert_eq!(parse_frame("$GPRMC,A*A"), Err(FrameError::MalformedChecksum));
+        assert_eq!(parse_frame("$GPRMC,A*1FA"), Err(FrameError::MalformedChecksum));
+        // Lowercase 2-digit hex is still accepted (real devices emit it).
+        let lower = "$GNRMC,103607.00,A,5327.03942,N,10214.42462,W,0.046,,060321,,,A,V*0e";
+        let upper = "$GNRMC,103607.00,A,5327.03942,N,10214.42462,W,0.046,,060321,,,A,V*0E";
+        assert!(parse_frame(lower).is_ok(), "lowercase *0e must parse");
+        assert!(parse_frame(upper).is_ok(), "uppercase *0E must parse");
     }
 
     #[test]
