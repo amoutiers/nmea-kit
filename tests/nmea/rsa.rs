@@ -33,3 +33,13 @@ fn roundtrip() {
     let parsed = Rsa::parse(&frame.fields).expect("parse");
     assert_eq!(original, parsed);
 }
+
+#[test]
+fn rsa_values() {
+    let frame = parse_frame("$IIRSA,10.5,A,,V*4D").expect("valid RSA frame");
+    let x = Rsa::parse(&frame.fields).expect("parse RSA");
+    assert!((x.starboard_angle.expect("starboard_angle") - 10.5).abs() < 1e-2);
+    assert_eq!(x.starboard_status, Some('A'));
+    assert!(x.port_angle.is_none());
+    assert_eq!(x.port_status, Some('V'));
+}

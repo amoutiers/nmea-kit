@@ -31,3 +31,11 @@ fn roundtrip() {
     let parsed = Ths::parse(&frame.fields).expect("parse");
     assert_eq!(original, parsed);
 }
+
+#[test]
+fn ths_values() {
+    let frame = parse_frame("$GPTHS,77.52,E*34").expect("valid THS frame");
+    let x = Ths::parse(&frame.fields).expect("parse THS");
+    assert!((x.heading_true.expect("heading_true") - 77.52).abs() < 1e-2);
+    assert_eq!(x.mode, Some('E'));
+}

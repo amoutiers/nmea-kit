@@ -46,3 +46,32 @@ fn roundtrip() {
     let parsed = Ttm::parse(&frame.fields).expect("parse");
     assert_eq!(original, parsed);
 }
+
+#[test]
+fn ttm_values() {
+    // Wire: $RATTM,02,1.43,170.5,T,0.16,264.4,T,1.42,36.9,N,,T,,,M*2A
+    // Trailing fields after speed_units 'N': ,,T,,,M
+    //   name=""    -> None
+    //   status='T' -> Some('T')
+    //   ref_target="" -> None
+    //   time=""    -> None
+    //   acq_type='M' -> Some('M')
+    let frame = parse_frame("$RATTM,02,1.43,170.5,T,0.16,264.4,T,1.42,36.9,N,,T,,,M*2A")
+        .expect("valid TTM frame");
+    let x = Ttm::parse(&frame.fields).expect("parse TTM");
+    assert_eq!(x.target_num, Some(2));
+    assert!((x.dist.expect("dist") - 1.43).abs() < 1e-2);
+    assert!((x.bearing.expect("bearing") - 170.5).abs() < 1e-2);
+    assert_eq!(x.bearing_type, Some('T'));
+    assert!((x.speed.expect("speed") - 0.16).abs() < 1e-2);
+    assert!((x.course.expect("course") - 264.4).abs() < 1e-2);
+    assert_eq!(x.course_type, Some('T'));
+    assert!((x.dist_cpa.expect("dist_cpa") - 1.42).abs() < 1e-2);
+    assert!((x.time_cpa.expect("time_cpa") - 36.9).abs() < 1e-2);
+    assert_eq!(x.speed_units, Some('N'));
+    assert!(x.name.is_none());
+    assert_eq!(x.status, Some('T'));
+    assert!(x.ref_target.is_none());
+    assert!(x.time.is_none());
+    assert_eq!(x.acq_type, Some('M'));
+}

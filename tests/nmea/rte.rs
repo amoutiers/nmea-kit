@@ -40,3 +40,23 @@ fn roundtrip() {
     let parsed = Rte::parse(&frame.fields).expect("parse");
     assert_eq!(original, parsed);
 }
+
+#[test]
+fn rte_values() {
+    let frame = parse_frame("$IIRTE,4,1,c,Rte 1,411,412,413,414,415*6F").expect("valid RTE frame");
+    let x = Rte::parse(&frame.fields).expect("parse RTE");
+    assert_eq!(x.num_sentences, Some(4));
+    assert_eq!(x.sentence_num, Some(1));
+    assert_eq!(x.mode, Some('c'));
+    assert_eq!(x.name.as_deref(), Some("Rte 1"));
+    assert_eq!(
+        x.idents,
+        vec![
+            "411".to_string(),
+            "412".to_string(),
+            "413".to_string(),
+            "414".to_string(),
+            "415".to_string(),
+        ]
+    );
+}

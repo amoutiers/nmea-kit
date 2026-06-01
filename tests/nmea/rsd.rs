@@ -44,3 +44,23 @@ fn roundtrip() {
     let parsed = Rsd::parse(&frame.fields).expect("parse");
     assert_eq!(original, parsed);
 }
+
+#[test]
+fn rsd_values() {
+    let frame = parse_frame("$RARSD,0.00,,2.50,005.0,0.00,,4.50,355.0,,,3.0,N,H*51")
+        .expect("valid RSD frame");
+    let x = Rsd::parse(&frame.fields).expect("parse RSD");
+    assert!((x.origin1_range.expect("origin1_range") - 0.0).abs() < 1e-2);
+    assert!(x.origin1_bearing.is_none());
+    assert!((x.vrm1.expect("vrm1") - 2.5).abs() < 1e-2);
+    assert!((x.bearing_line1.expect("bearing_line1") - 5.0).abs() < 1e-2);
+    assert!((x.origin2_range.expect("origin2_range") - 0.0).abs() < 1e-2);
+    assert!(x.origin2_bearing.is_none());
+    assert!((x.vrm2.expect("vrm2") - 4.5).abs() < 1e-2);
+    assert!((x.bearing_line2.expect("bearing_line2") - 355.0).abs() < 1e-2);
+    assert!(x.cursor_range.is_none());
+    assert!(x.cursor_bearing.is_none());
+    assert!((x.range_scale.expect("range_scale") - 3.0).abs() < 1e-2);
+    assert_eq!(x.range_unit, Some('N'));
+    assert_eq!(x.display_rotation, Some('H'));
+}
