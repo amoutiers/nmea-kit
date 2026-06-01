@@ -42,7 +42,10 @@ impl Gsv {
         // Satellite groups are 4 fields each; remainder of 1 means signal_id is present.
         let remaining = fields.len().saturating_sub(3);
         let num_groups = remaining / 4;
-        let has_signal_id = remaining % 4 == 1;
+        // A remainder of 1 means a signal_id field is present — but only if it's non-empty.
+        // A stray trailing comma from parse_frame adds an empty field that must not trigger this.
+        let has_signal_id = remaining % 4 == 1
+            && fields.get(3 + num_groups * 4).is_some_and(|f| !f.is_empty());
 
         let mut sats = Vec::with_capacity(num_groups);
         for _ in 0..num_groups {
@@ -182,6 +185,21 @@ mod tests {
         let frame2 = parse_frame(sentence.trim()).expect("re-parse");
         let gsv2 = Gsv::parse(&frame2.fields).expect("re-parse GSV");
         assert_eq!(gsv2.signal_id, Some('B'));
+    }
+
+    #[test]
+    fn gsv_trailing_empty_field_not_treated_as_signal_id() {
+        // A 1-sat GSV without signal_id, with a stray trailing empty field
+        // (as produced by parse_frame for a sentence with a trailing comma).
+        // has_signal_id must NOT fire; signal_id must be None; sat data intact.
+        let fields: Vec<&str> = vec!["1", "1", "01", "09", "73", "246", "35", ""];
+        let gsv = Gsv::parse(&fields).expect("parse");
+        assert!(gsv.signal_id.is_none(), "empty trailing field must not be treated as signal_id");
+        assert_eq!(gsv.sats.len(), 1);
+        assert_eq!(gsv.sats[0].prn, Some(9));
+        assert_eq!(gsv.sats[0].elevation, Some(73));
+        assert_eq!(gsv.sats[0].azimuth, Some(246));
+        assert_eq!(gsv.sats[0].snr, Some(35));
     }
 
     #[test]
