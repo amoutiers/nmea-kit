@@ -33,3 +33,20 @@ fn roundtrip() {
     let parsed = Vhw::parse(&frame.fields).expect("parse");
     assert_eq!(original, parsed);
 }
+
+#[test]
+fn vhw_values() {
+    // (a) value half
+    let frame = parse_frame("$SDVHW,182.5,T,181.8,M,0.0,N,0.0,K*4C").expect("valid VHW frame");
+    let x = Vhw::parse(&frame.fields).expect("parse VHW");
+    assert!((x.heading_true.expect("heading_true") - 182.5).abs() < 1e-2);
+    assert!((x.heading_mag.expect("heading_mag") - 181.8).abs() < 1e-2);
+    assert!((x.speed_kts.expect("speed_kts") - 0.0).abs() < 1e-2);
+    assert!((x.speed_kmh.expect("speed_kmh") - 0.0).abs() < 1e-2);
+
+    // (b) wire half — 0.0 encodes as "0"
+    let s = x.to_sentence("SD");
+    let body = s.trim().trim_start_matches('$');
+    let body = &body[..body.rfind('*').expect("cksum")];
+    assert_eq!(body, "SDVHW,182.5,T,181.8,M,0,N,0,K");
+}

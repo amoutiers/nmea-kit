@@ -34,3 +34,21 @@ fn roundtrip() {
     let parsed = Vwt::parse(&frame.fields).expect("parse");
     assert_eq!(original, parsed);
 }
+
+#[test]
+fn vwt_values() {
+    // (a) value half — fixture has 030., 05.2, 018.7 which parse to 30.0, 5.2, 18.7
+    let frame = parse_frame("$IIVWT,030.,R,10.1,N,05.2,M,018.7,K*75").expect("valid VWT frame");
+    let x = Vwt::parse(&frame.fields).expect("parse VWT");
+    assert!((x.angle.expect("angle") - 30.0).abs() < 1e-2);
+    assert_eq!(x.angle_lr, Some('R'));
+    assert!((x.speed_knots.expect("speed_knots") - 10.1).abs() < 1e-2);
+    assert!((x.speed_ms.expect("speed_ms") - 5.2).abs() < 1e-2);
+    assert!((x.speed_kmh.expect("speed_kmh") - 18.7).abs() < 1e-2);
+
+    // (b) wire half — 030.→"30", 05.2→"5.2", 018.7→"18.7"
+    let s = x.to_sentence("II");
+    let body = s.trim().trim_start_matches('$');
+    let body = &body[..body.rfind('*').expect("cksum")];
+    assert_eq!(body, "IIVWT,30,R,10.1,N,5.2,M,18.7,K");
+}

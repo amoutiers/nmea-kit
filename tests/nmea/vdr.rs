@@ -32,3 +32,19 @@ fn roundtrip() {
     let parsed = Vdr::parse(&frame.fields).expect("parse");
     assert_eq!(original, parsed);
 }
+
+#[test]
+fn vdr_values() {
+    // (a) value half
+    let frame = parse_frame("$IIVDR,10.1,T,12.3,M,1.2,N*3A").expect("valid VDR frame");
+    let x = Vdr::parse(&frame.fields).expect("parse VDR");
+    assert!((x.direction_true.expect("direction_true") - 10.1).abs() < 1e-2);
+    assert!((x.direction_mag.expect("direction_mag") - 12.3).abs() < 1e-2);
+    assert!((x.speed_knots.expect("speed_knots") - 1.2).abs() < 1e-2);
+
+    // (b) wire half
+    let s = x.to_sentence("II");
+    let body = s.trim().trim_start_matches('$');
+    let body = &body[..body.rfind('*').expect("cksum")];
+    assert_eq!(body, "IIVDR,10.1,T,12.3,M,1.2,N");
+}
