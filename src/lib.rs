@@ -1,3 +1,13 @@
+#![cfg_attr(
+    not(test),
+    deny(
+        clippy::panic,
+        clippy::expect_used,
+        clippy::todo,
+        clippy::unimplemented,
+        clippy::unreachable
+    )
+)]
 //! # nmea-kit
 //!
 //! Bidirectional NMEA 0183 parser/encoder with AIS message decoding.

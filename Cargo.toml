@@ -89,6 +89,9 @@ xdr = []
 xte = []
 zda = []
 
+[lints.rust]
+unsafe_code = "forbid"
+
 [lints.clippy]
 unwrap_used = "deny"
 cognitive_complexity = "deny"
