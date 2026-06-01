@@ -141,6 +141,7 @@ mod tests {
         // MMSI is bits 8-37 (30 bits)
         let mmsi = extract_u32(&bits, 8, 30).expect("valid");
         assert!(mmsi > 0);
+        assert_eq!(mmsi, 371798000); // exact MMSI (was only asserted > 0)
     }
 
     #[test]
