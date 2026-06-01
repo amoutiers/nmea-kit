@@ -17,7 +17,10 @@ pub struct Gsa {
     pub hdop: Option<f32>,
     /// Vertical dilution of precision.
     pub vdop: Option<f32>,
-    /// GNSS system id (NMEA 4.11+): hex digit, 1=GPS, 2=GLONASS, 3=Galileo, 4=BeiDou, …
+    /// GNSS system id (NMEA 4.11+): one hex digit ('1'=GPS, '2'=GLONASS, '3'=Galileo,
+    /// '4'=BeiDou, …). Parsed via [`FieldReader::char`] which keeps only the first
+    /// character. NMEA 4.11 mandates a single hex digit; multi-character values from
+    /// non-conforming devices are silently truncated.
     pub system_id: Option<char>,
 }
 
