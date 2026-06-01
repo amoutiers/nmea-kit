@@ -2,10 +2,11 @@
 
 All notable changes to nmea-kit are documented here.
 
-## [0.7.0] - 2026-05-31
+## [0.7.0] - 2026-06-01
 
 ### Breaking
 - `FieldReader` / `FieldWriter` are no longer part of the public API (now `pub(crate)`) — they were unintended glob-re-export leakage.
+- `FrameError` has a new variant `NonAsciiAddress` — exhaustive matches on `FrameError` must be updated.
 - `Gsv.signal_id`: `Option<u8>` → `Option<char>` (hex signal IDs were silently dropped).
 - `Rmc`: new field `nav_status: Option<char>` (NMEA 4.1).
 - `Gsa`: new field `system_id: Option<char>` (NMEA 4.11).
@@ -15,13 +16,25 @@ All notable changes to nmea-kit are documented here.
 
 ### Fixed
 - `parse_frame` no longer panics on a non-ASCII address; returns `FrameError::NonAsciiAddress`.
+- `parse_frame` now rejects malformed checksums (wrong length, non-hex characters); lowercase hex checksums (e.g. `*0e`) remain valid.
+- `FieldReader`: `"NaN"` / `"inf"` / `"-inf"` float fields now yield `None` instead of `Some(NaN)` / `Some(inf)`.
+- `FieldWriter`: non-finite float values emit an empty field (not `"NaN"`); `-0.0` normalizes to `"0"`.
 - AIS Type 27 latitude/longitude were scaled by 10 instead of 600 (1/10 minute) — positions were corrupted/dropped.
 - AIS Type 24 Part B `callsign` and `ship_type` were read at the wrong bit offsets (garbage output).
 - AIS Type 9 `dte`/`assigned`/`raim` flags were read at the wrong bit offsets.
-- GSV hex signal IDs and the RMC/GSA NMEA 4.x trailing fields were silently dropped on parse and lost on re-encode.
-- Position sentences now encode coordinates with zero-padded degrees (`00454.5784`, not `454.5784`).
 - AIS 6-bit armor gap characters (`0x58`–`0x5F`) are now rejected; `extract_i32` no longer overflows at `len == 32`.
+- AIS fragment reassembly: concurrent multi-part messages on channels A and B with the same sequence ID no longer collide; duplicate continuation fragments are now silently ignored instead of discarding the in-progress assembly.
+- AIS payloads with an out-of-range `fill_bits` value (> 5) are now rejected instead of being coerced to 0.
+- AIS AtoN and safety-message names now preserve leading spaces; only trailing 6-bit padding (`@`) is stripped.
+- GSV hex signal IDs and the RMC/GSA NMEA 4.x trailing fields were silently dropped on parse and lost on re-encode.
+- `TXT` sentences whose free-text payload contains commas are now fully preserved on parse.
+- Position sentences now encode coordinates with zero-padded degrees (`00454.5784`, not `454.5784`).
+- Coordinate encoder now always emits a decimal point for whole-number values (`0.0` → `"0000.0"`, not `"0000"`), fixing compatibility with strict NMEA parsers.
+- GSV `has_signal_id` heuristic no longer fires on an empty trailing field produced by a stray trailing comma.
 - Removed the last panic-family macro (`unreachable!`) from library code.
+
+### Changed
+- `unsafe_code` is now `forbid` at the crate level; `panic!` / `expect` / `todo!` / `unreachable!` are denied in non-test builds. These invariants were already respected; they are now enforced by the compiler.
 
 ### Note
 - NMEA sentence coverage is **54** (51 standard + 3 proprietary). Earlier changelog running tallies under-counted by 2; this is the authoritative total.
