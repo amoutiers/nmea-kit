@@ -30,3 +30,17 @@ fn roundtrip() {
     let parsed = Hdm::parse(&frame.fields).expect("parse");
     assert_eq!(original, parsed);
 }
+
+#[test]
+fn hdm_values() {
+    // (a) value half
+    let frame = parse_frame("$GPHDM,223.12,M*05").expect("valid");
+    let x = Hdm::parse(&frame.fields).expect("parse");
+    assert!((x.heading_mag.expect("heading_mag") - 223.12).abs() < 1e-2);
+
+    // (b) wire half
+    let s = x.to_sentence("GP");
+    let body = s.trim().trim_start_matches('$');
+    let body = &body[..body.rfind('*').expect("cksum")];
+    assert_eq!(body, "GPHDM,223.12,M");
+}

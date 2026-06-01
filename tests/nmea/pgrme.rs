@@ -34,3 +34,20 @@ fn roundtrip() {
     let parsed = Pgrme::parse(&frame.fields).expect("parse");
     assert_eq!(original, parsed);
 }
+
+#[test]
+fn pgrme_values() {
+    // (a) value half
+    let frame = parse_frame("$PGRME,3.3,M,4.9,M,6.0,M*25").expect("valid");
+    let x = Pgrme::parse(&frame.fields).expect("parse");
+    assert!((x.horizontal.expect("horizontal") - 3.3).abs() < 1e-2);
+    assert!((x.vertical.expect("vertical") - 4.9).abs() < 1e-2);
+    assert!((x.spherical.expect("spherical") - 6.0).abs() < 1e-2);
+
+    // (b) wire half — proprietary: to_sentence("") body starts with PGRME,
+    // normalization: 6.0→6 via format!("{}", v)
+    let s = x.to_sentence("");
+    let body = s.trim().trim_start_matches('$');
+    let body = &body[..body.rfind('*').expect("cksum")];
+    assert_eq!(body, "PGRME,3.3,M,4.9,M,6,M");
+}

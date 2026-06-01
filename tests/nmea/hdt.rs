@@ -30,3 +30,17 @@ fn roundtrip() {
     let parsed = Hdt::parse(&frame.fields).expect("parse");
     assert_eq!(original, parsed);
 }
+
+#[test]
+fn hdt_values() {
+    // (a) value half
+    let frame = parse_frame("$HEHDT,4.0,T*2B").expect("valid");
+    let x = Hdt::parse(&frame.fields).expect("parse");
+    assert!((x.heading_true.expect("heading_true") - 4.0).abs() < 1e-2);
+
+    // (b) wire half — 4.0 normalises to "4" via format!("{}", v)
+    let s = x.to_sentence("HE");
+    let body = s.trim().trim_start_matches('$');
+    let body = &body[..body.rfind('*').expect("cksum")];
+    assert_eq!(body, "HEHDT,4,T");
+}
