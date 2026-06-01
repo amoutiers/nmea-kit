@@ -53,3 +53,31 @@ fn roundtrip() {
     let parsed = Mda::parse(&frame.fields).expect("parse");
     assert_eq!(original, parsed);
 }
+
+#[test]
+fn mda_values() {
+    let frame =
+        parse_frame("$WIMDA,,I,+0.985,B,+03.1,C,+5.6,C,40.0,3.0,+3.4,C,90.0,T,85.0,M,10.0,N,,M*1A")
+            .expect("valid");
+    let m = Mda::parse(&frame.fields).expect("parse");
+    assert!(m.baro_inches.is_none());
+    assert_eq!(m.baro_inches_unit, Some('I'));
+    assert!((m.baro_bars.expect("baro_bars") - 0.985).abs() < 1e-4);
+    assert_eq!(m.baro_bars_unit, Some('B'));
+    assert!((m.air_temp.expect("air_temp") - 3.1).abs() < 1e-4);
+    assert_eq!(m.air_temp_unit, Some('C'));
+    assert!((m.water_temp.expect("water_temp") - 5.6).abs() < 1e-4);
+    assert_eq!(m.water_temp_unit, Some('C'));
+    assert!((m.rel_humidity.expect("rel_humidity") - 40.0).abs() < 1e-4);
+    assert!((m.abs_humidity.expect("abs_humidity") - 3.0).abs() < 1e-4);
+    assert!((m.dew_point.expect("dew_point") - 3.4).abs() < 1e-4);
+    assert_eq!(m.dew_point_unit, Some('C'));
+    assert!((m.wind_dir_true.expect("wind_dir_true") - 90.0).abs() < 1e-4);
+    assert_eq!(m.wind_dir_true_unit, Some('T'));
+    assert!((m.wind_dir_mag.expect("wind_dir_mag") - 85.0).abs() < 1e-4);
+    assert_eq!(m.wind_dir_mag_unit, Some('M'));
+    assert!((m.wind_speed_knots.expect("wind_speed_knots") - 10.0).abs() < 1e-4);
+    assert_eq!(m.wind_speed_knots_unit, Some('N'));
+    assert!(m.wind_speed_ms.is_none());
+    assert_eq!(m.wind_speed_ms_unit, Some('M'));
+}

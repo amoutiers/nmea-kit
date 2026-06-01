@@ -31,3 +31,11 @@ fn roundtrip() {
     let parsed = Rot::parse(&frame.fields).expect("parse");
     assert_eq!(original, parsed);
 }
+
+#[test]
+fn rot_values() {
+    let frame = parse_frame("$HEROT,0.0,A*2B").expect("valid");
+    let r = Rot::parse(&frame.fields).expect("parse");
+    assert!((r.rate_of_turn.expect("rate_of_turn") - 0.0).abs() < 1e-4);
+    assert_eq!(r.valid, Some('A'));
+}

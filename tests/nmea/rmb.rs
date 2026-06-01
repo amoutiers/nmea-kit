@@ -47,3 +47,27 @@ fn roundtrip() {
     let parsed = Rmb::parse(&frame.fields).expect("parse");
     assert_eq!(original, parsed);
 }
+
+#[test]
+fn rmb_values() {
+    let frame =
+        parse_frame("$ECRMB,A,0.000,L,001,002,4653.550,N,07115.984,W,2.505,334.205,0.000,V*04")
+            .expect("valid");
+    let r = Rmb::parse(&frame.fields).expect("parse");
+    assert_eq!(r.status, Some('A'));
+    assert!((r.ctrkerr.expect("ctrkerr") - 0.0).abs() < 1e-4);
+    assert_eq!(r.dirs, Some('L'));
+    assert_eq!(r.wpt_origin.as_deref(), Some("001"));
+    assert_eq!(r.wpt_dest.as_deref(), Some("002"));
+    // dest_lat is raw DDMM.MMMM (not decimal degrees)
+    assert!((r.dest_lat.expect("dest_lat") - 4653.550).abs() < 1e-4);
+    assert_eq!(r.ns, Some('N'));
+    // dest_lon is raw DDDMM.MMM (not decimal degrees)
+    assert!((r.dest_lon.expect("dest_lon") - 7115.984).abs() < 1e-4);
+    assert_eq!(r.ew, Some('W'));
+    assert!((r.range.expect("range") - 2.505).abs() < 1e-4);
+    assert!((r.bearing.expect("bearing") - 334.205).abs() < 1e-4);
+    assert!((r.velclos.expect("velclos") - 0.0).abs() < 1e-4);
+    assert_eq!(r.arrstatus, Some('V'));
+    assert!(r.valstatus.is_none());
+}

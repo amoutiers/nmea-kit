@@ -28,3 +28,15 @@ fn roundtrip() {
     let parsed = Pskpdpt::parse(&frame.fields).expect("parse");
     assert_eq!(original, parsed);
 }
+
+#[test]
+fn pskpdpt_values() {
+    let frame = parse_frame("$PSKPDPT,0002.5,+00.0,0010,10,03,*77").expect("valid");
+    let p = Pskpdpt::parse(&frame.fields).expect("parse");
+    assert!((p.depth.expect("depth") - 2.5).abs() < 1e-4);
+    assert!((p.offset.expect("offset") - 0.0).abs() < 1e-4);
+    assert!((p.range_scale.expect("range_scale") - 10.0).abs() < 1e-4);
+    assert_eq!(p.echo_strength, Some(10));
+    assert_eq!(p.channel, Some(3));
+    assert!(p.transducer_location.is_none());
+}

@@ -34,3 +34,14 @@ fn roundtrip() {
     let parsed = Rpm::parse(&frame.fields).expect("parse");
     assert_eq!(original, parsed);
 }
+
+#[test]
+fn rpm_values() {
+    let frame = parse_frame("$IIRPM,E,1,2418.2,10.5,A*5F").expect("valid");
+    let r = Rpm::parse(&frame.fields).expect("parse");
+    assert_eq!(r.source, Some('E'));
+    assert_eq!(r.engine_shaft_num, Some(1));
+    assert!((r.rpm.expect("rpm") - 2418.2).abs() < 1e-2);
+    assert!((r.pitch.expect("pitch") - 10.5).abs() < 1e-4);
+    assert_eq!(r.status, Some('A'));
+}

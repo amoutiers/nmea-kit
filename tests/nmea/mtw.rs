@@ -30,3 +30,11 @@ fn roundtrip() {
     let parsed = Mtw::parse(&frame.fields).expect("parse");
     assert_eq!(original, parsed);
 }
+
+#[test]
+fn mtw_values() {
+    let frame = parse_frame("$YXMTW,15.2,C*14").expect("valid");
+    let m = Mtw::parse(&frame.fields).expect("parse");
+    assert!((m.temperature.expect("temperature") - 15.2).abs() < 1e-4);
+    assert_eq!(m.units, Some('C'));
+}
