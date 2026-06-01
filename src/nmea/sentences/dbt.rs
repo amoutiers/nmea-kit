@@ -84,6 +84,12 @@ mod tests {
     }
 
     #[test]
+    fn dbt_encode_exact_fields() {
+        let dbt = Dbt { depth_feet: Some(7.7), depth_meters: Some(2.3), depth_fathoms: Some(1.3) };
+        assert_eq!(dbt.encode(), vec!["7.7", "f", "2.3", "M", "1.3", "F"]);
+    }
+
+    #[test]
     fn dbt_signalk() {
         let f = parse_frame("$IIDBT,035.53,f,010.83,M,005.85,F*23").expect("valid DBT frame");
         let d = Dbt::parse(&f.fields).expect("parse DBT");

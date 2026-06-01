@@ -111,6 +111,17 @@ mod tests {
         assert!((mwd.wind_speed_ms.expect("ms") - 5.2).abs() < 0.1);
     }
     #[test]
+    fn mwd_encode_exact_fields() {
+        let mwd = Mwd {
+            wind_dir_true: Some(270.0),
+            wind_dir_mag: Some(268.5),
+            wind_speed_kts: Some(12.4),
+            wind_speed_ms: Some(6.4),
+        };
+        assert_eq!(mwd.encode(), vec!["270", "T", "268.5", "M", "12.4", "N", "6.4", "M"]);
+    }
+
+    #[test]
     fn mwd_encode_roundtrip() {
         let mwd = Mwd {
             wind_dir_true: Some(270.0),

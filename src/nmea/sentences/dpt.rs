@@ -74,6 +74,12 @@ mod tests {
     }
 
     #[test]
+    fn dpt_encode_exact_fields() {
+        let dpt = Dpt { depth: Some(4.1), offset: Some(0.0), rangescale: None };
+        assert_eq!(dpt.encode(), vec!["4.1", "0", ""]);
+    }
+
+    #[test]
     fn dpt_encode_roundtrip() {
         let d = Dpt {
             depth: Some(4.1),
