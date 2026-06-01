@@ -21,6 +21,22 @@ fn dispatch() {
 }
 
 #[test]
+fn hdg_values() {
+    let frame = parse_frame("$SDHDG,181.9,,,0.6,E*32").expect("valid");
+    let hdg = Hdg::parse(&frame.fields).expect("parse");
+    assert!((hdg.heading_mag.expect("heading_mag") - 181.9).abs() < 1e-4);
+    assert_eq!(hdg.deviation, None);
+    assert_eq!(hdg.deviation_ew, None);
+    assert!((hdg.variation.expect("variation") - 0.6).abs() < 1e-4);
+    assert_eq!(hdg.variation_ew, Some('E'));
+    // half (b): canonical body equals fixture body (byte-identical)
+    let s = hdg.to_sentence("SD");
+    let body = s.trim().trim_start_matches('$');
+    let body = &body[..body.rfind('*').expect("cksum")];
+    assert_eq!(body, "SDHDG,181.9,,,0.6,E");
+}
+
+#[test]
 fn roundtrip() {
     let original = Hdg {
         heading_mag: Some(181.9),

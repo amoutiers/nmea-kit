@@ -21,6 +21,20 @@ fn dispatch() {
 }
 
 #[test]
+fn dbt_values() {
+    let frame = parse_frame("$SDDBT,7.7,f,2.3,M,1.3,F*05").expect("valid");
+    let dbt = Dbt::parse(&frame.fields).expect("parse");
+    assert!((dbt.depth_feet.expect("depth_feet") - 7.7).abs() < 1e-4);
+    assert!((dbt.depth_meters.expect("depth_meters") - 2.3).abs() < 1e-4);
+    assert!((dbt.depth_fathoms.expect("depth_fathoms") - 1.3).abs() < 1e-4);
+    // half (b): canonical body equals fixture body (byte-identical)
+    let s = dbt.to_sentence("SD");
+    let body = s.trim().trim_start_matches('$');
+    let body = &body[..body.rfind('*').expect("cksum")];
+    assert_eq!(body, "SDDBT,7.7,f,2.3,M,1.3,F");
+}
+
+#[test]
 fn roundtrip() {
     let original = Dbt {
         depth_feet: Some(35.53),

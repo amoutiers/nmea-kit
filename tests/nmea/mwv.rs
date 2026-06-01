@@ -21,6 +21,22 @@ fn dispatch() {
 }
 
 #[test]
+fn mwv_values() {
+    let frame = parse_frame("$IIMWV,336,R,13.41,N,A*22").expect("valid");
+    let mwv = Mwv::parse(&frame.fields).expect("parse");
+    assert!((mwv.wind_angle.expect("wind_angle") - 336.0).abs() < 1e-3);
+    assert_eq!(mwv.reference, Some('R'));
+    assert!((mwv.wind_speed.expect("wind_speed") - 13.41).abs() < 1e-4);
+    assert_eq!(mwv.speed_units, Some('N'));
+    assert_eq!(mwv.status, Some('A'));
+    // half (b): canonical body equals fixture body (byte-identical)
+    let s = mwv.to_sentence("II");
+    let body = s.trim().trim_start_matches('$');
+    let body = &body[..body.rfind('*').expect("cksum")];
+    assert_eq!(body, "IIMWV,336,R,13.41,N,A");
+}
+
+#[test]
 fn roundtrip() {
     let original = Mwv {
         wind_angle: Some(336.0),

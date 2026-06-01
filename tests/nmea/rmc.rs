@@ -25,6 +25,35 @@ fn dispatch() {
 }
 
 #[test]
+fn rmc_values() {
+    let frame =
+        parse_frame("$GPRMC,085412.000,A,5222.3198,N,00454.5784,E,0.58,251.34,030414,,,A*65")
+            .expect("valid");
+    let rmc = Rmc::parse(&frame.fields).expect("parse");
+    assert_eq!(rmc.time, Some("085412.000".to_string()));
+    assert_eq!(rmc.status, Some('A'));
+    assert!((rmc.lat.expect("lat") - 5222.3198).abs() < 1e-9);
+    assert_eq!(rmc.ns, Some('N'));
+    assert!((rmc.lon.expect("lon") - 454.5784).abs() < 1e-9);
+    assert_eq!(rmc.ew, Some('E'));
+    assert!((rmc.sog.expect("sog") - 0.58).abs() < 1e-4);
+    assert!((rmc.cog.expect("cog") - 251.34).abs() < 1e-3);
+    assert_eq!(rmc.date, Some("030414".to_string()));
+    assert_eq!(rmc.mag_var, None);
+    assert_eq!(rmc.mag_var_ew, None);
+    assert_eq!(rmc.pos_mode, Some('A'));
+    assert_eq!(rmc.nav_status, None);
+    // half (b): canonical re-encode
+    let s = rmc.to_sentence("GP");
+    let body = s.trim().trim_start_matches('$');
+    let body = &body[..body.rfind('*').expect("cksum")];
+    assert_eq!(
+        body,
+        "GPRMC,085412.000,A,5222.3198,N,00454.5784,E,0.58,251.34,030414,,,A,"
+    );
+}
+
+#[test]
 fn roundtrip() {
     let original = Rmc {
         time: Some("120000.00".to_string()),

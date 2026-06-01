@@ -21,6 +21,22 @@ fn dispatch() {
 }
 
 #[test]
+fn vtg_values() {
+    let frame = parse_frame("$GPVTG,0.0,T,359.3,M,0.0,N,0.0,K,A*2F").expect("valid");
+    let vtg = Vtg::parse(&frame.fields).expect("parse");
+    assert!((vtg.course_true.expect("course_true") - 0.0).abs() < 1e-4);
+    assert!((vtg.course_mag.expect("course_mag") - 359.3).abs() < 1e-3);
+    assert!((vtg.speed_kts.expect("speed_kts") - 0.0).abs() < 1e-4);
+    assert!((vtg.speed_kmh.expect("speed_kmh") - 0.0).abs() < 1e-4);
+    assert_eq!(vtg.mode, Some('A'));
+    // half (b): canonical re-encode — "0.0" → "0" for all zero f32 values
+    let s = vtg.to_sentence("GP");
+    let body = s.trim().trim_start_matches('$');
+    let body = &body[..body.rfind('*').expect("cksum")];
+    assert_eq!(body, "GPVTG,0,T,359.3,M,0,N,0,K,A");
+}
+
+#[test]
 fn roundtrip() {
     let original = Vtg {
         course_true: Some(0.0),

@@ -25,6 +25,35 @@ fn dispatch() {
 }
 
 #[test]
+fn gns_values() {
+    let frame =
+        parse_frame("$GPGNS,111648.00,0235.0379,S,04422.1450,W,ANN,12,0.8,8.5,-22.3,,,S*5D")
+            .expect("valid");
+    let gns = Gns::parse(&frame.fields).expect("parse");
+    assert_eq!(gns.time, Some("111648.00".to_string()));
+    assert!((gns.lat.expect("lat") - 235.0379).abs() < 1e-9);
+    assert_eq!(gns.ns, Some('S'));
+    assert!((gns.lon.expect("lon") - 4422.145).abs() < 1e-9);
+    assert_eq!(gns.ew, Some('W'));
+    assert_eq!(gns.mode, Some("ANN".to_string()));
+    assert_eq!(gns.num_sats, Some(12));
+    assert!((gns.hdop.expect("hdop") - 0.8).abs() < 1e-4);
+    assert!((gns.altitude.expect("alt") - 8.5).abs() < 1e-4);
+    assert!((gns.geoid_sep.expect("geoid") - (-22.3)).abs() < 1e-3);
+    assert_eq!(gns.dgps_age, None);
+    assert_eq!(gns.dgps_station, None);
+    assert_eq!(gns.nav_status, Some('S'));
+    // half (b): canonical re-encode — "04422.1450" → "04422.145" (trailing zero dropped)
+    let s = gns.to_sentence("GP");
+    let body = s.trim().trim_start_matches('$');
+    let body = &body[..body.rfind('*').expect("cksum")];
+    assert_eq!(
+        body,
+        "GPGNS,111648.00,0235.0379,S,04422.145,W,ANN,12,0.8,8.5,-22.3,,,S"
+    );
+}
+
+#[test]
 fn roundtrip() {
     let original = Gns {
         time: Some("120000.00".to_string()),

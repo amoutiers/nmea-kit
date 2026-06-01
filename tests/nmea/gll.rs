@@ -21,6 +21,24 @@ fn dispatch() {
 }
 
 #[test]
+fn gll_values() {
+    let frame = parse_frame("$GPGLL,5958.613,N,02325.928,E,121022,A,D*40").expect("valid");
+    let gll = Gll::parse(&frame.fields).expect("parse");
+    assert!((gll.lat.expect("lat") - 5958.613).abs() < 1e-9);
+    assert_eq!(gll.ns, Some('N'));
+    assert!((gll.lon.expect("lon") - 2325.928).abs() < 1e-9);
+    assert_eq!(gll.ew, Some('E'));
+    assert_eq!(gll.time, Some("121022".to_string()));
+    assert_eq!(gll.status, Some('A'));
+    assert_eq!(gll.mode, Some('D'));
+    // half (b): canonical re-encode — mode always emitted, producing trailing comma if mode=Some
+    let s = gll.to_sentence("GP");
+    let body = s.trim().trim_start_matches('$');
+    let body = &body[..body.rfind('*').expect("cksum")];
+    assert_eq!(body, "GPGLL,5958.613,N,02325.928,E,121022,A,D");
+}
+
+#[test]
 fn roundtrip() {
     let original = Gll {
         lat: Some(4807.038),
