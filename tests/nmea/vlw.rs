@@ -37,3 +37,17 @@ fn roundtrip() {
     let parsed = Vlw::parse(&frame.fields).expect("parse");
     assert_eq!(original, parsed);
 }
+
+#[test]
+fn vlw_values() {
+    let frame = parse_frame("$GNVLW,,N,,N,0.000,N,0.000,N*44").expect("valid");
+    let vlw = Vlw::parse(&frame.fields).expect("parse");
+    assert!(vlw.total_water_dist.is_none());
+    assert_eq!(vlw.total_water_dist_unit, Some('N'));
+    assert!(vlw.water_dist.is_none());
+    assert_eq!(vlw.water_dist_unit, Some('N'));
+    assert!((vlw.total_ground_dist.expect("total_ground_dist") - 0.0).abs() < 1e-2);
+    assert_eq!(vlw.total_ground_dist_unit, Some('N'));
+    assert!((vlw.ground_dist.expect("ground_dist") - 0.0).abs() < 1e-2);
+    assert_eq!(vlw.ground_dist_unit, Some('N'));
+}

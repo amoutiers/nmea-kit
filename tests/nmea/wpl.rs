@@ -33,3 +33,14 @@ fn roundtrip() {
     let parsed = Wpl::parse(&frame.fields).expect("parse");
     assert_eq!(original, parsed);
 }
+
+#[test]
+fn wpl_values() {
+    let frame = parse_frame("$IIWPL,5503.4530,N,01037.2742,E,411*6F").expect("valid");
+    let wpl = Wpl::parse(&frame.fields).expect("parse");
+    assert!((wpl.lat.expect("lat") - 5503.453_f64).abs() < 1e-2);
+    assert_eq!(wpl.ns, Some('N'));
+    assert!((wpl.lon.expect("lon") - 1037.2742_f64).abs() < 1e-2);
+    assert_eq!(wpl.ew, Some('E'));
+    assert_eq!(wpl.ident.as_deref(), Some("411"));
+}

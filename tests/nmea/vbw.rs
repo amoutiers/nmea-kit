@@ -38,3 +38,19 @@ fn roundtrip() {
     let parsed = Vbw::parse(&frame.fields).expect("parse");
     assert_eq!(original, parsed);
 }
+
+#[test]
+fn vbw_values() {
+    let frame = parse_frame("$GPVBW,12.3,0.07,A,11.78,0.12,A*6F").expect("valid");
+    let vbw = Vbw::parse(&frame.fields).expect("parse");
+    assert!((vbw.long_water_spd.expect("long_water_spd") - 12.3).abs() < 1e-2);
+    assert!((vbw.trans_water_spd.expect("trans_water_spd") - 0.07).abs() < 1e-2);
+    assert_eq!(vbw.water_spd_status, Some('A'));
+    assert!((vbw.long_ground_spd.expect("long_ground_spd") - 11.78).abs() < 1e-2);
+    assert!((vbw.trans_ground_spd.expect("trans_ground_spd") - 0.12).abs() < 1e-2);
+    assert_eq!(vbw.ground_spd_status, Some('A'));
+    assert!(vbw.stern_trans_water_spd.is_none());
+    assert!(vbw.stern_water_spd_status.is_none());
+    assert!(vbw.stern_trans_ground_spd.is_none());
+    assert!(vbw.stern_ground_spd_status.is_none());
+}

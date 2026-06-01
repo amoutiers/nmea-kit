@@ -45,3 +45,14 @@ fn roundtrip() {
     let parsed = Xdr::parse(&frame.fields).expect("parse");
     assert_eq!(original, parsed);
 }
+
+#[test]
+fn xdr_values() {
+    let frame = parse_frame("$SDXDR,C,23.15,C,WTHI*70").expect("valid");
+    let xdr = Xdr::parse(&frame.fields).expect("parse");
+    assert_eq!(xdr.groups.len(), 1);
+    assert_eq!(xdr.groups[0].sensor_type, Some('C'));
+    assert!((xdr.groups[0].value.expect("value") - 23.15).abs() < 1e-2);
+    assert_eq!(xdr.groups[0].unit, Some('C'));
+    assert_eq!(xdr.groups[0].name.as_deref(), Some("WTHI"));
+}

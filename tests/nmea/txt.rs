@@ -33,3 +33,13 @@ fn roundtrip() {
     let parsed = Txt::parse(&frame.fields).expect("parse");
     assert_eq!(original, parsed);
 }
+
+#[test]
+fn txt_values() {
+    let frame = parse_frame("$GPTXT,01,01,02,u-blox ag - www.u-blox.com*50").expect("valid");
+    let txt = Txt::parse(&frame.fields).expect("parse");
+    assert_eq!(txt.num_msg, Some(1));
+    assert_eq!(txt.msg_num, Some(1));
+    assert_eq!(txt.msg_type, Some(2));
+    assert_eq!(txt.text.as_deref(), Some("u-blox ag - www.u-blox.com"));
+}

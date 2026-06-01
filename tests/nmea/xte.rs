@@ -35,3 +35,15 @@ fn roundtrip() {
     let parsed = Xte::parse(&frame.fields).expect("parse");
     assert_eq!(original, parsed);
 }
+
+#[test]
+fn xte_values() {
+    let frame = parse_frame("$GPXTE,A,A,0.67,L,N*6F").expect("valid");
+    let xte = Xte::parse(&frame.fields).expect("parse");
+    assert_eq!(xte.gwarn, Some('A'));
+    assert_eq!(xte.lccwarn, Some('A'));
+    assert!((xte.ctrkerr.expect("ctrkerr") - 0.67).abs() < 1e-2);
+    assert_eq!(xte.dirs, Some('L'));
+    assert_eq!(xte.disunit, Some('N'));
+    assert!(xte.mode.is_none());
+}
