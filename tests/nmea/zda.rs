@@ -24,6 +24,18 @@ fn dispatch() {
 }
 
 #[test]
+fn zda_values() {
+    let frame = parse_frame("$GPZDA,172809.456,12,07,1996,00,00*57").expect("valid");
+    let z = Zda::parse(&frame.fields).expect("parse");
+    assert_eq!(z.time.as_deref(), Some("172809.456"));
+    assert_eq!(z.day, Some(12));
+    assert_eq!(z.month, Some(7));
+    assert_eq!(z.year, Some(1996));
+    assert_eq!(z.local_hour_offset, Some(0));
+    assert_eq!(z.local_min_offset, Some(0));
+}
+
+#[test]
 fn roundtrip() {
     let original = Zda {
         time: Some("160012.71".to_string()),
