@@ -249,10 +249,11 @@ impl FieldWriter {
     fn push_coord(&mut self, value: Option<f64>, int_width: usize) {
         self.fields.push(match value {
             Some(v) => {
+                debug_assert!(v >= 0.0, "coordinate magnitude must be non-negative; sign belongs in the N/S·E/W field");
                 let s = format!("{v}");
                 match s.split_once('.') {
                     Some((int, frac)) => format!("{int:0>int_width$}.{frac}"),
-                    None => format!("{s:0>int_width$}"),
+                    None => format!("{s:0>int_width$}.0"),
                 }
             }
             None => String::new(),
@@ -482,6 +483,16 @@ mod tests {
         w.lat(Some(4807.038));   // already 4 digits, unchanged
         w.lat(None);             // empty field
         let fields = w.finish();
-        assert_eq!(fields, vec!["00454.5784", "0837.038", "01131", "4807.038", ""]);
+        assert_eq!(fields, vec!["00454.5784", "0837.038", "01131.0", "4807.038", ""]);
+    }
+
+    #[test]
+    fn writer_coord_integer_emits_decimal_point() {
+        let mut w = FieldWriter::new();
+        w.lat(Some(0.0));       // équateur → "0000.0"
+        w.lon(Some(0.0));       // méridien → "00000.0"
+        w.lat(Some(1131.0));    // 11°31.0' → "1131.0"
+        w.lon(Some(1131.0));    // → "01131.0"
+        assert_eq!(w.finish(), vec!["0000.0", "00000.0", "1131.0", "01131.0"]);
     }
 }
