@@ -35,11 +35,18 @@ fn type9_second_fixture_gpsd() {
 #[test]
 fn type9_flag_offsets_gpsd() {
     let mut parser = AisParser::new();
-    // This gpsd fixture has DTE set (bit 142 == 1).
+    // Fixture: bit 142=1 (dte), bit 146=0 (assigned), bit 147=0 (raim).
+    // Verified by hand-decoding the 6-bit armor payload. These three bits
+    // were corrected from wrong offsets (138/139) to ITU-R M.1371 (146/147).
     let frame = parse_frame("!AIVDM,1,1,,B,91b55wi;hbOS@OdQAC062Ch2089h,0*30").expect("valid");
     match parser.decode(&frame).expect("decoded") {
         AisMessage::SarAircraft(sar) => {
             assert!(sar.dte, "DTE@142 should be true for this fixture");
+            assert!(
+                !sar.assigned,
+                "assigned@146 should be false for this fixture"
+            );
+            assert!(!sar.raim, "raim@147 should be false for this fixture");
         }
         other => panic!("expected SarAircraft, got {other:?}"),
     }
