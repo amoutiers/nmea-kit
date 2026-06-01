@@ -28,3 +28,15 @@ fn roundtrip() {
     let parsed = Bww::parse(&frame.fields).expect("parse");
     assert_eq!(original, parsed);
 }
+
+#[test]
+fn bww_values() {
+    let frame = parse_frame("$GPBWW,097.0,T,103.2,M,POINTB,POINTA*41").expect("valid");
+    let b = Bww::parse(&frame.fields).expect("parse");
+    assert!((b.bear_true.expect("bear_true") - 97.0).abs() < 1e-4);
+    assert_eq!(b.bear_true_type, Some('T'));
+    assert!((b.bear_mag.expect("bear_mag") - 103.2).abs() < 1e-4);
+    assert_eq!(b.bear_mag_type, Some('M'));
+    assert_eq!(b.wpt_dest.as_deref(), Some("POINTB"));
+    assert_eq!(b.wpt_origin.as_deref(), Some("POINTA"));
+}

@@ -44,3 +44,24 @@ fn roundtrip() {
     let parsed = Apb::parse(&frame.fields).expect("parse");
     assert_eq!(original, parsed);
 }
+
+#[test]
+fn apb_values() {
+    let frame = parse_frame("$GPAPB,A,A,0.10,R,N,V,V,011,M,DEST,011,M,011,M*3C").expect("valid");
+    let a = Apb::parse(&frame.fields).expect("parse");
+    assert_eq!(a.lcgwarn, Some('A'));
+    assert_eq!(a.lccwarn, Some('A'));
+    assert!((a.ctrkerr.expect("ctrkerr") - 0.10).abs() < 1e-4);
+    assert_eq!(a.dirs, Some('R'));
+    assert_eq!(a.ctrkunit, Some('N'));
+    assert_eq!(a.aalmcirc, Some('V'));
+    assert_eq!(a.aalmperp, Some('V'));
+    assert!((a.bear_o2d.expect("bear_o2d") - 11.0).abs() < 1e-4);
+    assert_eq!(a.bear_o2d_type, Some('M'));
+    assert_eq!(a.wpt.as_deref(), Some("DEST"));
+    assert!((a.bear_dest.expect("bear_dest") - 11.0).abs() < 1e-4);
+    assert_eq!(a.bear_dest_type, Some('M'));
+    assert!((a.bear_steer.expect("bear_steer") - 11.0).abs() < 1e-4);
+    assert_eq!(a.bear_steer_type, Some('M'));
+    assert!(a.mode.is_none());
+}

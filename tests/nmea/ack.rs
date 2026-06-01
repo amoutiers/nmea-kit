@@ -23,3 +23,10 @@ fn roundtrip() {
     let parsed = Ack::parse(&frame.fields).expect("parse");
     assert_eq!(original, parsed);
 }
+
+#[test]
+fn ack_values() {
+    let frame = parse_frame("$VRACK,001*50").expect("valid");
+    let a = Ack::parse(&frame.fields).expect("parse");
+    assert_eq!(a.alert_id.as_deref(), Some("001"));
+}

@@ -34,3 +34,14 @@ fn roundtrip() {
     let parsed = Aam::parse(&frame.fields).expect("parse");
     assert_eq!(original, parsed);
 }
+
+#[test]
+fn aam_values() {
+    let frame = parse_frame("$GPAAM,A,A,0.10,N,WPTNME*32").expect("valid");
+    let a = Aam::parse(&frame.fields).expect("parse");
+    assert_eq!(a.arrce, Some('A'));
+    assert_eq!(a.perp, Some('A'));
+    assert!((a.crad.expect("crad") - 0.10).abs() < 1e-4);
+    assert_eq!(a.cunit, Some('N'));
+    assert_eq!(a.wpt.as_deref(), Some("WPTNME"));
+}

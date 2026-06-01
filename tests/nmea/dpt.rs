@@ -32,3 +32,12 @@ fn roundtrip() {
     let parsed = Dpt::parse(&frame.fields).expect("parse");
     assert_eq!(original, parsed);
 }
+
+#[test]
+fn dpt_values() {
+    let frame = parse_frame("$IIDPT,4.1,0.0*45").expect("valid");
+    let d = Dpt::parse(&frame.fields).expect("parse");
+    assert!((d.depth.expect("depth") - 4.1).abs() < 1e-4);
+    assert!((d.offset.expect("offset") - 0.0).abs() < 1e-4);
+    assert!(d.rangescale.is_none());
+}
