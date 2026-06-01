@@ -41,3 +41,29 @@ fn roundtrip() {
     let parsed = Bwr::parse(&frame.fields).expect("parse");
     assert_eq!(original, parsed);
 }
+
+#[test]
+fn bwr_values() {
+    let frame = parse_frame("$GPBWR,225444,4917.24,N,12309.57,W,051.9,T,031.6,M,001.3,N,004*38")
+        .expect("valid");
+    let x = Bwr::parse(&frame.fields).expect("parse");
+    // (a) value half
+    assert_eq!(x.time.as_deref(), Some("225444"));
+    assert!((x.lat.expect("lat") - 4917.24).abs() < 1e-2);
+    assert_eq!(x.ns, Some('N'));
+    assert!((x.lon.expect("lon") - 12309.57).abs() < 1e-2);
+    assert_eq!(x.ew, Some('W'));
+    assert!((x.bear_true.expect("bear_true") - 51.9).abs() < 1e-2);
+    assert!((x.bear_mag.expect("bear_mag") - 31.6).abs() < 1e-2);
+    assert!((x.dist.expect("dist") - 1.3).abs() < 1e-2);
+    assert_eq!(x.wpt.as_deref(), Some("004"));
+    assert!(x.mode.is_none());
+    // (b) wire half
+    let s = x.to_sentence("GP");
+    let body = s.trim().trim_start_matches('$');
+    let body = &body[..body.rfind('*').expect("cksum")];
+    assert_eq!(
+        body,
+        "GPBWR,225444,4917.24,N,12309.57,W,51.9,T,31.6,M,1.3,N,004,"
+    );
+}

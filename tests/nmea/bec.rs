@@ -39,3 +39,28 @@ fn roundtrip() {
     let parsed = Bec::parse(&frame.fields).expect("parse");
     assert_eq!(original, parsed);
 }
+
+#[test]
+fn bec_values() {
+    let frame = parse_frame("$GPBEC,220516,5130.02,N,00046.34,W,213.8,T,218.0,M,0004.6,N,EGLM*33")
+        .expect("valid");
+    let x = Bec::parse(&frame.fields).expect("parse");
+    // (a) value half
+    assert_eq!(x.time.as_deref(), Some("220516"));
+    assert!((x.lat.expect("lat") - 5130.02).abs() < 1e-2);
+    assert_eq!(x.ns, Some('N'));
+    assert!((x.lon.expect("lon") - 46.34).abs() < 1e-2);
+    assert_eq!(x.ew, Some('W'));
+    assert!((x.bear_true.expect("bear_true") - 213.8).abs() < 1e-2);
+    assert!((x.bear_mag.expect("bear_mag") - 218.0).abs() < 1e-2);
+    assert!((x.dist.expect("dist") - 4.6).abs() < 1e-2);
+    assert_eq!(x.wpt.as_deref(), Some("EGLM"));
+    // (b) wire half
+    let s = x.to_sentence("GP");
+    let body = s.trim().trim_start_matches('$');
+    let body = &body[..body.rfind('*').expect("cksum")];
+    assert_eq!(
+        body,
+        "GPBEC,220516,5130.02,N,00046.34,W,213.8,T,218,M,4.6,N,EGLM"
+    );
+}

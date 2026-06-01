@@ -32,3 +32,18 @@ fn roundtrip() {
     let parsed = Dbk::parse(&frame.fields).expect("parse");
     assert_eq!(original, parsed);
 }
+
+#[test]
+fn dbk_values() {
+    let frame = parse_frame("$SDDBK,12.3,f,3.7,M,2.0,F*2F").expect("valid");
+    let x = Dbk::parse(&frame.fields).expect("parse");
+    // (a) value half
+    assert!((x.depth_feet.expect("depth_feet") - 12.3).abs() < 1e-2);
+    assert!((x.depth_meters.expect("depth_meters") - 3.7).abs() < 1e-2);
+    assert!((x.depth_fathoms.expect("depth_fathoms") - 2.0).abs() < 1e-2);
+    // (b) wire half
+    let s = x.to_sentence("SD");
+    let body = s.trim().trim_start_matches('$');
+    let body = &body[..body.rfind('*').expect("cksum")];
+    assert_eq!(body, "SDDBK,12.3,f,3.7,M,2,F");
+}
