@@ -61,3 +61,36 @@ impl PositionReport {
         })
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // Set `len` bits of `val` (MSB first) at `offset` in a per-bit buffer.
+    fn set_bits(buf: &mut [u8], offset: usize, len: usize, val: u32) {
+        for i in 0..len {
+            buf[offset + i] = ((val >> (len - 1 - i)) & 1) as u8;
+        }
+    }
+
+    #[test]
+    fn type1_sentinels_decode_to_none() {
+        // Build a 168-bit Type-1 buffer with every "not available" sentinel raw.
+        let mut bits = vec![0u8; 168];
+        set_bits(&mut bits, 0, 6, 1); // msg_type 1
+        set_bits(&mut bits, 42, 8, 0x80); // ROT raw -128 (two's complement in 8 bits)
+        set_bits(&mut bits, 50, 10, 1023); // SOG not available
+        set_bits(&mut bits, 61, 28, 108_600_000); // lon 181deg (181 * 600000) - not available
+        set_bits(&mut bits, 89, 27, 54_600_000); // lat 91deg (91 * 600000) - not available
+        set_bits(&mut bits, 116, 12, 3600); // COG not available
+        set_bits(&mut bits, 128, 9, 511); // heading not available
+
+        let pos = PositionReport::decode_class_a(&bits).expect("decodes");
+        assert_eq!(pos.rate_of_turn, None);
+        assert_eq!(pos.sog, None);
+        assert_eq!(pos.longitude, None);
+        assert_eq!(pos.latitude, None);
+        assert_eq!(pos.cog, None);
+        assert_eq!(pos.heading, None);
+    }
+}
