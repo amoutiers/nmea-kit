@@ -34,3 +34,13 @@ pub use sar_aircraft::SarAircraftReport;
 pub use static_b::StaticDataReport;
 pub use utc_date_response::UtcDateResponse;
 pub use voyage_a::StaticVoyageData;
+
+#[cfg(test)]
+pub(crate) mod test_helpers {
+    /// Set `len` bits of `val` (MSB first) at `offset` in a per-bit buffer.
+    pub(crate) fn set_bits(buf: &mut [u8], offset: usize, len: usize, val: u32) {
+        for i in 0..len {
+            buf[offset + i] = ((val >> (len - 1 - i)) & 1) as u8;
+        }
+    }
+}
