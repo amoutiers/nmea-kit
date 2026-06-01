@@ -49,3 +49,30 @@ fn roundtrip() {
     let parsed = Gsa::parse(&frame.fields).expect("parse");
     assert_eq!(original, parsed);
 }
+
+#[test]
+fn gsa_values() {
+    // Wire: $GPGSA,A,3,04,05,,09,12,,,24,,,,,2.5,1.3,2.1*39
+    // PRN slots (0-based): 04(0) 05(1) _(2) 09(3) 12(4) _(5) _(6) 24(7) _(8) _(9) _(10) _(11)
+    let frame =
+        parse_frame("$GPGSA,A,3,04,05,,09,12,,,24,,,,,2.5,1.3,2.1*39").expect("valid GSA fixture");
+    let gsa = Gsa::parse(&frame.fields).expect("parse GSA");
+    assert_eq!(gsa.mode, Some('A'));
+    assert_eq!(gsa.fix_type, Some(3));
+    assert_eq!(gsa.prns[0], Some(4));
+    assert_eq!(gsa.prns[1], Some(5));
+    assert!(gsa.prns[2].is_none());
+    assert_eq!(gsa.prns[3], Some(9));
+    assert_eq!(gsa.prns[4], Some(12));
+    assert!(gsa.prns[5].is_none());
+    assert!(gsa.prns[6].is_none());
+    assert_eq!(gsa.prns[7], Some(24));
+    assert!(gsa.prns[8].is_none());
+    assert!(gsa.prns[9].is_none());
+    assert!(gsa.prns[10].is_none());
+    assert!(gsa.prns[11].is_none());
+    assert!((gsa.pdop.expect("pdop") - 2.5_f32).abs() < 1e-4);
+    assert!((gsa.hdop.expect("hdop") - 1.3_f32).abs() < 1e-4);
+    assert!((gsa.vdop.expect("vdop") - 2.1_f32).abs() < 1e-4);
+    assert!(gsa.system_id.is_none());
+}

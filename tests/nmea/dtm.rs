@@ -37,3 +37,17 @@ fn roundtrip() {
     let parsed = Dtm::parse(&frame.fields).expect("parse");
     assert_eq!(original, parsed);
 }
+
+#[test]
+fn dtm_values() {
+    let frame = parse_frame("$GPDTM,W84,,0.0,N,0.0,E,0.0,W84*6F").expect("valid DTM fixture");
+    let dtm = Dtm::parse(&frame.fields).expect("parse DTM");
+    assert_eq!(dtm.datum.as_deref(), Some("W84"));
+    assert!(dtm.sub_datum.is_none());
+    assert!((dtm.lat_offset.expect("lat_offset") - 0.0_f32).abs() < 1e-4);
+    assert_eq!(dtm.ns, Some('N'));
+    assert!((dtm.lon_offset.expect("lon_offset") - 0.0_f32).abs() < 1e-4);
+    assert_eq!(dtm.ew, Some('E'));
+    assert!((dtm.alt_offset.expect("alt_offset") - 0.0_f32).abs() < 1e-4);
+    assert_eq!(dtm.ref_datum.as_deref(), Some("W84"));
+}

@@ -37,3 +37,17 @@ fn roundtrip() {
     let parsed = Gst::parse(&frame.fields).expect("parse");
     assert_eq!(original, parsed);
 }
+
+#[test]
+fn gst_values() {
+    let frame = parse_frame("$GPGST,131519.00,11,,,,0.70,0.49,1.1*53").expect("valid GST fixture");
+    let gst = Gst::parse(&frame.fields).expect("parse GST");
+    assert_eq!(gst.time.as_deref(), Some("131519.00"));
+    assert!((gst.range_rms.expect("range_rms") - 11.0_f32).abs() < 1e-4);
+    assert!(gst.std_major.is_none());
+    assert!(gst.std_minor.is_none());
+    assert!(gst.orient.is_none());
+    assert!((gst.std_lat.expect("std_lat") - 0.70_f32).abs() < 1e-4);
+    assert!((gst.std_lon.expect("std_lon") - 0.49_f32).abs() < 1e-4);
+    assert!((gst.std_alt.expect("std_alt") - 1.1_f32).abs() < 1e-4);
+}

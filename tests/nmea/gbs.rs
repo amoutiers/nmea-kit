@@ -37,3 +37,17 @@ fn roundtrip() {
     let parsed = Gbs::parse(&frame.fields).expect("parse");
     assert_eq!(original, parsed);
 }
+
+#[test]
+fn gbs_values() {
+    let frame = parse_frame("$GPGBS,194907.00,3.0,1.9,4.2,,,,*4E").expect("valid GBS fixture");
+    let gbs = Gbs::parse(&frame.fields).expect("parse GBS");
+    assert_eq!(gbs.time.as_deref(), Some("194907.00"));
+    assert!((gbs.err_lat.expect("err_lat") - 3.0_f32).abs() < 1e-4);
+    assert!((gbs.err_lon.expect("err_lon") - 1.9_f32).abs() < 1e-4);
+    assert!((gbs.err_alt.expect("err_alt") - 4.2_f32).abs() < 1e-4);
+    assert!(gbs.svid.is_none());
+    assert!(gbs.prob.is_none());
+    assert!(gbs.bias.is_none());
+    assert!(gbs.stddev.is_none());
+}

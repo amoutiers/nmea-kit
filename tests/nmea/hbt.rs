@@ -25,3 +25,12 @@ fn roundtrip() {
     let parsed = Hbt::parse(&frame.fields).expect("parse");
     assert_eq!(original, parsed);
 }
+
+#[test]
+fn hbt_values() {
+    let frame = parse_frame("$HCHBT,1.5,A,1*23").expect("valid HBT fixture");
+    let hbt = Hbt::parse(&frame.fields).expect("parse HBT");
+    assert!((hbt.interval.expect("interval") - 1.5_f32).abs() < 1e-4);
+    assert_eq!(hbt.operation_status, Some('A'));
+    assert_eq!(hbt.msg_id, Some(1));
+}
