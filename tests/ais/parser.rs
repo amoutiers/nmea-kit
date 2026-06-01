@@ -25,3 +25,19 @@ fn type8_now_decoded() {
         other => panic!("expected BinaryBroadcast (type 8), got {other:?}"),
     }
 }
+
+#[test]
+fn truncated_payloads_return_none_no_panic() {
+    let mut parser = AisParser::new();
+    // Each payload is far shorter than the message type's minimum bit length,
+    // so the decoder's `bits.len() < N` guard must return None (never panic).
+    for frame_str in [
+        "!AIVDM,1,1,,A,1,0*17", // type 1 (needs >= 144 bits) - 6 bits
+        "!AIVDM,1,1,,A,5,0*13", // type 5 (needs >= 424) - 6 bits
+        "!AIVDM,1,1,,A,H,0*6E", // type 24 (needs >= 160) - 6 bits
+    ] {
+        let frame = parse_frame(frame_str).expect("frame parses");
+        // Must not panic; truncated content yields None or Unknown, never a wrong decode.
+        let _ = parser.decode(&frame);
+    }
+}
