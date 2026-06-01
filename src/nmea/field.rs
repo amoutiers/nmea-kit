@@ -494,8 +494,8 @@ mod tests {
     #[test]
     fn writer_coord_integer_emits_decimal_point() {
         let mut w = FieldWriter::new();
-        w.lat(Some(0.0));       // équateur → "0000.0"
-        w.lon(Some(0.0));       // méridien → "00000.0"
+        w.lat(Some(0.0));       // equator  → "0000.0"
+        w.lon(Some(0.0));       // meridian → "00000.0"
         w.lat(Some(1131.0));    // 11°31.0' → "1131.0"
         w.lon(Some(1131.0));    // → "01131.0"
         assert_eq!(w.finish(), vec!["0000.0", "00000.0", "1131.0", "01131.0"]);
