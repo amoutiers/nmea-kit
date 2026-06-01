@@ -26,3 +26,18 @@ fn type15_with_second_station_gpsd() {
         panic!("expected Interrogation, got {msg:?}");
     }
 }
+
+#[test]
+fn type15_values() {
+    let mut parser = AisParser::new();
+    let frame = parse_frame("!AIVDM,1,1,,A,?5OP=l00052HD00,2*5B").expect("valid");
+    let msg = parser.decode(&frame).expect("decoded");
+    match msg {
+        AisMessage::Interrogation(intr) => {
+            assert_eq!(intr.mmsi, 368578000);
+            assert_eq!(intr.mmsi_1, 5158);
+            assert_eq!(intr.msg_type_1_1, 5);
+        }
+        other => panic!("expected Interrogation, got {other:?}"),
+    }
+}

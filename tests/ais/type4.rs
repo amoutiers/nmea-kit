@@ -31,3 +31,26 @@ fn type_4_base_station_gpsd() {
         other => panic!("expected BaseStation, got {other:?}"),
     }
 }
+
+#[test]
+fn type4_values() {
+    let mut parser = AisParser::new();
+    let frame =
+        parse_frame("!AIVDM,1,1,,A,403OviQuMGCqWrRO9>E6fE700@GO,0*4D").expect("valid Type 4 frame");
+    let msg = parser.decode(&frame).expect("Type 4 should decode");
+    match msg {
+        AisMessage::BaseStation(r) => {
+            assert_eq!(r.mmsi, 3669702);
+            assert_eq!(r.year, Some(2007));
+            assert_eq!(r.month, Some(5));
+            let lat = r.latitude.expect("latitude present");
+            let lon = r.longitude.expect("longitude present");
+            assert!((lat - 36.883766666666666).abs() < 0.00001, "lat was {lat}");
+            assert!(
+                (lon - (-76.35236166666667)).abs() < 0.00001,
+                "lon was {lon}"
+            );
+        }
+        other => panic!("expected BaseStation, got {other:?}"),
+    }
+}

@@ -34,3 +34,29 @@ fn type_5_multi_fragment_static_voyage_gpsd() {
         other => panic!("expected StaticVoyage, got {other:?}"),
     }
 }
+
+#[test]
+fn type5_values() {
+    let mut parser = AisParser::new();
+    let f1 = parse_frame(
+        "!AIVDM,2,1,1,A,55?MbV02;H;s<HtKR20EHE:0@T4@Dn2222222216L961O5Gf0NSQEp6ClRp8,0*1C",
+    )
+    .expect("valid Type 5 fragment 1");
+    assert!(
+        parser.decode(&f1).is_none(),
+        "fragment 1 should return None"
+    );
+    let f2 = parse_frame("!AIVDM,2,2,1,A,88888888880,2*25").expect("valid Type 5 fragment 2");
+    let msg = parser
+        .decode(&f2)
+        .expect("fragment 2 should complete Type 5");
+    match msg {
+        AisMessage::StaticVoyage(sv) => {
+            assert_eq!(sv.mmsi, 351759000);
+            assert_eq!(sv.callsign, "3FOF8");
+            assert_eq!(sv.vessel_name, "EVER DIADEM");
+            assert_eq!(sv.ship_type, 70);
+        }
+        other => panic!("expected StaticVoyage, got {other:?}"),
+    }
+}

@@ -8,6 +8,8 @@ mod type11;
 mod type12;
 #[path = "ais/type13.rs"]
 mod type13;
+#[path = "ais/type14.rs"]
+mod type14;
 #[path = "ais/type15.rs"]
 mod type15;
 #[path = "ais/type18.rs"]

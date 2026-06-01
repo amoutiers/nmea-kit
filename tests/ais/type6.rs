@@ -26,3 +26,18 @@ fn type6_dac_fid_gpsd() {
         panic!("expected BinaryAddressed, got {msg:?}");
     }
 }
+
+#[test]
+fn type6_values() {
+    let mut parser = AisParser::new();
+    let frame = parse_frame("!AIVDM,1,1,,A,6h2E:81>NmKC04p0J<000?vv20Ru,0*31").expect("valid");
+    let msg = parser.decode(&frame).expect("decoded");
+    match msg {
+        AisMessage::BinaryAddressed(ba) => {
+            assert_eq!(ba.mmsi, 2443808);
+            assert_eq!(ba.dac, 1);
+            assert_eq!(ba.fid, 14);
+        }
+        other => panic!("expected BinaryAddressed, got {other:?}"),
+    }
+}

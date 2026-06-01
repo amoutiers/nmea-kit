@@ -26,3 +26,17 @@ fn type12_with_text_gpsd() {
         panic!("expected SafetyAddressed, got {msg:?}");
     }
 }
+
+#[test]
+fn type12_values() {
+    let mut parser = AisParser::new();
+    let frame = parse_frame("!AIVDM,1,1,,A,<42Lati0W:Ov=C7P6B?=Pjoihhjhqq0,2*2B").expect("valid");
+    let msg = parser.decode(&frame).expect("decoded");
+    match msg {
+        AisMessage::SafetyAddressed(sa) => {
+            assert_eq!(sa.mmsi, 271002099);
+            assert_eq!(sa.text, "MSG FROM 271002099");
+        }
+        other => panic!("expected SafetyAddressed, got {other:?}"),
+    }
+}

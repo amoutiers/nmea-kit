@@ -27,3 +27,29 @@ fn type_21_aid_to_navigation_gpsd() {
         other => panic!("expected AidToNavigation, got {other:?}"),
     }
 }
+
+#[test]
+fn type21_values() {
+    let mut parser = AisParser::new();
+    let frame = parse_frame("!AIVDM,1,1,,B,E>jCfrv2`0c2h0W:0a0h6220d5Du0`Htp00000l1@Dc2P0,4*3C")
+        .expect("valid Type 21 frame");
+    let msg = parser.decode(&frame).expect("Type 21 should decode");
+    match msg {
+        AisMessage::AidToNavigation(a) => {
+            assert_eq!(a.mmsi, 992276203);
+            assert_eq!(a.name, "EPAVE ANTARA LDDAXJ)");
+            assert_eq!(a.aid_type, 28);
+            let lat = a.lat.expect("latitude present");
+            let lon = a.lon.expect("longitude present");
+            assert!(
+                (lat - (-27.962026666666667)).abs() < 0.00001,
+                "lat was {lat}"
+            );
+            assert!(
+                (lon - (-83.61035333333334)).abs() < 0.00001,
+                "lon was {lon}"
+            );
+        }
+        other => panic!("expected AidToNavigation, got {other:?}"),
+    }
+}

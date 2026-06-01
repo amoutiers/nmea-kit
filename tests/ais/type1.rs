@@ -47,3 +47,24 @@ fn sentinel_filtering_signalk() {
         }
     }
 }
+
+#[test]
+fn type1_values() {
+    let mut parser = AisParser::new();
+    let frame =
+        parse_frame("!AIVDM,1,1,,A,13aEOK?P00PD2wVMdLDRhgvL289?,0*26").expect("valid Type 1 frame");
+    let msg = parser.decode(&frame).expect("Type 1 should decode");
+    match msg {
+        AisMessage::Position(pos) => {
+            assert_eq!(pos.msg_type, 1);
+            assert_eq!(pos.mmsi, 244670316);
+            let lat = pos.latitude.expect("latitude present");
+            let lon = pos.longitude.expect("longitude present");
+            assert!((lat - 51.89475).abs() < 0.00001, "lat was {lat}");
+            assert!((lon - 4.379285).abs() < 0.00001, "lon was {lon}");
+            let cog = pos.cog.expect("cog present");
+            assert!((cog - 70.6).abs() < 0.1, "cog was {cog}");
+        }
+        other => panic!("expected Position, got {other:?}"),
+    }
+}

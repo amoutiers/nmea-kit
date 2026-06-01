@@ -27,3 +27,19 @@ fn type7_multiple_acks_gpsd() {
         panic!("expected BinaryAck, got {msg:?}");
     }
 }
+
+#[test]
+fn type7_values() {
+    let mut parser = AisParser::new();
+    let frame = parse_frame("!AIVDM,1,1,,A,702R5`hwCjq8,0*6B").expect("valid");
+    let msg = parser.decode(&frame).expect("decoded");
+    match msg {
+        AisMessage::BinaryAck(ack) => {
+            assert_eq!(ack.mmsi, 2655651);
+            assert_eq!(ack.acks.len(), 1);
+            assert_eq!(ack.acks[0].mmsi, 265538450);
+            assert_eq!(ack.acks[0].sequence, 0);
+        }
+        other => panic!("expected BinaryAck (type 7), got {other:?}"),
+    }
+}
