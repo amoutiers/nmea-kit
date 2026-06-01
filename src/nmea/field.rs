@@ -148,6 +148,19 @@ pub(crate) struct FieldWriter {
     fields: Vec<String>,
 }
 
+// Shared logic for f32/f64 writers: non-finite → empty, -0.0 → "0".
+// Expands at the call site so type inference resolves `0.0` and `is_finite()`
+// to the concrete float type.
+macro_rules! push_optional_float {
+    ($fields:expr, $value:expr) => {
+        $fields.push(match $value {
+            Some(v) if !v.is_finite() => String::new(),
+            Some(v) => format!("{}", if v == 0.0 { 0.0 } else { v }),
+            None => String::new(),
+        });
+    };
+}
+
 impl FieldWriter {
     pub(crate) fn new() -> Self {
         Self { fields: Vec::new() }
@@ -155,21 +168,13 @@ impl FieldWriter {
 
     /// Write an optional f32. `None` → empty field. Non-finite → empty field. `-0.0` → `"0"`.
     pub(crate) fn f32(&mut self, value: Option<f32>) {
-        self.fields.push(match value {
-            Some(v) if !v.is_finite() => String::new(),
-            Some(v) => format!("{}", if v == 0.0 { 0.0 } else { v }),
-            None => String::new(),
-        });
+        push_optional_float!(self.fields, value);
     }
 
     /// Write an optional f64. `None` → empty field. Non-finite → empty field. `-0.0` → `"0"`.
     #[cfg_attr(not(test), expect(dead_code, reason = "reserved for future sentence types"))]
     pub(crate) fn f64(&mut self, value: Option<f64>) {
-        self.fields.push(match value {
-            Some(v) if !v.is_finite() => String::new(),
-            Some(v) => format!("{}", if v == 0.0 { 0.0 } else { v }),
-            None => String::new(),
-        });
+        push_optional_float!(self.fields, value);
     }
 
     /// Write an optional u8. `None` → empty field.
