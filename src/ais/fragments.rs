@@ -277,4 +277,19 @@ mod tests {
             .expect("completes despite the duplicate");
         assert_eq!(done.payload, "AAAABBBBCCCC");
     }
+
+    #[test]
+    fn fragment_channel_mismatch_discarded() {
+        let mut c = FragmentCollector::new();
+        // Fragment 1 of 2 on channel A (message id 0).
+        assert!(c.process(&["2", "1", "0", "A", "AAAA", "0"]).is_none());
+        // Fragment 2 of 2, SAME message id, but on channel B — no slot in row B.
+        assert!(c.process(&["2", "2", "0", "B", "BBBB", "0"]).is_none());
+        // Channel A's in-progress assembly is untouched; its own fragment 2 completes it.
+        let done = c
+            .process(&["2", "2", "0", "A", "CCCC", "2"])
+            .expect("A completes");
+        assert_eq!(done.payload, "AAAACCCC");
+        assert_eq!(done.channel, 'A');
+    }
 }
