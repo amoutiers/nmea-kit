@@ -27,7 +27,7 @@ pub struct Gsv {
     /// Satellite information blocks (up to 4 per message).
     pub sats: Vec<SatInfo>,
     /// Signal ID (NMEA 4.11, optional last field): one hex digit ('0'–'9', 'A'–'F').
-    /// Parsed via [`FieldReader::char`] which keeps only the first character — NMEA 4.11
+    /// Only the first character is used — NMEA 4.11
     /// mandates a single hex digit, so multi-character values from non-conforming devices
     /// are silently truncated.
     pub signal_id: Option<char>,
