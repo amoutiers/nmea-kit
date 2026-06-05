@@ -2,6 +2,8 @@
 
 All notable changes to nmea-kit are documented here.
 
+## [Unreleased]
+
 ## [0.7.0] - 2026-06-01
 
 ### Breaking
@@ -260,6 +262,7 @@ AIS coverage expanded from 9 to 16 message types.
 - Zero external dependencies
 - CI: tests, clippy, rustfmt, doc checks on stable + MSRV 1.85.0
 
+[0.7.0]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.7.0
 [0.6.2]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.6.2
 [0.6.1]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.6.1
 [0.6.0]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.6.0

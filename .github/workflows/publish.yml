@@ -22,3 +22,34 @@ jobs:
       - run: cargo publish
         env:
           CARGO_REGISTRY_TOKEN: ${{ steps.auth.outputs.token }}
+
+  release:
+    needs: publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+      - name: Extract CHANGELOG section
+        id: changelog
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          body=$(awk "/^## \[$version\]/{found=1; next} found && /^## \[/{exit} found{print}" CHANGELOG.md \
+            | sed '/^[[:space:]]*$/{ /./!d }' \
+            | sed '${/^[[:space:]]*$/d}')
+          heading=$(grep "^## \[$version\]" CHANGELOG.md | head -1)
+          anchor=$(echo "$heading" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9 -]//g' | tr -s ' ' | tr ' ' '-' | sed 's/^-//;s/-$//')
+          body="${body}
+
+          ---
+
+          📜 [Full changelog](https://github.com/amoutiers/nmea-kit/blob/master/CHANGELOG.md#${anchor})
+          📦 [crates.io](https://crates.io/crates/nmea-kit/${version})"
+          echo "$body" > release-notes.md
+      - name: Create GitHub Release
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            --title "$GITHUB_REF_NAME" \
+            --notes-file release-notes.md
+        env:
+          GH_TOKEN: ${{ github.token }}
