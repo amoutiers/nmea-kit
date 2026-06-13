@@ -12,6 +12,13 @@ pub(crate) struct FieldReader<'a> {
     idx: usize,
 }
 
+#[cfg_attr(
+    not(feature = "nmea"),
+    expect(
+        dead_code,
+        reason = "several field helpers are exercised only by sentence features absent from a single-feature build"
+    )
+)]
 impl<'a> FieldReader<'a> {
     pub(crate) fn new(fields: &'a [&'a str]) -> Self {
         Self { fields, idx: 0 }
@@ -161,6 +168,13 @@ macro_rules! push_optional_float {
     };
 }
 
+#[cfg_attr(
+    not(feature = "nmea"),
+    expect(
+        dead_code,
+        reason = "several field helpers are exercised only by sentence features absent from a single-feature build"
+    )
+)]
 impl FieldWriter {
     pub(crate) fn new() -> Self {
         Self { fields: Vec::new() }

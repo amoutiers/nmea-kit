@@ -4,6 +4,14 @@ All notable changes to nmea-kit are documented here.
 
 ## [Unreleased]
 
+## [0.7.1] — 2026-06-13
+
+### Added
+- MTA (Mean Temperature of Air) sentence type — air temperature with unit indicator
+- VPW (Speed Measured Parallel to Wind) sentence type — speed parallel to wind (VMG to wind), in knots and m/s
+
+NMEA sentence coverage: 54 → 56 types.
+
 ## [0.7.0] - 2026-06-01
 
 ### Breaking
@@ -262,6 +270,7 @@ AIS coverage expanded from 9 to 16 message types.
 - Zero external dependencies
 - CI: tests, clippy, rustfmt, doc checks on stable + MSRV 1.85.0
 
+[0.7.1]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.7.1
 [0.7.0]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.7.0
 [0.6.2]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.6.2
 [0.6.1]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.6.1

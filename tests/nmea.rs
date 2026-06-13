@@ -48,6 +48,8 @@ mod hdm;
 mod hdt;
 #[path = "nmea/mda.rs"]
 mod mda;
+#[path = "nmea/mta.rs"]
+mod mta;
 #[path = "nmea/mtw.rs"]
 mod mtw;
 #[path = "nmea/mwd.rs"]
@@ -92,6 +94,8 @@ mod vdr;
 mod vhw;
 #[path = "nmea/vlw.rs"]
 mod vlw;
+#[path = "nmea/vpw.rs"]
+mod vpw;
 #[path = "nmea/vtg.rs"]
 mod vtg;
 #[path = "nmea/vwr.rs"]

@@ -34,7 +34,7 @@ Sources : go-nmea, gpsd.
 - [x] VBW — Dual Ground/Water Speed
 - [x] VHW — Water Speed and Heading
 - [x] VLW — Distance Traveled through Water
-- [ ] VPW — Speed, Measured Parallel to Wind
+- [x] VPW — Speed, Measured Parallel to Wind
 - [x] VTG — Track Made Good and Ground Speed
 
 ## Wind
@@ -81,7 +81,7 @@ Sources : go-nmea, gpsd.
 ## Environment
 
 - [x] MDA — Meteorological Composite
-- [ ] MTA — Air Temperature
+- [x] MTA — Air Temperature
 - [x] MTW — Mean Temperature of Water
 - [x] XDR — Transducer Measurement
 

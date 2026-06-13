@@ -50,6 +50,8 @@ mod hdm;
 mod hdt;
 #[cfg(feature = "mda")]
 mod mda;
+#[cfg(feature = "mta")]
+mod mta;
 #[cfg(feature = "mtw")]
 mod mtw;
 #[cfg(feature = "mwd")]
@@ -92,6 +94,8 @@ mod vdr;
 mod vhw;
 #[cfg(feature = "vlw")]
 mod vlw;
+#[cfg(feature = "vpw")]
+mod vpw;
 #[cfg(feature = "vtg")]
 mod vtg;
 #[cfg(feature = "vwr")]
@@ -159,6 +163,8 @@ pub use hdm::*;
 pub use hdt::*;
 #[cfg(feature = "mda")]
 pub use mda::*;
+#[cfg(feature = "mta")]
+pub use mta::*;
 #[cfg(feature = "mtw")]
 pub use mtw::*;
 #[cfg(feature = "mwd")]
@@ -201,6 +207,8 @@ pub use vdr::*;
 pub use vhw::*;
 #[cfg(feature = "vlw")]
 pub use vlw::*;
+#[cfg(feature = "vpw")]
+pub use vpw::*;
 #[cfg(feature = "vtg")]
 pub use vtg::*;
 #[cfg(feature = "vwr")]

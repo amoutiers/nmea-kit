@@ -34,7 +34,7 @@
 //!
 //! ## Features
 //!
-//! - `nmea` (default) — all 52 NMEA sentence types
+//! - `nmea` (default) — all 56 NMEA sentence types
 //! - `ais` (default) — 16 AIS message types (read-only decode)
 //! - `dbs`, `dbt`, `dpt`, … — individual sentence types
 
@@ -72,6 +72,7 @@ macro_rules! nmea_item {
             feature = "hdm",
             feature = "hdt",
             feature = "mda",
+            feature = "mta",
             feature = "mtw",
             feature = "mwd",
             feature = "mwv",
@@ -93,6 +94,7 @@ macro_rules! nmea_item {
             feature = "vdr",
             feature = "vhw",
             feature = "vlw",
+            feature = "vpw",
             feature = "vtg",
             feature = "vwr",
             feature = "vwt",

@@ -110,6 +110,7 @@ nmea_sentences![
         // Wind
         ["mwd", Mwd, "MWD"],
         ["mwv", Mwv, "MWV"],
+        ["vpw", Vpw, "VPW"],
         ["vwr", Vwr, "VWR"],
         ["vwt", Vwt, "VWT"],
         // Heading
@@ -147,6 +148,7 @@ nmea_sentences![
         ["dbk", Dbk, "DBK"],
         // Environment
         ["mda", Mda, "MDA"],
+        ["mta", Mta, "MTA"],
         ["mtw", Mtw, "MTW"],
         ["xdr", Xdr, "XDR"],
         // Radar / Target tracking
