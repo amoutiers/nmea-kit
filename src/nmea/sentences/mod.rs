@@ -48,6 +48,8 @@ mod hbt;
 mod hdm;
 #[cfg(feature = "hdt")]
 mod hdt;
+#[cfg(feature = "hsc")]
+mod hsc;
 #[cfg(feature = "mda")]
 mod mda;
 #[cfg(feature = "mta")]
@@ -58,6 +60,8 @@ mod mtw;
 mod mwd;
 #[cfg(feature = "mwv")]
 mod mwv;
+#[cfg(feature = "osd")]
+mod osd;
 #[cfg(feature = "pashr")]
 mod pashr;
 #[cfg(feature = "pgrme")]
@@ -161,6 +165,8 @@ pub use hbt::*;
 pub use hdm::*;
 #[cfg(feature = "hdt")]
 pub use hdt::*;
+#[cfg(feature = "hsc")]
+pub use hsc::*;
 #[cfg(feature = "mda")]
 pub use mda::*;
 #[cfg(feature = "mta")]
@@ -171,6 +177,8 @@ pub use mtw::*;
 pub use mwd::*;
 #[cfg(feature = "mwv")]
 pub use mwv::*;
+#[cfg(feature = "osd")]
+pub use osd::*;
 #[cfg(feature = "pashr")]
 pub use pashr::*;
 #[cfg(feature = "pgrme")]

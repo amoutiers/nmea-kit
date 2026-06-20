@@ -30,7 +30,7 @@ Sources : go-nmea, gpsd.
 
 ## Course & Speed
 
-- [ ] OSD — Own Ship Data
+- [x] OSD — Own Ship Data
 - [x] VBW — Dual Ground/Water Speed
 - [x] VHW — Water Speed and Heading
 - [x] VLW — Distance Traveled through Water
@@ -55,7 +55,7 @@ Sources : go-nmea, gpsd.
 
 - [ ] APA — Autopilot Sentence "A"
 - [x] APB — Autopilot Sentence "B"
-- [ ] HSC — Heading Steering Command
+- [x] HSC — Heading Steering Command
 - [x] ROT — Rate of Turn
 - [x] RSA — Rudder Sensor Angle
 

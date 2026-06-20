@@ -117,10 +117,12 @@ nmea_sentences![
         ["hdt", Hdt, "HDT"],
         ["hdg", Hdg, "HDG"],
         ["hdm", Hdm, "HDM"],
+        ["hsc", Hsc, "HSC"],
         ["rot", Rot, "ROT"],
         ["ths", Ths, "THS"],
         // Navigation
         ["aam", Aam, "AAM"],
+        ["osd", Osd, "OSD"],
         ["apb", Apb, "APB"],
         ["bec", Bec, "BEC"],
         ["bod", Bod, "BOD"],

@@ -4,6 +4,14 @@ All notable changes to nmea-kit are documented here.
 
 ## [Unreleased]
 
+## [0.7.2] — 2026-06-20
+
+### Added
+- HSC (Heading Steering Command) sentence type — commanded heading true and magnetic, with optional status
+- OSD (Own Ship Data) sentence type — heading, course, speed, set and drift with reference indicators
+
+NMEA sentence coverage: 56 → 58 types.
+
 ## [0.7.1] — 2026-06-13
 
 ### Added
@@ -270,6 +278,7 @@ AIS coverage expanded from 9 to 16 message types.
 - Zero external dependencies
 - CI: tests, clippy, rustfmt, doc checks on stable + MSRV 1.85.0
 
+[0.7.2]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.7.2
 [0.7.1]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.7.1
 [0.7.0]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.7.0
 [0.6.2]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.6.2
