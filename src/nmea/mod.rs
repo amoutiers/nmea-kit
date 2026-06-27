@@ -159,6 +159,7 @@ nmea_sentences![
         ["ttm", Ttm, "TTM"],
         // Alert
         ["ack", Ack, "ACK"],
+        ["acn", Acn, "ACN"],
         // Communication
         ["txt", Txt, "TXT"],
         // Heartbeat
@@ -178,10 +179,13 @@ nmea_sentences![
 
 #[cfg(test)]
 mod tests {
+    #[cfg(any(feature = "pskpdpt", feature = "rmc"))]
     use super::*;
+    #[cfg(any(feature = "pskpdpt", feature = "rmc"))]
     use crate::parse_frame;
 
     #[test]
+    #[cfg(feature = "rmc")]
     fn talkerless_standard_address_dispatches() {
         // A bare "$RMC,..." (no talker) parses with talker == "".
         let frame = parse_frame("$RMC,175957.917,A,3857.1234,N,07705.1234,W,0.0,0.0,010100,,,A*60")
@@ -193,6 +197,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg(feature = "pskpdpt")]
     fn proprietary_still_dispatches() {
         let frame = parse_frame("$PSKPDPT,0002.5,+00.0,0010,10,03,*77").expect("valid");
         assert!(matches!(

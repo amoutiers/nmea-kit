@@ -2,6 +2,8 @@
 mod aam;
 #[path = "nmea/ack.rs"]
 mod ack;
+#[path = "nmea/acn.rs"]
+mod acn;
 #[path = "nmea/apb.rs"]
 mod apb;
 #[path = "nmea/bec.rs"]

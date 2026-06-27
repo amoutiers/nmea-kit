@@ -4,6 +4,16 @@ All notable changes to nmea-kit are documented here.
 
 ## [Unreleased]
 
+## [0.7.3] — 2026-06-27
+
+### Added
+- ACN (Alert Command) sentence type — alert time, manufacturer, identifier, instance, command, and state
+
+### Fixed
+- Single-feature unit test runs no longer require unrelated RMC or PSKPDPT features.
+
+NMEA sentence coverage: 58 → 59 types.
+
 ## [0.7.2] — 2026-06-20
 
 ### Added
@@ -278,6 +288,7 @@ AIS coverage expanded from 9 to 16 message types.
 - Zero external dependencies
 - CI: tests, clippy, rustfmt, doc checks on stable + MSRV 1.85.0
 
+[0.7.3]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.7.3
 [0.7.2]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.7.2
 [0.7.1]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.7.1
 [0.7.0]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.7.0

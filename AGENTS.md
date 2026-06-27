@@ -4,12 +4,12 @@ Bidirectional NMEA 0183 parser/encoder + AIS decoder. Zero dependencies. MIT/Apa
 
 | Key | Value |
 |---|---|
-| Crate | `nmea-kit` v0.7.2 |
+| Crate | `nmea-kit` v0.7.3 |
 | Edition | 2024, MSRV 1.85.0 |
 | Dependencies | 0 |
-| NMEA sentences | 58 (bidirectional) |
+| NMEA sentences | 59 (bidirectional) |
 | AIS message types | 16 (read-only) |
-| Tests | 632, 0 failures |
+| Tests | 639, 0 failures |
 | Unsafe blocks | 0 |
 
 For contribution workflow, test rules, and the sentence-type checklist see [CONTRIBUTING.md](CONTRIBUTING.md).

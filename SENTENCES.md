@@ -136,7 +136,7 @@ Sources : go-nmea, gpsd.
 ## Safety & Alarms
 
 - [x] ACK — Acknowledge Alarm
-- [ ] ACN — Alert Command
+- [x] ACN — Alert Command
 - [ ] ALA — Alert
 - [ ] ALC — Cyclic Alert List
 - [ ] ALF — Alert
