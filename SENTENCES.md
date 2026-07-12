@@ -1,9 +1,11 @@
-# NMEA 0183 sentence coverage
+# NMEA 0183 Sentence Coverage
 
 Checked = supported by nmea-kit.
 Sources : go-nmea, gpsd.
 
-## Position
+## NMEA Sentences
+
+### Position
 
 - [x] DTM — Datum Reference
 - [x] GGA — Global Positioning System Fix Data
@@ -13,7 +15,7 @@ Sources : go-nmea, gpsd.
 - [ ] RMA — Recommended Minimum Navigation Information
 - [x] RMC — Recommended Minimum Navigation Information
 
-## Satellites
+### Satellites
 
 - [x] GBS — GPS Satellite Fault Detection
 - [ ] GRS — GPS Range Residuals
@@ -21,14 +23,14 @@ Sources : go-nmea, gpsd.
 - [x] GST — GPS Pseudorange Noise Statistics
 - [x] GSV — Satellites in View
 
-## Heading
+### Heading
 
 - [x] HDG — Heading, Deviation & Variation
 - [x] HDM — Heading, Magnetic
 - [x] HDT — Heading, True
 - [x] THS — True Heading and Status
 
-## Course & Speed
+### Course & Speed
 
 - [x] OSD — Own Ship Data
 - [x] VBW — Dual Ground/Water Speed
@@ -37,21 +39,21 @@ Sources : go-nmea, gpsd.
 - [x] VPW — Speed, Measured Parallel to Wind
 - [x] VTG — Track Made Good and Ground Speed
 
-## Wind
+### Wind
 
 - [x] MWD — Wind Direction & Speed
 - [x] MWV — Wind Speed and Angle
 - [x] VWR — Relative Wind Speed and Angle
 - [x] VWT — True Wind Speed and Angle
 
-## Depth
+### Depth
 
 - [x] DBK — Depth Below Keel
 - [x] DBS — Depth Below Surface
 - [x] DBT — Depth Below Transducer
 - [x] DPT — Depth of Water
 
-## Steering
+### Steering
 
 - [ ] APA — Autopilot Sentence "A"
 - [x] APB — Autopilot Sentence "B"
@@ -59,7 +61,7 @@ Sources : go-nmea, gpsd.
 - [x] ROT — Rate of Turn
 - [x] RSA — Rudder Sensor Angle
 
-## Waypoints & Routes
+### Waypoints & Routes
 
 - [x] AAM — Waypoint Arrival Alarm
 - [x] BEC — Bearing & Distance to Waypoint, Dead Reckoning
@@ -78,18 +80,18 @@ Sources : go-nmea, gpsd.
 - [ ] ZFO — UTC & Time from Origin Waypoint
 - [ ] ZTG — UTC & Time to Destination Waypoint
 
-## Environment
+### Environment
 
 - [x] MDA — Meteorological Composite
 - [x] MTA — Air Temperature
 - [x] MTW — Mean Temperature of Water
 - [x] XDR — Transducer Measurement
 
-## Time
+### Time
 
 - [x] ZDA — Time & Date
 
-## Targets
+### Targets
 
 - [x] RSD — Radar System Data
 - [ ] TLB — Target Label
@@ -97,13 +99,76 @@ Sources : go-nmea, gpsd.
 - [ ] TTD — Tracked Target Data
 - [x] TTM — Tracked Target Message
 
-## AIS Sentences
+### Safety & Alarms
 
-- [ ] ABM — Addressed Binary Message
-- [ ] BBM — Broadcast Binary Message
-- [ ] VSD — AIS Voyage Static Data
+- [x] ACK — Acknowledge Alarm
+- [x] ACN — Alert Command
+- [ ] ALA — Alert
+- [ ] ALC — Cyclic Alert List
+- [ ] ALF — Alert
+- [ ] ALR — Alert Response
+- [ ] ARC — Alert Response Command
+- [ ] DOR — Door Status
+- [ ] DSC — Digital Selective Calling Information
+- [ ] DSE — DSC Extended
+- [ ] EVE — Event
+- [ ] FIR — Fire Detection
+- [x] HBT — Heartbeat Supervision
 
-## AIS Message Types (decoded from AIVDM/AIVDO)
+### Vessel Systems
+
+- [x] RPM — Revolutions
+- [x] VDR — Set and Drift
+
+### Communication
+
+- [ ] ALM — GPS Almanac Data
+- [ ] FSI — Frequency Set Information
+- [ ] MSK — Control for a Beacon Receiver
+- [ ] MSS — Beacon Receiver Status
+- [ ] RLM — Return Link Message
+- [ ] SFI — Scanning Frequency Information
+- [ ] STN — Multiple Data ID
+- [x] TXT — Text Transmission
+
+### Trawl / Fishing
+
+- [ ] HFB — Trawl Headrope to Footrope and Bottom
+- [ ] ITS — Trawl Door Spread 2 Distance
+- [ ] TDS — Trawl Door Spread Distance
+- [ ] TFI — Trawl Filling Indicator
+- [ ] TPC — Trawl Position Cartesian Coordinates
+- [ ] TPR — Trawl Position Relative Vessel
+- [ ] TPT — Trawl Position True
+
+### Proprietary
+
+- [x] PASHR — RT300 Inertial Attitude (Hemisphere/Ashtech)
+- [ ] PCDIN — NMEA 2000 via SeaSmart bridge
+- [x] PGRME — Garmin Estimated Position Error
+- [ ] PGRMT — Garmin Sensor Status
+- [ ] PHTRO — Vessel Pitch and Roll (Xsens)
+- [ ] PKLDS — Keel Depth Sentence
+- [ ] PKLID — Keel ID
+- [ ] PKLSH — Keel Shallow
+- [ ] PKNDS — Knudsen Depth
+- [ ] PKNID — Knudsen ID
+- [ ] PKNSH — Knudsen Shallow
+- [ ] PKWDWPL — Waypoint (unknown vendor)
+- [ ] PMTK — MediaTek GPS Command
+- [ ] PRDID — RDI Doppler Instrument Data
+- [x] PSKPDPT — Skipper Depth
+- [ ] PSONCMS — SMC IMU Data (SBG Systems)
+
+## AIS
+
+### Sentences
+
+- [x] ABM — Addressed Binary Message
+- [x] BBM — Broadcast Binary Message
+- [x] VSD — AIS Voyage Static Data
+
+### Message Types (decoded from AIVDM/AIVDO)
 
 - [x] Type 1 — Class A Position Report (under way, engine)
 - [x] Type 2 — Class A Position Report (at anchor)
@@ -132,64 +197,3 @@ Sources : go-nmea, gpsd.
 - [ ] Type 25 — Single Slot Binary Message
 - [ ] Type 26 — Multiple Slot Binary Message
 - [x] Type 27 — Long Range Position Report (satellite AIS)
-
-## Safety & Alarms
-
-- [x] ACK — Acknowledge Alarm
-- [x] ACN — Alert Command
-- [ ] ALA — Alert
-- [ ] ALC — Cyclic Alert List
-- [ ] ALF — Alert
-- [ ] ALR — Alert Response
-- [ ] ARC — Alert Response Command
-- [ ] DOR — Door Status
-- [ ] DSC — Digital Selective Calling Information
-- [ ] DSE — DSC Extended
-- [ ] EVE — Event
-- [ ] FIR — Fire Detection
-- [x] HBT — Heartbeat Supervision
-
-## Vessel Systems
-
-- [x] RPM — Revolutions
-- [x] VDR — Set and Drift
-
-## Communication
-
-- [ ] ALM — GPS Almanac Data
-- [ ] FSI — Frequency Set Information
-- [ ] MSK — Control for a Beacon Receiver
-- [ ] MSS — Beacon Receiver Status
-- [ ] RLM — Return Link Message
-- [ ] SFI — Scanning Frequency Information
-- [ ] STN — Multiple Data ID
-- [x] TXT — Text Transmission
-
-## Trawl / Fishing
-
-- [ ] HFB — Trawl Headrope to Footrope and Bottom
-- [ ] ITS — Trawl Door Spread 2 Distance
-- [ ] TDS — Trawl Door Spread Distance
-- [ ] TFI — Trawl Filling Indicator
-- [ ] TPC — Trawl Position Cartesian Coordinates
-- [ ] TPR — Trawl Position Relative Vessel
-- [ ] TPT — Trawl Position True
-
-## Proprietary
-
-- [x] PASHR — RT300 Inertial Attitude (Hemisphere/Ashtech)
-- [ ] PCDIN — NMEA 2000 via SeaSmart bridge
-- [x] PGRME — Garmin Estimated Position Error
-- [ ] PGRMT — Garmin Sensor Status
-- [ ] PHTRO — Vessel Pitch and Roll (Xsens)
-- [ ] PKLDS — Keel Depth Sentence
-- [ ] PKLID — Keel ID
-- [ ] PKLSH — Keel Shallow
-- [ ] PKNDS — Knudsen Depth
-- [ ] PKNID — Knudsen ID
-- [ ] PKNSH — Knudsen Shallow
-- [ ] PKWDWPL — Waypoint (unknown vendor)
-- [ ] PMTK — MediaTek GPS Command
-- [ ] PRDID — RDI Doppler Instrument Data
-- [x] PSKPDPT — Skipper Depth
-- [ ] PSONCMS — SMC IMU Data (SBG Systems)

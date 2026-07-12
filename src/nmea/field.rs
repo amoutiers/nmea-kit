@@ -310,11 +310,14 @@ impl Default for FieldWriter {
 /// # Standard sentences
 ///
 /// ```
-/// use nmea_kit::nmea::{NmeaEncodable, sentences::Dpt};
+/// #[cfg(feature = "dpt")]
+/// {
+///     use nmea_kit::nmea::{NmeaEncodable, sentences::Dpt};
 ///
-/// let dpt = Dpt { depth: Some(4.1), offset: Some(0.0), rangescale: None };
-/// let sentence = dpt.to_sentence("II");
-/// assert!(sentence.starts_with("$IIDPT,"));
+///     let dpt = Dpt { depth: Some(4.1), offset: Some(0.0), rangescale: None };
+///     let sentence = dpt.to_sentence("II");
+///     assert!(sentence.starts_with("$IIDPT,"));
+/// }
 /// ```
 ///
 /// # Proprietary sentences

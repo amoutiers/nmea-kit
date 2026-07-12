@@ -1,38 +1,52 @@
-//! AIS (Automatic Identification System) message decoding.
+//! AIS (Automatic Identification System) message decoding and application-layer sentences.
 //!
-//! Read-only: decodes AIVDM/AIVDO messages from `!`-prefixed NMEA frames.
-//! Transmitting AIS requires certified hardware.
+//! Decodes AIVDM/AIVDO messages from `!`-prefixed NMEA frames when the `ais`
+//! feature is enabled. AIS application-layer NMEA sentences such as ABM, BBM,
+//! and VSD live in `ais::sentences` and keep their wire prefixes.
 //!
 //! # Usage
 //!
 //! ```
-//! use nmea_kit::ais::{AisParser, AisMessage};
-//! use nmea_kit::parse_frame;
+//! #[cfg(feature = "ais")]
+//! {
+//!     use nmea_kit::ais::{AisParser, AisMessage};
+//!     use nmea_kit::parse_frame;
 //!
-//! let mut parser = AisParser::new();
+//!     let mut parser = AisParser::new();
 //!
-//! // Single-fragment message
-//! let frame = parse_frame("!AIVDM,1,1,,A,13aEOK?P00PD2wVMdLDRhgvL289?,0*26").expect("valid");
-//! if let Some(msg) = parser.decode(&frame) {
-//!     match msg {
-//!         AisMessage::Position(pos) => println!("MMSI: {}, lat: {:?}", pos.mmsi, pos.latitude),
-//!         _ => {}
+//!     // Single-fragment message
+//!     let frame = parse_frame("!AIVDM,1,1,,A,13aEOK?P00PD2wVMdLDRhgvL289?,0*26").expect("valid");
+//!     if let Some(msg) = parser.decode(&frame) {
+//!         match msg {
+//!             AisMessage::Position(pos) => println!("MMSI: {}, lat: {:?}", pos.mmsi, pos.latitude),
+//!             _ => {}
+//!         }
 //!     }
 //! }
 //! ```
 
+#[cfg(feature = "ais")]
 pub mod armor;
+#[cfg(feature = "ais")]
 pub mod fragments;
+#[cfg(feature = "ais")]
 pub mod messages;
+#[cfg(any(feature = "abm", feature = "bbm", feature = "vsd"))]
+pub mod sentences;
 
+#[cfg(feature = "ais")]
 pub use messages::*;
 
+#[cfg(feature = "ais")]
 use armor::decode_armor;
+#[cfg(feature = "ais")]
 use fragments::FragmentCollector;
 
+#[cfg(feature = "ais")]
 use crate::NmeaFrame;
 
 /// Unified AIS message enum.
+#[cfg(feature = "ais")]
 #[non_exhaustive]
 #[derive(Debug, Clone, PartialEq)]
 pub enum AisMessage {
@@ -72,10 +86,12 @@ pub enum AisMessage {
 ///
 /// Maintains fragment buffers for concurrent multi-part messages.
 /// Feed it frames from `parse_frame()` — it returns decoded messages.
+#[cfg(feature = "ais")]
 pub struct AisParser {
     collector: FragmentCollector,
 }
 
+#[cfg(feature = "ais")]
 impl AisParser {
     pub fn new() -> Self {
         Self {
@@ -130,6 +146,7 @@ impl AisParser {
     }
 }
 
+#[cfg(feature = "ais")]
 impl Default for AisParser {
     fn default() -> Self {
         Self::new()
@@ -137,6 +154,7 @@ impl Default for AisParser {
 }
 
 #[cfg(test)]
+#[cfg(feature = "ais")]
 mod tests {
     use super::*;
     use crate::parse_frame;

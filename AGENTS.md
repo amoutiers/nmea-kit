@@ -4,12 +4,13 @@ Bidirectional NMEA 0183 parser/encoder + AIS decoder. Zero dependencies. MIT/Apa
 
 | Key | Value |
 |---|---|
-| Crate | `nmea-kit` v0.7.3 |
+| Crate | `nmea-kit` v0.7.4 |
 | Edition | 2024, MSRV 1.85.0 |
 | Dependencies | 0 |
 | NMEA sentences | 59 (bidirectional) |
+| AIS sentences | 3 (bidirectional) |
 | AIS message types | 16 (read-only) |
-| Tests | 639, 0 failures |
+| Tests | 660, 0 failures |
 | Unsafe blocks | 0 |
 
 For contribution workflow, test rules, and the sentence-type checklist see [CONTRIBUTING.md](CONTRIBUTING.md).
@@ -44,8 +45,9 @@ use nmea_kit::nmea::{ddmm_to_decimal, decimal_to_ddmm};
 ddmm_to_decimal(ddmm: f64) -> f64   // DDMM.MMMM → decimal degrees
 decimal_to_ddmm(decimal: f64) -> f64 // decimal degrees → DDMM.MMMM
 
-// AIS decoder
+// AIS decoder and AIS application-layer sentences
 use nmea_kit::ais::{AisParser, AisMessage};
+use nmea_kit::ais::sentences::{Abm, Bbm, Vsd, AisSentence};
 
 let mut parser = AisParser::new();
 parser.decode(&frame) -> Option<AisMessage>    // None while awaiting fragments
@@ -160,6 +162,7 @@ src/nmea/mod.rs         → NmeaSentence enum + dispatch macro
 src/nmea/field.rs       → FieldReader, FieldWriter, ddmm_to_decimal, decimal_to_ddmm
 src/nmea/sentences/*.rs → one file per sentence type (struct + parse + encode)
 src/ais/mod.rs          → AisParser + AisMessage enum
+src/ais/sentences/*.rs  → AIS application-layer NMEA sentences such as ABM, BBM, VSD
 src/ais/armor.rs        → 6-bit ASCII decode + bit extraction
 src/ais/fragments.rs    → multi-fragment reassembly
 src/ais/messages/*.rs   → one file per AIS message type
@@ -169,7 +172,7 @@ src/ais/messages/*.rs   → one file per AIS message type
 
 ### NMEA sentence implementation
 
-Every sentence type follows the same pattern using `FieldReader`/`FieldWriter`:
+Every NMEA sentence type follows the same pattern using `FieldReader`/`FieldWriter`:
 
 - `SENTENCE_TYPE` — 3-char const (`"MWD"`, `"RMC"`, etc.)
 - `parse(fields: &[&str]) -> Option<Self>` — sequential field reading (always returns `Some`, lenient)
@@ -205,6 +208,11 @@ AIS types use bit-level extraction from decoded 6-bit armor:
 
 Helper functions in `position_a.rs` are `pub(crate)` — shared by `position_b.rs` and `position_b_ext.rs`.
 
+### AIS application-layer sentences
+
+AIS application-layer sentence types live under `ais::sentences`, not `nmea::sentences`.
+They preserve their wire prefix (`!` for ABM/BBM, `$` for VSD) and are dispatched with `AisSentence::parse(&frame)`.
+
 ## Field definitions reference
 
 Sentence field layouts are sourced from [pynmeagps](https://github.com/semuconsulting/pynmeagps) (`nmeatypes_get.py`). Test fixtures from [SignalK](https://github.com/SignalK/signalk-parser-nmea0183) and [GPSD](https://gitlab.com/gpsd/gpsd). Full sentence coverage tracked in [SENTENCES.md](SENTENCES.md).
@@ -222,7 +230,7 @@ cargo fmt                                                # format
 
 - No `nom`, no proc-macro, no `syn`/`quote` — keep compile times minimal
 - Zero dependencies (serde was removed as unused)
-- AIS is read-only — encoding AIS would go behind an `ais-encode` feature flag (not yet implemented)
+- AIS AIVDM/AIVDO message decoding is read-only; AIS application-layer sentences are bidirectional
 - No `unwrap()` in library code — `expect("description")` in tests only
 - No `panic!`, `todo!`, or `#[allow(dead_code)]` in `src/`
 - Edition 2024, MSRV 1.85.0

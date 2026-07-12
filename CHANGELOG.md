@@ -4,6 +4,15 @@ All notable changes to nmea-kit are documented here.
 
 ## [Unreleased]
 
+## [0.7.4] — 2026-07-12
+
+### Added
+- ABM (AIS Addressed Binary Message) sentence type — fragment metadata, destination MMSI, channel, VDL message number, payload, and fill bits
+- BBM (AIS Broadcast Binary Message) sentence type — fragment metadata, channel, VDL message number, payload, and fill bits
+- VSD (AIS Voyage Static Data) sentence type — ship type, draught, persons on board, destination, ETA, navigation status, and regional field
+
+Sentence coverage: 59 NMEA sentence types + 3 AIS application-layer sentences.
+
 ## [0.7.3] — 2026-06-27
 
 ### Added
@@ -288,6 +297,7 @@ AIS coverage expanded from 9 to 16 message types.
 - Zero external dependencies
 - CI: tests, clippy, rustfmt, doc checks on stable + MSRV 1.85.0
 
+[0.7.4]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.7.4
 [0.7.3]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.7.3
 [0.7.2]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.7.2
 [0.7.1]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.7.1

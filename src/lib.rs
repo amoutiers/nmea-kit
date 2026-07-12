@@ -19,10 +19,10 @@
 //!                                     │
 //!                      ┌──────────────┼──────────────┐
 //!                      ▼              ▼               ▼
-//!                $ + known      $ + unknown     ! (AIVDM/AIVDO)
-//!                      │              │               │
-//!                      ▼              ▼               ▼
-//!               Typed struct    Raw fields      AisMessage enum
+//!                $ + known      $ + unknown     ! AIVDM/AIVDO     AIS app sentences
+//!                      │              │               │              │
+//!                      ▼              ▼               ▼              ▼
+//!               Typed struct    Raw fields      AisMessage enum   AIS sentence struct
 //! ```
 //!
 //! ## Public API
@@ -30,12 +30,12 @@
 //! - [`parse_frame`] / [`encode_frame`] — frame layer (always available)
 //! - [`NmeaSentence`] — dispatch enum for all typed NMEA sentences
 //! - [`NmeaEncodable`] — trait for encoding NMEA sentences to wire format
-//! - [`ais`] — AIS decoder (behind `ais` feature)
+//! - [`ais`] — AIS decoder (behind `ais` feature) and AIS application-layer sentences
 //!
 //! ## Features
 //!
 //! - `nmea` (default) — all 59 NMEA sentence types
-//! - `ais` (default) — 16 AIS message types (read-only decode)
+//! - `ais` (default) — 16 AIS message types (read-only decode) + AIS application-layer sentences
 //! - `dbs`, `dbt`, `dpt`, … — individual sentence types
 
 mod error;
@@ -113,7 +113,7 @@ macro_rules! nmea_item {
 
 nmea_item! { pub mod nmea; }
 
-#[cfg(feature = "ais")]
+#[cfg(any(feature = "ais", feature = "abm", feature = "bbm", feature = "vsd"))]
 pub mod ais;
 
 pub use error::*;
