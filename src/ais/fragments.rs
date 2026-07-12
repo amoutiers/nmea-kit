@@ -40,11 +40,12 @@ const MAX_PAYLOAD_SIZE: usize = 256;
 /// sufficient for the 1152-bit maximum.
 const MAX_FRAGMENTS: u8 = 5;
 
-/// Map an AIS channel character to a slot row (A/1 → 0, B/2 → 1).
-fn channel_index(channel: char) -> usize {
+/// Map a valid AIS channel field to a slot row (A/1 → 0, B/2 → 1).
+fn channel_index(channel: &str) -> Option<usize> {
     match channel {
-        'B' | '2' => 1,
-        _ => 0,
+        "" | "A" | "1" => Some(0),
+        "B" | "2" => Some(1),
+        _ => None,
     }
 }
 
@@ -85,7 +86,9 @@ impl FragmentCollector {
         let total: u8 = fields[0].parse().ok()?;
         let frag_num: u8 = fields[1].parse().ok()?;
         let msg_id_str = fields[2];
-        let channel = fields[3].chars().next().unwrap_or('A');
+        let channel_field = fields[3];
+        let channel_index = channel_index(channel_field)?;
+        let channel = channel_field.chars().next().unwrap_or('A');
         let payload = fields[4];
         let fill_bits: u8 = fields[5].parse().ok().filter(|&n| n <= 5)?;
 
@@ -107,7 +110,7 @@ impl FragmentCollector {
         if msg_id > 9 {
             return None;
         }
-        let ch = channel_index(channel);
+        let ch = channel_index;
 
         if frag_num == 1 {
             // Start new assembly
@@ -245,6 +248,14 @@ mod tests {
             c.process(&["1", "1", "", "A", "13u@Dt002s000000000000000000", "7"])
                 .is_none()
         );
+    }
+
+    #[test]
+    fn invalid_channel_cannot_start_assembly() {
+        let mut c = FragmentCollector::new();
+        assert!(c.process(&["2", "1", "0", "Z", "AAAA", "0"]).is_none());
+        assert!(c.process(&["2", "2", "0", "A", "BBBB", "0"]).is_none());
+        assert!(c.slots[0][0].is_none());
     }
 
     #[test]
