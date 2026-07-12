@@ -11,6 +11,15 @@ All notable changes to nmea-kit are documented here.
 - BBM (AIS Broadcast Binary Message) sentence type — fragment metadata, channel, VDL message number, payload, and fill bits
 - VSD (AIS Voyage Static Data) sentence type — ship type, draught, persons on board, destination, ETA, navigation status, and regional field
 
+### Changed
+- CI now checks every feature independently without default features.
+
+### Fixed
+- AIS armor extractors now return `None` for overflowing offsets instead of panicking.
+- AIS armor decoding rejects invalid fill-bit counts.
+- AIS fragment reassembly rejects invalid channels instead of combining them with channel A fragments.
+- Fixed the README link to AIS message type coverage.
+
 Sentence coverage: 59 NMEA sentence types + 3 AIS application-layer sentences.
 
 ## [0.7.3] — 2026-06-27
