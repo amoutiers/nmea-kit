@@ -12,6 +12,9 @@
 /// The `fill_bits` parameter indicates how many of the rightmost bits in
 /// the last 6-bit group should be ignored (0-5).
 pub fn decode_armor(payload: &str, fill_bits: u8) -> Option<Vec<u8>> {
+    if fill_bits > 5 {
+        return None;
+    }
     let mut bits = Vec::with_capacity(payload.len() * 6);
 
     for ch in payload.bytes() {
@@ -33,7 +36,10 @@ pub fn decode_armor(payload: &str, fill_bits: u8) -> Option<Vec<u8>> {
 
     // Remove fill bits from the end
     let fill = fill_bits as usize;
-    if fill > 0 && bits.len() >= fill {
+    if fill > bits.len() {
+        return None;
+    }
+    if fill > 0 {
         bits.truncate(bits.len() - fill);
     }
 
@@ -114,6 +120,12 @@ mod tests {
     fn decode_with_fill_bits() {
         let bits = decode_armor("0", 2).expect("valid");
         assert_eq!(bits.len(), 4); // 6 - 2 = 4
+    }
+
+    #[test]
+    fn decode_rejects_invalid_fill_bits() {
+        assert_eq!(decode_armor("0", 6), None);
+        assert_eq!(decode_armor("", 1), None);
     }
 
     #[test]
