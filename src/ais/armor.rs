@@ -42,12 +42,16 @@ pub fn decode_armor(payload: &str, fill_bits: u8) -> Option<Vec<u8>> {
 
 /// Extract an unsigned integer from a bit slice at the given offset and length.
 pub fn extract_u32(bits: &[u8], offset: usize, len: usize) -> Option<u32> {
-    if offset + len > bits.len() || len > 32 {
+    if len > 32 {
+        return None;
+    }
+    let end = offset.checked_add(len)?;
+    if end > bits.len() {
         return None;
     }
     let mut val: u32 = 0;
-    for i in 0..len {
-        val = (val << 1) | u32::from(bits[offset + i]);
+    for &bit in &bits[offset..end] {
+        val = (val << 1) | u32::from(bit);
     }
     Some(val)
 }
@@ -70,10 +74,12 @@ pub fn extract_i32(bits: &[u8], offset: usize, len: usize) -> Option<i32> {
 /// Extract a 6-bit ASCII string from a bit slice.
 /// AIS text uses a custom 6-bit encoding: 0=@ (space), 1-26=A-Z, etc.
 pub fn extract_string(bits: &[u8], offset: usize, num_chars: usize) -> Option<String> {
+    let bit_len = num_chars.checked_mul(6)?;
+    let end = offset.checked_add(bit_len)?;
+    let chars = bits.get(offset..end)?;
     let mut s = String::with_capacity(num_chars);
-    for i in 0..num_chars {
-        let char_offset = offset + i * 6;
-        let val = extract_u32(bits, char_offset, 6)? as u8;
+    for chunk in chars.chunks_exact(6) {
+        let val = extract_u32(chunk, 0, 6)? as u8;
         let ch = match val {
             0 => '@',
             1..=26 => (b'A' + val - 1) as char,
@@ -148,6 +154,16 @@ mod tests {
     fn extract_unsigned_out_of_bounds() {
         let bits = vec![0, 1, 0];
         assert_eq!(extract_u32(&bits, 0, 4), None); // only 3 bits available
+    }
+
+    #[test]
+    fn extract_unsigned_large_offset_returns_none() {
+        assert_eq!(extract_u32(&[0], usize::MAX, 1), None);
+    }
+
+    #[test]
+    fn extract_text_large_offset_returns_none() {
+        assert_eq!(extract_string(&[0; 6], usize::MAX, 1), None);
     }
 
     #[test]
