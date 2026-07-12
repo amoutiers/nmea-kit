@@ -132,7 +132,7 @@ flowchart TD
 
 ¹ `Xdr` has an additional `to_sentences() -> Vec<String>` method that automatically splits many measurements into multiple sentences to stay within the 82-character NMEA line limit.
 
-### AIS messages (read-only) — [full type list](SENTENCES.md#ais-message-types-decoded-from-aivdmaivdo)
+### AIS messages (read-only) — [full type list](SENTENCES.md#message-types-decoded-from-aivdmaivdo)
 
 | Type(s) | Struct              | Description                                          |
 | ------- | ------------------- | ---------------------------------------------------- |
