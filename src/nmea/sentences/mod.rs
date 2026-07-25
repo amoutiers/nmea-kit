@@ -6,6 +6,10 @@ mod ack;
 mod aam;
 #[cfg(feature = "acn")]
 mod acn;
+#[cfg(feature = "alr")]
+mod alr;
+#[cfg(feature = "arc")]
+mod arc;
 #[cfg(feature = "apb")]
 mod apb;
 #[cfg(feature = "bec")]
@@ -125,6 +129,10 @@ pub use ack::*;
 pub use aam::*;
 #[cfg(feature = "acn")]
 pub use acn::*;
+#[cfg(feature = "alr")]
+pub use alr::*;
+#[cfg(feature = "arc")]
+pub use arc::*;
 #[cfg(feature = "apb")]
 pub use apb::*;
 #[cfg(feature = "bec")]

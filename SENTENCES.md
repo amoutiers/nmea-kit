@@ -106,8 +106,8 @@ Sources : go-nmea, gpsd.
 - [ ] ALA — Alert
 - [ ] ALC — Cyclic Alert List
 - [ ] ALF — Alert
-- [ ] ALR — Alert Response
-- [ ] ARC — Alert Response Command
+- [x] ALR — Alert Response
+- [x] ARC — Alert Response Command
 - [ ] DOR — Door Status
 - [ ] DSC — Digital Selective Calling Information
 - [ ] DSE — DSC Extended

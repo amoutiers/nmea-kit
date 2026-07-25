@@ -160,6 +160,8 @@ nmea_sentences![
         // Alert
         ["ack", Ack, "ACK"],
         ["acn", Acn, "ACN"],
+        ["alr", Alr, "ALR"],
+        ["arc", Arc, "ARC"],
         // Communication
         ["txt", Txt, "TXT"],
         // Heartbeat

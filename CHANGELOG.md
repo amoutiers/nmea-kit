@@ -4,6 +4,14 @@ All notable changes to nmea-kit are documented here.
 
 ## [Unreleased]
 
+## [0.7.5] — 2026-07-25
+
+### Added
+- ALR (Set Alarm State) sentence type — alarm time, identifier, condition, acknowledgement state, and description
+- ARC (Alert Response Command) sentence type — alert time, manufacturer, identifier, instance, and refused command
+
+NMEA sentence coverage: 59 → 61 types.
+
 ## [0.7.4] — 2026-07-12
 
 ### Added
@@ -306,6 +314,7 @@ AIS coverage expanded from 9 to 16 message types.
 - Zero external dependencies
 - CI: tests, clippy, rustfmt, doc checks on stable + MSRV 1.85.0
 
+[0.7.5]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.7.5
 [0.7.4]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.7.4
 [0.7.3]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.7.3
 [0.7.2]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.7.2
