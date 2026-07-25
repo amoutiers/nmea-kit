@@ -160,6 +160,8 @@ nmea_sentences![
         // Alert
         ["ack", Ack, "ACK"],
         ["acn", Acn, "ACN"],
+        ["ala", Ala, "ALA"],
+        ["alc", Alc, "ALC"],
         ["alr", Alr, "ALR"],
         ["arc", Arc, "ARC"],
         // Communication

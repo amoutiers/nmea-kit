@@ -4,6 +4,14 @@ All notable changes to nmea-kit are documented here.
 
 ## [Unreleased]
 
+## [0.7.6] — 2026-07-26
+
+### Added
+- ALA (System Faults and Alarms) sentence type — alarm source, condition, acknowledgement state, and message
+- ALC (Cyclic Alert List) sentence type — fragment metadata and alert entries
+
+NMEA sentence coverage: 61 → 63 types.
+
 ## [0.7.5] — 2026-07-25
 
 ### Added
@@ -314,6 +322,7 @@ AIS coverage expanded from 9 to 16 message types.
 - Zero external dependencies
 - CI: tests, clippy, rustfmt, doc checks on stable + MSRV 1.85.0
 
+[0.7.6]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.7.6
 [0.7.5]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.7.5
 [0.7.4]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.7.4
 [0.7.3]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.7.3

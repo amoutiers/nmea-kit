@@ -103,8 +103,8 @@ Sources : go-nmea, gpsd.
 
 - [x] ACK — Acknowledge Alarm
 - [x] ACN — Alert Command
-- [ ] ALA — Alert
-- [ ] ALC — Cyclic Alert List
+- [x] ALA — Alert
+- [x] ALC — Cyclic Alert List
 - [ ] ALF — Alert
 - [x] ALR — Alert Response
 - [x] ARC — Alert Response Command

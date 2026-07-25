@@ -1,6 +1,6 @@
 [package]
 name = "nmea-kit"
-version = "0.7.5"
+version = "0.7.6"
 edition = "2024"
 rust-version = "1.85.0"
 description = "Bidirectional NMEA 0183 parser and encoder with AIS decoding"
@@ -29,7 +29,7 @@ depth       = ["dbt", "dbs", "dbk", "dpt"]
 # Umbrella — all sentence types
 nmea = [
     "positioning", "speed", "heading", "wind", "depth",
-    "aam", "ack", "acn", "alr", "arc", "apb", "bec", "bod", "bwc", "bwr", "bww", "dtm", "gbs", "gsa", "gsv", "gst", "hbt", "hsc", "mda", "mta", "mtw", "osd", "pashr", "pgrme", "pskpdpt", "rmb", "rot", "rpm", "rsa", "rsd", "rte", "tll", "ttm", "txt", "vdr", "vlw", "vpw", "vwr", "vwt", "wcv", "wpl", "xdr", "xte", "zda",
+    "aam", "ack", "acn", "ala", "alc", "alr", "arc", "apb", "bec", "bod", "bwc", "bwr", "bww", "dtm", "gbs", "gsa", "gsv", "gst", "hbt", "hsc", "mda", "mta", "mtw", "osd", "pashr", "pgrme", "pskpdpt", "rmb", "rot", "rpm", "rsa", "rsd", "rte", "tll", "ttm", "txt", "vdr", "vlw", "vpw", "vwr", "vwt", "wcv", "wpl", "xdr", "xte", "zda",
 ]
 ais = ["abm", "bbm", "vsd"]
 
@@ -37,6 +37,8 @@ ais = ["abm", "bbm", "vsd"]
 aam = []
 ack = []
 acn = []
+ala = []
+alc = []
 alr = []
 arc = []
 apb = []
