@@ -38,3 +38,37 @@ impl core::fmt::Display for FrameError {
 }
 
 impl std::error::Error for FrameError {}
+
+/// Errors from encoding (invalid frame parts or field values).
+#[non_exhaustive]
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum EncodeError {
+    /// Prefix is not `$` or `!`.
+    InvalidPrefix(char),
+    /// Talker or sentence type contains non-ASCII characters.
+    NonAsciiAddress,
+    /// Sentence type is empty.
+    InvalidAddress,
+    /// A field contains `,`, `*`, `\r`, `\n`, or a non-ASCII character.
+    InvalidFieldCharacter(char),
+    /// Coordinate magnitude is NaN, infinite, or negative.
+    InvalidCoordinate,
+}
+
+impl core::fmt::Display for EncodeError {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::InvalidPrefix(c) => write!(f, "invalid prefix '{c}', expected '$' or '!'"),
+            Self::NonAsciiAddress => write!(f, "talker or sentence type is not ASCII"),
+            Self::InvalidAddress => write!(f, "sentence type is empty"),
+            Self::InvalidFieldCharacter(c) => {
+                write!(f, "field contains invalid character {c:?}")
+            }
+            Self::InvalidCoordinate => {
+                write!(f, "coordinate magnitude is NaN, infinite, or negative")
+            }
+        }
+    }
+}
+
+impl std::error::Error for EncodeError {}
