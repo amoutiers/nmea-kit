@@ -175,7 +175,7 @@ pub fn encode_frame(
         return Err(crate::EncodeError::NonAsciiAddress);
     }
     if sentence_type.is_empty() {
-        return Err(crate::EncodeError::InvalidAddress);
+        return Err(crate::EncodeError::EmptySentenceType);
     }
     for field in fields {
         if let Some(c) = field
@@ -343,7 +343,7 @@ mod tests {
     fn encode_frame_rejects_empty_sentence_type() {
         assert_eq!(
             encode_frame('$', "GP", "", &[]),
-            Err(crate::EncodeError::InvalidAddress)
+            Err(crate::EncodeError::EmptySentenceType)
         );
     }
 

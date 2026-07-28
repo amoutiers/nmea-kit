@@ -57,7 +57,7 @@ pub enum EncodeError {
     /// Talker or sentence type contains non-ASCII characters.
     NonAsciiAddress,
     /// Sentence type is empty.
-    InvalidAddress,
+    EmptySentenceType,
     /// A field contains `,`, `*`, `\r`, `\n`, or a non-ASCII character.
     InvalidFieldCharacter(char),
     /// Coordinate magnitude is NaN, infinite, or negative.
@@ -69,7 +69,7 @@ impl core::fmt::Display for EncodeError {
         match self {
             Self::InvalidPrefix(c) => write!(f, "invalid prefix '{c}', expected '$' or '!'"),
             Self::NonAsciiAddress => write!(f, "talker or sentence type is not ASCII"),
-            Self::InvalidAddress => write!(f, "sentence type is empty"),
+            Self::EmptySentenceType => write!(f, "sentence type is empty"),
             Self::InvalidFieldCharacter(c) => {
                 write!(f, "field contains invalid character {c:?}")
             }

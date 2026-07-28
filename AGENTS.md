@@ -56,7 +56,8 @@ parser.reset()                                  // clear fragment buffers
 
 ### Error model
 
-- **Frame layer**: `parse_frame()` returns `Result<NmeaFrame, FrameError>`. Variants: `Empty`, `InvalidPrefix`, `MalformedChecksum`, `BadChecksum`, `MalformedTagBlock`, `TooShort`.
+- **Frame layer**: `parse_frame()` returns `Result<NmeaFrame, FrameError>`. Variants: `Empty`, `InvalidPrefix`, `MalformedChecksum`, `BadChecksum`, `MalformedTagBlock`, `BadTagChecksum`, `TooShort`, `NonAsciiAddress`. When a tag-block checksum is present it is validated, and `tag_block` excludes its `*hh` suffix.
+- **Encode layer**: all encode APIs return `Result<_, EncodeError>`. Variants: `InvalidPrefix`, `NonAsciiAddress`, `EmptySentenceType`, `InvalidFieldCharacter`, `InvalidCoordinate`.
 - **NMEA content**: `parse()` always returns `Some`. Missing/malformed fields → `None` inside the struct. Intentional for marine instruments that send partial data.
 - **AIS content**: `decode()` returns `Option<AisMessage>`. `None` = awaiting fragments or decode failure.
 - **No panics**: 0 `panic!`, 0 `unwrap()`, 0 `todo!` in library code.
