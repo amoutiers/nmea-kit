@@ -91,6 +91,10 @@ Sources : go-nmea, gpsd.
 
 - [x] ZDA — Time & Date
 
+### AIS Interface
+
+- [x] VSD — AIS Voyage Static Data
+
 ### Targets
 
 - [x] RSD — Radar System Data
@@ -166,7 +170,6 @@ Sources : go-nmea, gpsd.
 
 - [x] ABM — Addressed Binary Message
 - [x] BBM — Broadcast Binary Message
-- [x] VSD — AIS Voyage Static Data
 
 ### Message Types (decoded from AIVDM/AIVDO)
 

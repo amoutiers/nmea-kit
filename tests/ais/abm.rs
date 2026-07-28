@@ -38,6 +38,21 @@ fn dispatch() {
 }
 
 #[test]
+fn dispatch_rejects_dollar_prefixed_abm() {
+    let frame = nmea_kit::NmeaFrame {
+        prefix: '$',
+        talker: "AI",
+        sentence_type: "ABM",
+        fields: vec![],
+        tag_block: None,
+    };
+    assert!(matches!(
+        AisSentence::parse(&frame),
+        AisSentence::Unknown { .. }
+    ));
+}
+
+#[test]
 fn roundtrip() {
     let original = Abm {
         num_frags: Some(1),

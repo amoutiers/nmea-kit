@@ -91,7 +91,7 @@ CHANGELOG entry:
 
 ### Added
 - `FieldReader::u16` / `i16` / `i32` and matching `FieldWriter` methods.
-- `NmeaEncodable::SENTENCE_TYPE` and `PROPRIETARY_ID` are now `&'static str` (was `&str`).
+- `NmeaEncodable::SENTENCE_TYPE` is now `&'static str` (was `&str`).
 
 [0.5.7]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.5.7
 ```
@@ -105,7 +105,7 @@ GitHub release body:
 
 ## Added
 - `FieldReader::u16` / `i16` / `i32` and matching `FieldWriter` methods.
-- `NmeaEncodable::SENTENCE_TYPE` and `PROPRIETARY_ID` are now `&'static str` (was `&str`).
+- `NmeaEncodable::SENTENCE_TYPE` is now `&'static str` (was `&str`).
 
 ---
 

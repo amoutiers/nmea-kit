@@ -41,9 +41,9 @@ sets `talker = ""` and `sentence_type` = the full address, so there is no collis
 with standard 3-char sentence types.
 
 1. Create `src/nmea/sentences/pxyz.rs` — same pattern as standard, but:
-   - Set `const PROPRIETARY_ID: &str = "PXYZ";` (the full wire address)
-   - `const SENTENCE_TYPE` stays as the last 3 chars (legacy compat)
-   - Use `to_proprietary_sentence()` in tests instead of `to_sentence(talker)`
+   - Set `const SENTENCE_TYPE: &str = "PXYZ";` to the full wire address
+   - Set `const PROPRIETARY: bool = true;`; `to_sentence(talker)` then ignores `talker`
+   - In tests, call `value.to_sentence("ignored")` and assert that the output starts with `$PXYZ`
 2. Add `pxyz = []` to `[features]` in `Cargo.toml`, and add `"pxyz"` to the `nmea` feature list
 3. Add `#[cfg(feature = "pxyz")] mod pxyz;` and `pub use pxyz::*;` to `sentences/mod.rs`
 4. Add `["pxyz", Pxyz, "PXYZ"],` to the `proprietary:` section of the `nmea_sentences!` macro in `nmea/mod.rs`

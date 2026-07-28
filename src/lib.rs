@@ -30,12 +30,12 @@
 //! - [`parse_frame`] / [`encode_frame`] — frame layer (always available)
 //! - [`NmeaSentence`] — dispatch enum for all typed NMEA sentences
 //! - [`NmeaEncodable`] — trait for encoding NMEA sentences to wire format
-//! - [`ais`] — AIS decoder (behind `ais` feature) and AIS application-layer sentences
+//! - [`ais`] — AIS decoder (behind `ais` feature) and `!`-prefixed AIS application sentences
 //!
 //! ## Features
 //!
-//! - `nmea` (default) — all 63 NMEA sentence types
-//! - `ais` (default) — 16 AIS message types (read-only decode) + AIS application-layer sentences
+//! - `nmea` (default) — all 64 NMEA sentence types
+//! - `ais` (default) — 16 AIS message types (read-only decode) + ABM/BBM application sentences
 //! - `dbs`, `dbt`, `dpt`, … — individual sentence types
 
 mod error;
@@ -105,6 +105,7 @@ macro_rules! nmea_item {
             feature = "vtg",
             feature = "vwr",
             feature = "vwt",
+            feature = "vsd",
             feature = "wcv",
             feature = "wpl",
             feature = "xdr",
@@ -117,7 +118,7 @@ macro_rules! nmea_item {
 
 nmea_item! { pub mod nmea; }
 
-#[cfg(any(feature = "ais", feature = "abm", feature = "bbm", feature = "vsd"))]
+#[cfg(any(feature = "ais", feature = "abm", feature = "bbm"))]
 pub mod ais;
 
 pub use error::*;

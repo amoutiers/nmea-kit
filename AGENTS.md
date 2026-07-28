@@ -7,10 +7,10 @@ Bidirectional NMEA 0183 parser/encoder + AIS decoder. Zero dependencies. MIT/Apa
 | Crate | `nmea-kit` v0.7.6 |
 | Edition | 2024, MSRV 1.85.0 |
 | Dependencies | 0 |
-| NMEA sentences | 63 (bidirectional) |
-| AIS sentences | 3 (bidirectional) |
+| NMEA sentences | 64 (bidirectional) |
+| AIS application sentences | 2 (bidirectional) |
 | AIS message types | 16 (read-only) |
-| Tests | 694, 0 failures |
+| Tests | 699, 0 failures |
 | Unsafe blocks | 0 |
 
 For contribution workflow, test rules, and the sentence-type checklist see [CONTRIBUTING.md](CONTRIBUTING.md).
@@ -21,23 +21,23 @@ For contribution workflow, test rules, and the sentence-type checklist see [CONT
 
 ```rust
 // Frame layer (always available)
-use nmea_kit::{parse_frame, encode_frame, NmeaFrame, FrameError};
+use nmea_kit::{parse_frame, encode_frame, EncodeError, NmeaFrame, FrameError};
 
 parse_frame(input: &str) -> Result<NmeaFrame, FrameError>
-encode_frame(prefix: char, talker: &str, sentence_type: &str, fields: &[&str]) -> String
+encode_frame(prefix: char, talker: &str, sentence_type: &str, fields: &[&str]) -> Result<String, EncodeError>
 
 // NMEA dispatch
 use nmea_kit::{NmeaSentence, NmeaEncodable};
 
 NmeaSentence::parse(&frame) -> NmeaSentence   // enum variant per type
-value.to_sentence(talker: &str) -> String      // NmeaEncodable; proprietary types ignore talker
+value.to_sentence(talker: &str) -> Result<String, EncodeError> // NmeaEncodable; proprietary types ignore talker
 
 // Individual sentence types
-use nmea_kit::nmea::sentences::{Mwd, Rmc, Dbt, ...};     // standard
+use nmea_kit::nmea::sentences::{Mwd, Rmc, Dbt, Vsd, ...}; // standard
 use nmea_kit::nmea::sentences::{Pashr, Pskpdpt, ...};    // proprietary
 
 Type::parse(fields: &[&str]) -> Option<Self>   // always Some for known types
-value.encode() -> Vec<String>                   // fields in wire order
+value.encode() -> Result<Vec<String>, EncodeError> // fields in wire order
 
 // Coordinate helpers
 use nmea_kit::nmea::{ddmm_to_decimal, decimal_to_ddmm};
@@ -45,9 +45,9 @@ use nmea_kit::nmea::{ddmm_to_decimal, decimal_to_ddmm};
 ddmm_to_decimal(ddmm: f64) -> f64   // DDMM.MMMM → decimal degrees
 decimal_to_ddmm(decimal: f64) -> f64 // decimal degrees → DDMM.MMMM
 
-// AIS decoder and AIS application-layer sentences
+// AIS decoder and !-prefixed application-layer sentences
 use nmea_kit::ais::{AisParser, AisMessage};
-use nmea_kit::ais::sentences::{Abm, Bbm, Vsd, AisSentence};
+use nmea_kit::ais::sentences::{Abm, Bbm, AisSentence};
 
 let mut parser = AisParser::new();
 parser.decode(&frame) -> Option<AisMessage>    // None while awaiting fragments
@@ -163,7 +163,7 @@ src/nmea/mod.rs         → NmeaSentence enum + dispatch macro
 src/nmea/field.rs       → FieldReader, FieldWriter, ddmm_to_decimal, decimal_to_ddmm
 src/nmea/sentences/*.rs → one file per sentence type (struct + parse + encode)
 src/ais/mod.rs          → AisParser + AisMessage enum
-src/ais/sentences/*.rs  → AIS application-layer NMEA sentences such as ABM, BBM, VSD
+src/ais/sentences/*.rs  → !-prefixed AIS application-layer NMEA sentences: ABM, BBM
 src/ais/armor.rs        → 6-bit ASCII decode + bit extraction
 src/ais/fragments.rs    → multi-fragment reassembly
 src/ais/messages/*.rs   → one file per AIS message type
@@ -177,8 +177,8 @@ Every NMEA sentence type follows the same pattern using `FieldReader`/`FieldWrit
 
 - `SENTENCE_TYPE` — 3-char const (`"MWD"`, `"RMC"`, etc.)
 - `parse(fields: &[&str]) -> Option<Self>` — sequential field reading (always returns `Some`, lenient)
-- `encode(&self) -> Vec<String>` — sequential field writing
-- `to_sentence(&self, talker: &str) -> String` — default impl on `NmeaEncodable` trait
+- `encode(&self) -> Result<Vec<String>, EncodeError>` — sequential field writing
+- `to_sentence(&self, talker: &str) -> Result<String, EncodeError>` — default impl on `NmeaEncodable` trait
 
 Fixed indicator fields (T, M, N, K, f, F) are handled with `r.skip()` on parse and `w.fixed('T')` on encode.
 
@@ -211,8 +211,7 @@ Helper functions in `position_a.rs` are `pub(crate)` — shared by `position_b.r
 
 ### AIS application-layer sentences
 
-AIS application-layer sentence types live under `ais::sentences`, not `nmea::sentences`.
-They preserve their wire prefix (`!` for ABM/BBM, `$` for VSD) and are dispatched with `AisSentence::parse(&frame)`.
+ABM and BBM live under `ais::sentences`, preserve their `!` prefix, and are dispatched with `AisSentence::parse(&frame)`. VSD is a conventional NMEA sentence (`$--VSD`) under `nmea::sentences`, dispatched with `NmeaSentence::parse(&frame)`.
 
 ## Field definitions reference
 
@@ -231,7 +230,7 @@ cargo fmt                                                # format
 
 - No `nom`, no proc-macro, no `syn`/`quote` — keep compile times minimal
 - Zero dependencies (serde was removed as unused)
-- AIS AIVDM/AIVDO message decoding is read-only; AIS application-layer sentences are bidirectional
+- AIS AIVDM/AIVDO message decoding is read-only; ABM/BBM and NMEA VSD are bidirectional
 - No `unwrap()` in library code — `expect("description")` in tests only
 - No `panic!`, `todo!`, or `#[allow(dead_code)]` in `src/`
 - Edition 2024, MSRV 1.85.0

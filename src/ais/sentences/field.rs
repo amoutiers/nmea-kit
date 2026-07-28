@@ -11,22 +11,6 @@ pub(super) fn read_u8(fields: &[&str], idx: &mut usize) -> Option<u8> {
 }
 
 #[cfg_attr(
-    not(feature = "vsd"),
-    expect(dead_code, reason = "used only by AIS VSD sentence parsing")
-)]
-pub(super) fn read_f32(fields: &[&str], idx: &mut usize) -> Option<f32> {
-    let val = fields.get(*idx).and_then(|f| {
-        if f.is_empty() {
-            None
-        } else {
-            f.parse::<f32>().ok().filter(|v| v.is_finite())
-        }
-    });
-    *idx += 1;
-    val
-}
-
-#[cfg_attr(
     not(feature = "abm"),
     expect(dead_code, reason = "used only by AIS ABM sentence parsing")
 )]
@@ -68,18 +52,6 @@ pub(super) fn read_string(fields: &[&str], idx: &mut usize) -> Option<String> {
 
 pub(super) fn encode_u8(value: Option<u8>) -> String {
     value.map(|v| v.to_string()).unwrap_or_default()
-}
-
-#[cfg_attr(
-    not(feature = "vsd"),
-    expect(dead_code, reason = "used only by AIS VSD sentence encoding")
-)]
-pub(super) fn encode_f32(value: Option<f32>) -> String {
-    match value {
-        Some(v) if !v.is_finite() => String::new(),
-        Some(v) => format!("{}", if v == 0.0 { 0.0 } else { v }),
-        None => String::new(),
-    }
 }
 
 #[cfg_attr(

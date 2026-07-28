@@ -48,6 +48,10 @@ macro_rules! nmea_sentences {
             ///
             /// Returns `Unknown` for unrecognized types.
             pub fn parse(frame: &NmeaFrame<'_>) -> Self {
+                if frame.prefix != '$' {
+                    return Self::from_frame(frame);
+                }
+
                 macro_rules! try_parse {
                     ($parser:expr, $v:ident) => {
                         match $parser(&frame.fields) {
@@ -60,7 +64,7 @@ macro_rules! nmea_sentences {
                     };
                 }
 
-                // Standard table first — matches the 3-char code for any frame.
+                // Standard table matches the 3-char code for '$'-prefixed frames.
                 // Proprietary wire codes (PASHR, PSKPDPT, …) never collide with a
                 // 3-char standard code, so a proprietary frame falls through.
                 match frame.sentence_type {
@@ -116,6 +120,8 @@ nmea_sentences![
         ["vpw", Vpw, "VPW"],
         ["vwr", Vwr, "VWR"],
         ["vwt", Vwt, "VWT"],
+        // AIS interface
+        ["vsd", Vsd, "VSD"],
         // Heading
         ["hdt", Hdt, "HDT"],
         ["hdg", Hdg, "HDG"],

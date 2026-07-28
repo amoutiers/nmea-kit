@@ -110,6 +110,8 @@ mod vhw;
 mod vlw;
 #[path = "nmea/vpw.rs"]
 mod vpw;
+#[path = "nmea/vsd.rs"]
+mod vsd;
 #[path = "nmea/vtg.rs"]
 mod vtg;
 #[path = "nmea/vwr.rs"]

@@ -116,6 +116,8 @@ mod vtg;
 mod vwr;
 #[cfg(feature = "vwt")]
 mod vwt;
+#[cfg(feature = "vsd")]
+mod vsd;
 #[cfg(feature = "wcv")]
 mod wcv;
 #[cfg(feature = "wpl")]
@@ -243,6 +245,8 @@ pub use vtg::*;
 pub use vwr::*;
 #[cfg(feature = "vwt")]
 pub use vwt::*;
+#[cfg(feature = "vsd")]
+pub use vsd::*;
 #[cfg(feature = "wcv")]
 pub use wcv::*;
 #[cfg(feature = "wpl")]

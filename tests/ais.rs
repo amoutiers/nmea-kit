@@ -58,6 +58,3 @@ mod type8;
 #[cfg(feature = "ais")]
 #[path = "ais/type9.rs"]
 mod type9;
-#[cfg(feature = "vsd")]
-#[path = "ais/vsd.rs"]
-mod vsd;

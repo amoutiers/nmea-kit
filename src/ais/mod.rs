@@ -1,8 +1,8 @@
 //! AIS (Automatic Identification System) message decoding and application-layer sentences.
 //!
 //! Decodes AIVDM/AIVDO messages from `!`-prefixed NMEA frames when the `ais`
-//! feature is enabled. AIS application-layer NMEA sentences such as ABM, BBM,
-//! and VSD live in `ais::sentences` and keep their wire prefixes.
+//! feature is enabled. The `!`-prefixed AIS application-layer NMEA sentences
+//! ABM and BBM live in `ais::sentences`.
 //!
 //! # Usage
 //!
@@ -31,7 +31,7 @@ pub mod armor;
 pub mod fragments;
 #[cfg(feature = "ais")]
 pub mod messages;
-#[cfg(any(feature = "abm", feature = "bbm", feature = "vsd"))]
+#[cfg(any(feature = "abm", feature = "bbm"))]
 pub mod sentences;
 
 #[cfg(feature = "ais")]
