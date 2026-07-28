@@ -48,7 +48,7 @@ let dbt = Dbt {
     depth_fathoms: Some(1.3),
 };
 
-let sentence = dbt.to_sentence("SD");
+let sentence = dbt.to_sentence("SD").expect("valid depth sentence");
 // "$SDDBT,7.7,f,2.3,M,1.3,F*05\r\n"
 ```
 
@@ -82,7 +82,7 @@ let abm = Abm {
     fill_bits: Some(0),
 };
 
-let sentence = abm.to_sentence("AI");
+let sentence = abm.to_sentence("AI").expect("valid AIS sentence");
 // "!AIABM,1,1,0,123456789,1,6,testpayload,0*08\r\n"
 ```
 
@@ -130,7 +130,7 @@ flowchart TD
 | Time               | ZDA                   |
 | Proprietary        | PASHR, PGRME, PSKPDPT |
 
-¹ `Xdr` has an additional `to_sentences() -> Vec<String>` method that automatically splits many measurements into multiple sentences to stay within the 82-character NMEA line limit.
+¹ `Xdr` has an additional `to_sentences() -> Result<Vec<String>, EncodeError>` method that automatically splits many measurements into multiple sentences to stay within the 82-character NMEA line limit.
 
 ### AIS application sentences (bidirectional)
 

@@ -4,6 +4,36 @@ All notable changes to nmea-kit are documented here.
 
 ## [Unreleased]
 
+## [0.8.0] — 2026-07-27
+
+### Changed (breaking)
+- `encode_frame()` now returns `Result<String, EncodeError>` and validates the prefix, the address (ASCII, non-empty type), and every field (no `,`, `*`, `\r`, `\n`, non-ASCII)
+- `NmeaEncodable::to_sentence()` and `encode()` now return `Result<_, EncodeError>`; same for XDR `to_sentences()`, AIS ABM/BBM, and NMEA VSD
+- Invalid coordinate magnitudes (NaN, infinite, negative) now produce an explicit `EncodeError::InvalidCoordinate` instead of malformed wire output. This also removes a debug-build panic in `FieldWriter`
+- The IEC 61162-450 tag block checksum is now validated when present; invalid checksums are rejected (`FrameError::BadTagChecksum`), and `NmeaFrame::tag_block` no longer includes the `*hh` suffix
+- AIS reserved values now decode to `None`: Type 9 timestamp 61-63, Types 4/11 hour 25-31, minute 61-63, second 61-63, month 13-15, and heading 360-510 (Types 1/2/3/18/19)
+- `Vsd` moved from `nmea_kit::ais::sentences::Vsd` to `nmea_kit::nmea::sentences::Vsd`
+- `AisSentence::Vsd` was removed; dispatch `$--VSD` with `NmeaSentence::parse()` and match `NmeaSentence::Vsd`
+- Feature `vsd` is now an NMEA feature; the `ais` umbrella feature enables ABM/BBM application sentences plus AIS VDM/VDO decoding
+
+### Fixed
+- Single-fragment AIS frames now enforce the 256-character payload limit (DoS hardening)
+- Field-less proprietary (`$PABC*10`) and talkerless (`$RMC*5C`) frames are no longer rejected as `TooShort`
+- A tag block without a following sentence now returns `TooShort` instead of `Empty`
+- XDR rejects `NaN`/`inf` values like every other sentence type
+- Proprietary dispatch no longer triggers on hand-built frames with a non-empty talker
+- `AisPayload::channel` is `'A'`/`'B'` as documented when the numeric channel syntax (`1`/`2`) is used
+- NMEA and AIS application dispatchers reject frames with the wrong wire prefix
+
+### Documentation
+- README feature examples now target `nmea-kit` 0.8.
+- Proprietary-sentence contribution and release instructions match `NmeaEncodable`.
+
+### Migration
+- `let s = x.to_sentence("GP");` → `let s = x.to_sentence("GP")?;` (or `.expect("...")`)
+- `encode_frame(...)` → `encode_frame(...)?`
+- If you parse `frame.tag_block` yourself, the `*hh` checksum suffix is no longer present
+
 ## [0.7.6] — 2026-07-26
 
 ### Added
@@ -322,6 +352,7 @@ AIS coverage expanded from 9 to 16 message types.
 - Zero external dependencies
 - CI: tests, clippy, rustfmt, doc checks on stable + MSRV 1.85.0
 
+[0.8.0]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.8.0
 [0.7.6]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.7.6
 [0.7.5]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.7.5
 [0.7.4]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.7.4

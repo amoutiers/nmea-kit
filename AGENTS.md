@@ -4,13 +4,12 @@ Bidirectional NMEA 0183 parser/encoder + AIS decoder. Zero dependencies. MIT/Apa
 
 | Key | Value |
 |---|---|
-| Crate | `nmea-kit` v0.7.6 |
+| Crate | `nmea-kit` v0.8.0 |
 | Edition | 2024, MSRV 1.85.0 |
 | Dependencies | 0 |
 | NMEA sentences | 64 (bidirectional) |
 | AIS application sentences | 2 (bidirectional) |
-| AIS message types | 16 (read-only) |
-| Tests | 699, 0 failures |
+| Tests | 721, 0 failures |
 | Unsafe blocks | 0 |
 
 For contribution workflow, test rules, and the sentence-type checklist see [CONTRIBUTING.md](CONTRIBUTING.md).
@@ -56,7 +55,6 @@ parser.reset()                                  // clear fragment buffers
 
 ### Error model
 
-- **Frame layer**: `parse_frame()` returns `Result<NmeaFrame, FrameError>`. Variants: `Empty`, `InvalidPrefix`, `MalformedChecksum`, `BadChecksum`, `MalformedTagBlock`, `BadTagChecksum`, `TooShort`, `NonAsciiAddress`. When a tag-block checksum is present it is validated, and `tag_block` excludes its `*hh` suffix.
 - **Encode layer**: all encode APIs return `Result<_, EncodeError>`. Variants: `InvalidPrefix`, `NonAsciiAddress`, `EmptySentenceType`, `InvalidFieldCharacter`, `InvalidCoordinate`.
 - **NMEA content**: `parse()` always returns `Some`. Missing/malformed fields → `None` inside the struct. Intentional for marine instruments that send partial data.
 - **AIS content**: `decode()` returns `Option<AisMessage>`. `None` = awaiting fragments or decode failure.
