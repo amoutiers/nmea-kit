@@ -7,7 +7,7 @@ use nmea_kit::parse_frame;
 fn decode_encode() {
     let frame = parse_frame("$RATLL,,3647.422,N,01432.592,E,,,,*58").expect("valid");
     let tll = Tll::parse(&frame.fields).expect("parse");
-    let sentence = tll.to_sentence("RA");
+    let sentence = tll.to_sentence("RA").expect("encode");
     let frame2 = parse_frame(sentence.trim()).expect("re-parse");
     let tll2 = Tll::parse(&frame2.fields).expect("parse");
     assert_eq!(tll, tll2);
@@ -26,7 +26,7 @@ fn roundtrip() {
         status: Some('T'),
         ref_target: None,
     };
-    let sentence = original.to_sentence("RA");
+    let sentence = original.to_sentence("RA").expect("encode");
     let frame = parse_frame(sentence.trim()).expect("re-parse");
     let parsed = Tll::parse(&frame.fields).expect("parse");
     assert_eq!(original, parsed);

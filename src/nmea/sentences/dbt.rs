@@ -34,7 +34,7 @@ impl Dbt {
 impl NmeaEncodable for Dbt {
     const SENTENCE_TYPE: &str = "DBT";
 
-    fn encode(&self) -> Vec<String> {
+    fn encode(&self) -> Result<Vec<String>, crate::EncodeError> {
         let mut w = FieldWriter::new();
         w.f32(self.depth_feet);
         w.fixed('f');
@@ -74,7 +74,7 @@ mod tests {
             depth_meters: Some(10.83),
             depth_fathoms: Some(5.85),
         };
-        let sentence = original.to_sentence("II");
+        let sentence = original.to_sentence("II").expect("encode");
         assert!(sentence.starts_with("$IIDBT,"));
 
         let frame = parse_frame(sentence.trim()).expect("re-parse DBT sentence");
@@ -86,7 +86,7 @@ mod tests {
     #[test]
     fn dbt_encode_exact_fields() {
         let dbt = Dbt { depth_feet: Some(7.7), depth_meters: Some(2.3), depth_fathoms: Some(1.3) };
-        assert_eq!(dbt.encode(), vec!["7.7", "f", "2.3", "M", "1.3", "F"]);
+        assert_eq!(dbt.encode().expect("encode"), vec!["7.7", "f", "2.3", "M", "1.3", "F"]);
     }
 
     #[test]

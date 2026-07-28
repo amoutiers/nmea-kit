@@ -62,7 +62,7 @@ impl Gga {
 impl NmeaEncodable for Gga {
     const SENTENCE_TYPE: &str = "GGA";
 
-    fn encode(&self) -> Vec<String> {
+    fn encode(&self) -> Result<Vec<String>, crate::EncodeError> {
         let mut w = FieldWriter::new();
         w.string(self.time.as_deref());
         w.lat(self.lat);
@@ -145,7 +145,7 @@ mod tests {
             dgps_age: None,
             dgps_station: None,
         };
-        let sentence = gga.to_sentence("GP");
+        let sentence = gga.to_sentence("GP").expect("encode");
         let frame = parse_frame(sentence.trim()).expect("re-parse GGA");
         let gga2 = Gga::parse(&frame.fields).expect("parse roundtrip GGA");
         assert_eq!(gga, gga2);

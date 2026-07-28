@@ -35,7 +35,7 @@ impl Rpm {
 impl NmeaEncodable for Rpm {
     const SENTENCE_TYPE: &str = "RPM";
 
-    fn encode(&self) -> Vec<String> {
+    fn encode(&self) -> Result<Vec<String>, crate::EncodeError> {
         let mut w = FieldWriter::new();
         w.char(self.source);
         w.u8(self.engine_shaft_num);
@@ -60,7 +60,7 @@ mod tests {
             pitch: None,
             status: None,
         }
-        .to_sentence("II");
+        .to_sentence("II").expect("encode");
         let frame = parse_frame(f.trim()).expect("valid");
         let r = Rpm::parse(&frame.fields).expect("parse");
         assert!(r.source.is_none());
@@ -78,7 +78,7 @@ mod tests {
             pitch: Some(10.5),
             status: Some('A'),
         };
-        let sentence = original.to_sentence("II");
+        let sentence = original.to_sentence("II").expect("encode");
         let frame = parse_frame(sentence.trim()).expect("re-parse");
         let parsed = Rpm::parse(&frame.fields).expect("re-parse RPM");
         assert_eq!(original, parsed);

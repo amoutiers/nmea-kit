@@ -11,7 +11,7 @@ fn decode_encode() {
     )
     .expect("valid");
     let gga = Gga::parse(&frame.fields).expect("parse");
-    let sentence = gga.to_sentence("GP");
+    let sentence = gga.to_sentence("GP").expect("encode");
     let frame2 = parse_frame(sentence.trim()).expect("re-parse");
     let gga2 = Gga::parse(&frame2.fields).expect("parse");
     assert_eq!(gga, gga2);
@@ -48,7 +48,7 @@ fn gga_values() {
     assert!((gga.dgps_age.expect("dgps_age") - 2.0).abs() < 1e-4);
     assert_eq!(gga.dgps_station, Some("0031".to_string()));
     // half (b): canonical re-encode — "2.0" dgps_age → "2"
-    let s = gga.to_sentence("GP");
+    let s = gga.to_sentence("GP").expect("encode");
     let body = s.trim().trim_start_matches('$');
     let body = &body[..body.rfind('*').expect("cksum")];
     assert_eq!(
@@ -75,7 +75,7 @@ fn roundtrip() {
         dgps_age: None,
         dgps_station: None,
     };
-    let sentence = original.to_sentence("GP");
+    let sentence = original.to_sentence("GP").expect("encode");
     let frame = parse_frame(sentence.trim()).expect("re-parse");
     let parsed = Gga::parse(&frame.fields).expect("parse");
     assert_eq!(original, parsed);

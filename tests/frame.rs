@@ -43,7 +43,8 @@ fn dpt_fixtures_signalk() {
 
 #[test]
 fn encode_ais_prefix() {
-    let result = encode_frame('!', "AI", "VDM", &["1", "1", "", "A", "payload", "0"]);
+    let result =
+        encode_frame('!', "AI", "VDM", &["1", "1", "", "A", "payload", "0"]).expect("valid");
     assert!(result.starts_with("!AIVDM,"));
     let frame = parse_frame(result.trim()).expect("re-parse AIS encoded");
     assert_eq!(frame.prefix, '!');
@@ -52,7 +53,7 @@ fn encode_ais_prefix() {
 
 #[test]
 fn encode_no_fields() {
-    let result = encode_frame('$', "GP", "RMC", &[]);
+    let result = encode_frame('$', "GP", "RMC", &[]).expect("valid");
     assert!(result.starts_with("$GPRMC*"));
     assert!(result.ends_with("\r\n"));
 }
@@ -64,7 +65,8 @@ fn encode_then_parse_roundtrip() {
         "WI",
         "MWD",
         &["270.0", "T", "268.5", "M", "12.4", "N", "6.4", "M"],
-    );
+    )
+    .expect("valid");
     assert!(encoded.starts_with("$WIMWD,"));
     assert!(encoded.ends_with("\r\n"));
 
@@ -159,7 +161,7 @@ fn parse_with_tag_block() {
 
 #[test]
 fn roundtrip_preserves_empty_fields() {
-    let encoded = encode_frame('$', "GP", "APB", &["", "", "", "", "", "", ""]);
+    let encoded = encode_frame('$', "GP", "APB", &["", "", "", "", "", "", ""]).expect("valid");
     let frame = parse_frame(encoded.trim()).expect("re-parse with empty fields");
     assert_eq!(frame.sentence_type, "APB");
     assert!(

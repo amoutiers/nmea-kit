@@ -9,7 +9,7 @@ fn decode_encode() {
     let frame =
         parse_frame("$RARSD,0.00,,2.50,005.0,0.00,,4.50,355.0,,,3.0,N,H*51").expect("valid");
     let rsd = Rsd::parse(&frame.fields).expect("parse");
-    let sentence = rsd.to_sentence("RA");
+    let sentence = rsd.to_sentence("RA").expect("encode");
     let frame2 = parse_frame(sentence.trim()).expect("re-parse");
     let rsd2 = Rsd::parse(&frame2.fields).expect("parse");
     assert_eq!(rsd, rsd2);
@@ -39,7 +39,7 @@ fn roundtrip() {
         range_unit: Some('N'),
         display_rotation: Some('H'),
     };
-    let sentence = original.to_sentence("RA");
+    let sentence = original.to_sentence("RA").expect("encode");
     let frame = parse_frame(sentence.trim()).expect("re-parse");
     let parsed = Rsd::parse(&frame.fields).expect("parse");
     assert_eq!(original, parsed);

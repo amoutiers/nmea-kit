@@ -63,7 +63,7 @@ impl Bwr {
 impl NmeaEncodable for Bwr {
     const SENTENCE_TYPE: &str = "BWR";
 
-    fn encode(&self) -> Vec<String> {
+    fn encode(&self) -> Result<Vec<String>, crate::EncodeError> {
         let mut w = FieldWriter::new();
         w.string(self.time.as_deref());
         w.lat(self.lat);
@@ -101,7 +101,7 @@ mod tests {
             wpt: None,
             mode: None,
         }
-        .to_sentence("GP");
+        .to_sentence("GP").expect("encode");
         let frame = parse_frame(f.trim()).expect("valid");
         let b = Bwr::parse(&frame.fields).expect("parse");
         assert!(b.time.is_none());
@@ -123,7 +123,7 @@ mod tests {
             wpt: Some("004".to_string()),
             mode: None,
         };
-        let sentence = original.to_sentence("GP");
+        let sentence = original.to_sentence("GP").expect("encode");
         let frame = parse_frame(sentence.trim()).expect("re-parse");
         let parsed = Bwr::parse(&frame.fields).expect("re-parse BWR");
         assert_eq!(original, parsed);

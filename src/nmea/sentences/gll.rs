@@ -41,7 +41,7 @@ impl Gll {
 impl NmeaEncodable for Gll {
     const SENTENCE_TYPE: &str = "GLL";
 
-    fn encode(&self) -> Vec<String> {
+    fn encode(&self) -> Result<Vec<String>, crate::EncodeError> {
         let mut w = FieldWriter::new();
         w.lat(self.lat);
         w.char(self.ns);
@@ -103,7 +103,7 @@ mod tests {
         let frame = parse_frame("$GPGLL,5958.613,N,02325.928,E,120000,A*29")
             .expect("valid GLL");
         let gll = Gll::parse(&frame.fields).expect("parse GLL");
-        let sentence = gll.to_sentence("GP");
+        let sentence = gll.to_sentence("GP").expect("encode");
         // Longitude 023°25.928' must keep its 3-digit (5-char integer) degree field.
         assert!(sentence.contains(",02325.928,"), "leading zero lost: {sentence}");
     }
@@ -119,7 +119,7 @@ mod tests {
             status: Some('A'),
             mode: Some('A'),
         };
-        let sentence = gll.to_sentence("GP");
+        let sentence = gll.to_sentence("GP").expect("encode");
         let frame = parse_frame(sentence.trim()).expect("re-parse GLL");
         let gll2 = Gll::parse(&frame.fields).expect("parse roundtrip GLL");
         assert_eq!(gll, gll2);

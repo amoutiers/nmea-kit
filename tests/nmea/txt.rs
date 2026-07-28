@@ -8,7 +8,7 @@ use nmea_kit::{NmeaSentence, parse_frame};
 fn decode_encode() {
     let frame = parse_frame("$GPTXT,01,01,02,u-blox ag - www.u-blox.com*50").expect("valid");
     let txt = Txt::parse(&frame.fields).expect("parse");
-    let sentence = txt.to_sentence("GP");
+    let sentence = txt.to_sentence("GP").expect("encode");
     let frame2 = parse_frame(sentence.trim()).expect("re-parse");
     let txt2 = Txt::parse(&frame2.fields).expect("parse");
     assert_eq!(txt, txt2);
@@ -28,7 +28,7 @@ fn roundtrip() {
         msg_type: Some(2),
         text: Some("u-blox ag - www.u-blox.com".to_string()),
     };
-    let sentence = original.to_sentence("GP");
+    let sentence = original.to_sentence("GP").expect("encode");
     let frame = parse_frame(sentence.trim()).expect("re-parse");
     let parsed = Txt::parse(&frame.fields).expect("parse");
     assert_eq!(original, parsed);

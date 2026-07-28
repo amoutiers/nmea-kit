@@ -8,7 +8,7 @@ use nmea_kit::{NmeaSentence, parse_frame};
 fn decode_encode() {
     let frame = parse_frame("$GPHDM,223.12,M*05").expect("valid");
     let hdm = Hdm::parse(&frame.fields).expect("parse");
-    let sentence = hdm.to_sentence("GP");
+    let sentence = hdm.to_sentence("GP").expect("encode");
     let frame2 = parse_frame(sentence.trim()).expect("re-parse");
     let hdm2 = Hdm::parse(&frame2.fields).expect("parse");
     assert_eq!(hdm, hdm2);
@@ -25,7 +25,7 @@ fn roundtrip() {
     let original = Hdm {
         heading_mag: Some(186.5),
     };
-    let sentence = original.to_sentence("04");
+    let sentence = original.to_sentence("04").expect("encode");
     let frame = parse_frame(sentence.trim()).expect("re-parse");
     let parsed = Hdm::parse(&frame.fields).expect("parse");
     assert_eq!(original, parsed);
@@ -39,7 +39,7 @@ fn hdm_values() {
     assert!((x.heading_mag.expect("heading_mag") - 223.12).abs() < 1e-2);
 
     // (b) wire half
-    let s = x.to_sentence("GP");
+    let s = x.to_sentence("GP").expect("encode");
     let body = s.trim().trim_start_matches('$');
     let body = &body[..body.rfind('*').expect("cksum")];
     assert_eq!(body, "GPHDM,223.12,M");

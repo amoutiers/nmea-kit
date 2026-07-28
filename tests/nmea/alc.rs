@@ -44,7 +44,7 @@ fn roundtrip() {
             revision: Some(3),
         }],
     };
-    let sentence = original.to_sentence("FB");
+    let sentence = original.to_sentence("FB").expect("encode");
     let frame = parse_frame(sentence.trim()).expect("re-parse");
     assert_eq!(Alc::parse(&frame.fields).expect("parse"), original);
 }

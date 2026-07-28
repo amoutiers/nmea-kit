@@ -20,7 +20,7 @@ fn acn_values() {
 fn decode_encode() {
     let frame = parse_frame("$RAACN,220516,TCK,002,1,A,C*00").expect("valid");
     let acn = Acn::parse(&frame.fields).expect("parse");
-    let sentence = acn.to_sentence("RA");
+    let sentence = acn.to_sentence("RA").expect("encode");
     let frame2 = parse_frame(sentence.trim()).expect("re-parse");
     let acn2 = Acn::parse(&frame2.fields).expect("parse");
     assert_eq!(acn, acn2);
@@ -42,7 +42,7 @@ fn roundtrip() {
         command: Some('A'),
         state: Some('C'),
     };
-    let sentence = original.to_sentence("RA");
+    let sentence = original.to_sentence("RA").expect("encode");
     let frame = parse_frame(sentence.trim()).expect("re-parse");
     let parsed = Acn::parse(&frame.fields).expect("parse");
     assert_eq!(original, parsed);

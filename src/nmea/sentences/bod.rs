@@ -38,7 +38,7 @@ impl Bod {
 impl NmeaEncodable for Bod {
     const SENTENCE_TYPE: &str = "BOD";
 
-    fn encode(&self) -> Vec<String> {
+    fn encode(&self) -> Result<Vec<String>, crate::EncodeError> {
         let mut w = FieldWriter::new();
         w.f32(self.bear_true);
         w.char(self.bear_true_type);
@@ -78,7 +78,7 @@ mod tests {
             wpt_dest: None,
             wpt_origin: None,
         }
-        .to_sentence("GP");
+        .to_sentence("GP").expect("encode");
         let frame = parse_frame(f.trim()).expect("valid");
         let b = Bod::parse(&frame.fields).expect("parse");
         assert!(b.bear_true.is_none());
@@ -96,7 +96,7 @@ mod tests {
             wpt_dest: Some("DEST".to_string()),
             wpt_origin: Some("START".to_string()),
         };
-        let sentence = original.to_sentence("GP");
+        let sentence = original.to_sentence("GP").expect("encode");
         let frame = parse_frame(sentence.trim()).expect("re-parse");
         let parsed = Bod::parse(&frame.fields).expect("re-parse BOD");
         assert_eq!(original, parsed);

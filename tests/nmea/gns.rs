@@ -10,7 +10,7 @@ fn decode_encode() {
         parse_frame("$GPGNS,111648.00,0235.0379,S,04422.1450,W,ANN,12,0.8,8.5,-22.3,,,S*5D")
             .expect("valid");
     let gns = Gns::parse(&frame.fields).expect("parse");
-    let sentence = gns.to_sentence("GP");
+    let sentence = gns.to_sentence("GP").expect("encode");
     let frame2 = parse_frame(sentence.trim()).expect("re-parse");
     let gns2 = Gns::parse(&frame2.fields).expect("parse");
     assert_eq!(gns, gns2);
@@ -44,7 +44,7 @@ fn gns_values() {
     assert_eq!(gns.dgps_station, None);
     assert_eq!(gns.nav_status, Some('S'));
     // half (b): canonical re-encode — "04422.1450" → "04422.145" (trailing zero dropped)
-    let s = gns.to_sentence("GP");
+    let s = gns.to_sentence("GP").expect("encode");
     let body = s.trim().trim_start_matches('$');
     let body = &body[..body.rfind('*').expect("cksum")];
     assert_eq!(
@@ -70,7 +70,7 @@ fn roundtrip() {
         dgps_station: None,
         nav_status: Some('S'),
     };
-    let sentence = original.to_sentence("GP");
+    let sentence = original.to_sentence("GP").expect("encode");
     let frame = parse_frame(sentence.trim()).expect("re-parse");
     let parsed = Gns::parse(&frame.fields).expect("parse");
     assert_eq!(original, parsed);

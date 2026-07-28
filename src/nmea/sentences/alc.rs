@@ -65,7 +65,7 @@ impl Alc {
 impl NmeaEncodable for Alc {
     const SENTENCE_TYPE: &str = "ALC";
 
-    fn encode(&self) -> Vec<String> {
+    fn encode(&self) -> Result<Vec<String>, crate::EncodeError> {
         let mut w = FieldWriter::new();
         w.u8(self.num_frags);
         w.u8(self.frag_num);
@@ -95,7 +95,7 @@ mod tests {
             entries_num: None,
             entries: vec![],
         }
-        .to_sentence("FB");
+        .to_sentence("FB").expect("encode");
         let f = parse_frame(s.trim()).expect("valid");
         let a = Alc::parse(&f.fields).expect("parse");
         assert!(a.num_frags.is_none());
@@ -116,7 +116,7 @@ mod tests {
                 revision: Some(3),
             }],
         };
-        let sentence = original.to_sentence("FB");
+        let sentence = original.to_sentence("FB").expect("encode");
         let frame = parse_frame(sentence.trim()).expect("re-parse");
         let parsed = Alc::parse(&frame.fields).expect("parse");
         assert_eq!(original, parsed);

@@ -8,7 +8,7 @@ use nmea_kit::{NmeaSentence, parse_frame};
 fn decode_encode() {
     let frame = parse_frame("$GPZDA,172809.456,12,07,1996,00,00*57").expect("valid");
     let zda = Zda::parse(&frame.fields).expect("parse");
-    let sentence = zda.to_sentence("GP");
+    let sentence = zda.to_sentence("GP").expect("encode");
     let frame2 = parse_frame(sentence.trim()).expect("re-parse");
     let zda2 = Zda::parse(&frame2.fields).expect("parse");
     assert_eq!(zda.time, zda2.time);
@@ -45,7 +45,7 @@ fn roundtrip() {
         local_hour_offset: Some(-1),
         local_min_offset: Some(0),
     };
-    let sentence = original.to_sentence("GP");
+    let sentence = original.to_sentence("GP").expect("encode");
     let frame = parse_frame(sentence.trim()).expect("re-parse");
     let parsed = Zda::parse(&frame.fields).expect("parse");
     assert_eq!(original.time, parsed.time);

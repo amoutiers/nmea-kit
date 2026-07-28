@@ -35,7 +35,7 @@ impl Hdg {
 impl NmeaEncodable for Hdg {
     const SENTENCE_TYPE: &str = "HDG";
 
-    fn encode(&self) -> Vec<String> {
+    fn encode(&self) -> Result<Vec<String>, crate::EncodeError> {
         let mut w = FieldWriter::new();
         w.f32(self.heading_mag);
         w.f32(self.deviation);
@@ -102,7 +102,7 @@ mod tests {
             variation: Some(0.6),
             variation_ew: Some('E'),
         };
-        let sentence = hdg.to_sentence("SD");
+        let sentence = hdg.to_sentence("SD").expect("encode");
         let frame = parse_frame(sentence.trim()).expect("re-parse");
         let hdg2 = Hdg::parse(&frame.fields).expect("re-parse HDG");
         assert_eq!(hdg, hdg2);

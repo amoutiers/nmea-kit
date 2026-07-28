@@ -8,7 +8,7 @@ use nmea_kit::{NmeaSentence, parse_frame};
 fn decode_encode() {
     let frame = parse_frame("$GPXTE,A,A,0.67,L,N*6F").expect("valid");
     let xte = Xte::parse(&frame.fields).expect("parse");
-    let sentence = xte.to_sentence("GP");
+    let sentence = xte.to_sentence("GP").expect("encode");
     let frame2 = parse_frame(sentence.trim()).expect("re-parse");
     let xte2 = Xte::parse(&frame2.fields).expect("parse");
     assert_eq!(xte, xte2);
@@ -30,7 +30,7 @@ fn roundtrip() {
         disunit: Some('N'),
         mode: Some('D'),
     };
-    let sentence = original.to_sentence("GP");
+    let sentence = original.to_sentence("GP").expect("encode");
     let frame = parse_frame(sentence.trim()).expect("re-parse");
     let parsed = Xte::parse(&frame.fields).expect("parse");
     assert_eq!(original, parsed);

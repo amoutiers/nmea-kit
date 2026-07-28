@@ -32,7 +32,7 @@ impl Hbt {
 impl NmeaEncodable for Hbt {
     const SENTENCE_TYPE: &str = "HBT";
 
-    fn encode(&self) -> Vec<String> {
+    fn encode(&self) -> Result<Vec<String>, crate::EncodeError> {
         let mut w = FieldWriter::new();
         w.f32(self.interval);
         w.char(self.operation_status);
@@ -53,7 +53,7 @@ mod tests {
             operation_status: None,
             msg_id: None,
         }
-        .to_sentence("HC");
+        .to_sentence("HC").expect("encode");
         let f = parse_frame(s.trim()).expect("valid");
         let h = Hbt::parse(&f.fields).expect("parse");
         assert!(h.interval.is_none());
@@ -68,7 +68,7 @@ mod tests {
             operation_status: Some('A'),
             msg_id: Some(1),
         };
-        let sentence = original.to_sentence("HC");
+        let sentence = original.to_sentence("HC").expect("encode");
         let frame = parse_frame(sentence.trim()).expect("re-parse");
         let parsed = Hbt::parse(&frame.fields).expect("parse");
         assert_eq!(original, parsed);

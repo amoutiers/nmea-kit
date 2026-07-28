@@ -29,7 +29,7 @@ impl Dpt {
 impl NmeaEncodable for Dpt {
     const SENTENCE_TYPE: &str = "DPT";
 
-    fn encode(&self) -> Vec<String> {
+    fn encode(&self) -> Result<Vec<String>, crate::EncodeError> {
         let mut w = FieldWriter::new();
         w.f32(self.depth);
         w.f32(self.offset);
@@ -76,7 +76,7 @@ mod tests {
     #[test]
     fn dpt_encode_exact_fields() {
         let dpt = Dpt { depth: Some(4.1), offset: Some(0.0), rangescale: None };
-        assert_eq!(dpt.encode(), vec!["4.1", "0", ""]);
+        assert_eq!(dpt.encode().expect("encode"), vec!["4.1", "0", ""]);
     }
 
     #[test]
@@ -86,7 +86,7 @@ mod tests {
             offset: Some(1.0),
             rangescale: None,
         };
-        let s = d.to_sentence("II");
+        let s = d.to_sentence("II").expect("encode");
         let f = parse_frame(s.trim()).expect("re-parse DPT frame");
         let d2 = Dpt::parse(&f.fields).expect("re-parse DPT");
         assert_eq!(d, d2);

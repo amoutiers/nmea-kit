@@ -34,7 +34,7 @@ impl Hsc {
 impl NmeaEncodable for Hsc {
     const SENTENCE_TYPE: &str = "HSC";
 
-    fn encode(&self) -> Vec<String> {
+    fn encode(&self) -> Result<Vec<String>, crate::EncodeError> {
         let mut w = FieldWriter::new();
         w.f32(self.cmd_heading_true);
         w.fixed('T');
@@ -60,7 +60,7 @@ mod tests {
             cmd_heading_mag: None,
             status: None,
         }
-        .to_sentence("FT");
+        .to_sentence("FT").expect("encode");
         let frame = parse_frame(f.trim()).expect("valid");
         let h = Hsc::parse(&frame.fields).expect("parse");
         assert!(h.cmd_heading_true.is_none());
@@ -75,7 +75,7 @@ mod tests {
             cmd_heading_mag: Some(39.11),
             status: Some('A'),
         };
-        let sentence = original.to_sentence("FT");
+        let sentence = original.to_sentence("FT").expect("encode");
         let frame = parse_frame(sentence.trim()).expect("re-parse");
         let parsed = Hsc::parse(&frame.fields).expect("re-parse HSC");
         assert_eq!(original, parsed);

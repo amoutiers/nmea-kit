@@ -8,7 +8,7 @@ use nmea_kit::{NmeaSentence, parse_frame};
 fn decode_encode() {
     let frame = parse_frame("$SDXDR,C,23.15,C,WTHI*70").expect("valid");
     let xdr = Xdr::parse(&frame.fields).expect("parse");
-    let sentence = xdr.to_sentence("SD");
+    let sentence = xdr.to_sentence("SD").expect("encode");
     let frame2 = parse_frame(sentence.trim()).expect("re-parse");
     let xdr2 = Xdr::parse(&frame2.fields).expect("parse");
     assert_eq!(xdr, xdr2);
@@ -40,7 +40,7 @@ fn roundtrip() {
             },
         ],
     };
-    let sentence = original.to_sentence("WI");
+    let sentence = original.to_sentence("WI").expect("encode");
     let frame = parse_frame(sentence.trim()).expect("re-parse");
     let parsed = Xdr::parse(&frame.fields).expect("parse");
     assert_eq!(original, parsed);

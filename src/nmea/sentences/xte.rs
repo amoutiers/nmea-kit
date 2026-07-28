@@ -38,7 +38,7 @@ impl Xte {
 impl NmeaEncodable for Xte {
     const SENTENCE_TYPE: &str = "XTE";
 
-    fn encode(&self) -> Vec<String> {
+    fn encode(&self) -> Result<Vec<String>, crate::EncodeError> {
         let mut w = FieldWriter::new();
         w.char(self.gwarn);
         w.char(self.lccwarn);
@@ -65,7 +65,7 @@ mod tests {
             disunit: None,
             mode: None,
         }
-        .to_sentence("GP");
+        .to_sentence("GP").expect("encode");
         let frame = parse_frame(f.trim()).expect("valid");
         let x = Xte::parse(&frame.fields).expect("parse");
         assert!(x.gwarn.is_none());
@@ -83,7 +83,7 @@ mod tests {
             disunit: Some('N'),
             mode: Some('D'),
         };
-        let sentence = original.to_sentence("GP");
+        let sentence = original.to_sentence("GP").expect("encode");
         let frame = parse_frame(sentence.trim()).expect("re-parse");
         let parsed = Xte::parse(&frame.fields).expect("re-parse XTE");
         assert_eq!(original, parsed);

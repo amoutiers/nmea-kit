@@ -23,7 +23,7 @@ impl Hdm {
 impl NmeaEncodable for Hdm {
     const SENTENCE_TYPE: &str = "HDM";
 
-    fn encode(&self) -> Vec<String> {
+    fn encode(&self) -> Result<Vec<String>, crate::EncodeError> {
         let mut w = FieldWriter::new();
         w.f32(self.heading_mag);
         w.fixed('M');
@@ -68,7 +68,7 @@ mod tests {
         let hdm = Hdm {
             heading_mag: Some(186.5),
         };
-        let sentence = hdm.to_sentence("04");
+        let sentence = hdm.to_sentence("04").expect("encode");
         let frame = parse_frame(sentence.trim()).expect("re-parse");
         let hdm2 = Hdm::parse(&frame.fields).expect("re-parse HDM");
         assert_eq!(hdm, hdm2);

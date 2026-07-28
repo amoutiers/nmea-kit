@@ -7,7 +7,7 @@ use nmea_kit::parse_frame;
 fn decode_encode() {
     let frame = parse_frame("$GPBWW,097.0,T,103.2,M,POINTB,POINTA*41").expect("valid");
     let bww = Bww::parse(&frame.fields).expect("parse");
-    let sentence = bww.to_sentence("GP");
+    let sentence = bww.to_sentence("GP").expect("encode");
     let frame2 = parse_frame(sentence.trim()).expect("re-parse");
     let bww2 = Bww::parse(&frame2.fields).expect("parse");
     assert_eq!(bww, bww2);
@@ -23,7 +23,7 @@ fn roundtrip() {
         wpt_dest: Some("POINTB".to_string()),
         wpt_origin: Some("POINTA".to_string()),
     };
-    let sentence = original.to_sentence("GP");
+    let sentence = original.to_sentence("GP").expect("encode");
     let frame = parse_frame(sentence.trim()).expect("re-parse");
     let parsed = Bww::parse(&frame.fields).expect("parse");
     assert_eq!(original, parsed);

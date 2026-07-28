@@ -24,7 +24,7 @@ fn decode_encode() {
     let frame =
         parse_frame("$RAVSD,0,4.5,6,@@@@@@@@@@@@@@@@@@@@,220516,01,02,8,*6E").expect("valid");
     let vsd = Vsd::parse(&frame.fields).expect("parse");
-    let sentence2 = vsd.to_sentence("RA");
+    let sentence2 = vsd.to_sentence("RA").expect("encode");
     assert!(sentence2.starts_with("$RAVSD,"));
     let frame2 = parse_frame(sentence2.trim()).expect("re-parse");
     let vsd2 = Vsd::parse(&frame2.fields).expect("parse");
@@ -51,7 +51,7 @@ fn roundtrip() {
         nav_status: Some(8),
         regional: None,
     };
-    let sentence = original.to_sentence("RA");
+    let sentence = original.to_sentence("RA").expect("encode");
     let frame = parse_frame(sentence.trim()).expect("re-parse");
     let parsed = Vsd::parse(&frame.fields).expect("parse");
     assert_eq!(original, parsed);

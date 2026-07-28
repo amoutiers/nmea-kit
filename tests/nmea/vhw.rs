@@ -8,7 +8,7 @@ use nmea_kit::{NmeaSentence, parse_frame};
 fn decode_encode() {
     let frame = parse_frame("$SDVHW,182.5,T,181.8,M,0.0,N,0.0,K*4C").expect("valid");
     let vhw = Vhw::parse(&frame.fields).expect("parse");
-    let sentence = vhw.to_sentence("SD");
+    let sentence = vhw.to_sentence("SD").expect("encode");
     let frame2 = parse_frame(sentence.trim()).expect("re-parse");
     let vhw2 = Vhw::parse(&frame2.fields).expect("parse");
     assert_eq!(vhw, vhw2);
@@ -28,7 +28,7 @@ fn roundtrip() {
         speed_kts: Some(12.5),
         speed_kmh: Some(23.1),
     };
-    let sentence = original.to_sentence("SD");
+    let sentence = original.to_sentence("SD").expect("encode");
     let frame = parse_frame(sentence.trim()).expect("re-parse");
     let parsed = Vhw::parse(&frame.fields).expect("parse");
     assert_eq!(original, parsed);
@@ -45,7 +45,7 @@ fn vhw_values() {
     assert!((x.speed_kmh.expect("speed_kmh") - 0.0).abs() < 1e-2);
 
     // (b) wire half — 0.0 encodes as "0"
-    let s = x.to_sentence("SD");
+    let s = x.to_sentence("SD").expect("encode");
     let body = s.trim().trim_start_matches('$');
     let body = &body[..body.rfind('*').expect("cksum")];
     assert_eq!(body, "SDVHW,182.5,T,181.8,M,0,N,0,K");

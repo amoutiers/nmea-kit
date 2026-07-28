@@ -38,7 +38,7 @@ impl Zda {
 impl NmeaEncodable for Zda {
     const SENTENCE_TYPE: &str = "ZDA";
 
-    fn encode(&self) -> Vec<String> {
+    fn encode(&self) -> Result<Vec<String>, crate::EncodeError> {
         let mut w = FieldWriter::new();
         w.string(self.time.as_deref());
         w.u8(self.day);
@@ -77,7 +77,7 @@ mod tests {
             local_hour_offset: Some(-1),
             local_min_offset: Some(0),
         };
-        let sentence = zda.to_sentence("GP");
+        let sentence = zda.to_sentence("GP").expect("encode");
         assert!(sentence.starts_with("$GPZDA,"));
         let frame = parse_frame(sentence.trim()).expect("re-parse");
         let zda2 = Zda::parse(&frame.fields).expect("re-parse ZDA");

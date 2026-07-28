@@ -35,7 +35,7 @@ impl Mwv {
 impl NmeaEncodable for Mwv {
     const SENTENCE_TYPE: &str = "MWV";
 
-    fn encode(&self) -> Vec<String> {
+    fn encode(&self) -> Result<Vec<String>, crate::EncodeError> {
         let mut w = FieldWriter::new();
         w.f32(self.wind_angle);
         w.char(self.reference);
@@ -79,7 +79,7 @@ mod tests {
             speed_units: Some('N'),
             status: Some('A'),
         };
-        let sentence = original.to_sentence("II");
+        let sentence = original.to_sentence("II").expect("encode");
         let frame = parse_frame(sentence.trim()).expect("re-parse MWV sentence");
         let parsed = Mwv::parse(&frame.fields).expect("parse MWV from re-encoded frame");
 

@@ -24,7 +24,7 @@ impl Mtw {
 impl NmeaEncodable for Mtw {
     const SENTENCE_TYPE: &str = "MTW";
 
-    fn encode(&self) -> Vec<String> {
+    fn encode(&self) -> Result<Vec<String>, crate::EncodeError> {
         let mut w = FieldWriter::new();
         w.f32(self.temperature);
         w.char(self.units);
@@ -67,7 +67,7 @@ mod tests {
             temperature: Some(15.2),
             units: Some('C'),
         };
-        let sentence = original.to_sentence("YX");
+        let sentence = original.to_sentence("YX").expect("encode");
         let f = parse_frame(sentence.trim()).expect("re-parse MTW frame");
         let parsed = Mtw::parse(&f.fields).expect("parse MTW from re-encoded frame");
         assert_eq!(original, parsed);

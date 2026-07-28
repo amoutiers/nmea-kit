@@ -64,7 +64,7 @@ impl Gsa {
 impl NmeaEncodable for Gsa {
     const SENTENCE_TYPE: &str = "GSA";
 
-    fn encode(&self) -> Vec<String> {
+    fn encode(&self) -> Result<Vec<String>, crate::EncodeError> {
         let mut w = FieldWriter::new();
         w.char(self.mode);
         w.u8(self.fix_type);
@@ -95,7 +95,7 @@ mod tests {
             vdop: None,
             system_id: None,
         }
-        .to_sentence("GP");
+        .to_sentence("GP").expect("encode");
         let frame = parse_frame(f.trim()).expect("valid");
         let g = Gsa::parse(&frame.fields).expect("parse");
         assert!(g.mode.is_none());
@@ -128,7 +128,7 @@ mod tests {
             vdop: Some(2.1),
             system_id: None,
         };
-        let sentence = original.to_sentence("GP");
+        let sentence = original.to_sentence("GP").expect("encode");
         let frame = parse_frame(sentence.trim()).expect("re-parse");
         let parsed = Gsa::parse(&frame.fields).expect("re-parse GSA");
         assert_eq!(original, parsed);
@@ -160,7 +160,7 @@ mod tests {
         let gsa = Gsa::parse(&frame.fields).expect("parse GSA");
         assert_eq!(gsa.system_id, Some('4'));
 
-        let sentence = gsa.to_sentence("GN");
+        let sentence = gsa.to_sentence("GN").expect("encode");
         let frame2 = parse_frame(sentence.trim()).expect("re-parse");
         let gsa2 = Gsa::parse(&frame2.fields).expect("re-parse");
         assert_eq!(gsa2.system_id, Some('4'));

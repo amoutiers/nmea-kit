@@ -8,7 +8,7 @@ use nmea_kit::{NmeaSentence, parse_frame};
 fn decode_encode() {
     let frame = parse_frame("$GPGLL,5958.613,N,02325.928,E,121022,A,D*40").expect("valid");
     let gll = Gll::parse(&frame.fields).expect("parse");
-    let sentence = gll.to_sentence("GP");
+    let sentence = gll.to_sentence("GP").expect("encode");
     let frame2 = parse_frame(sentence.trim()).expect("re-parse");
     let gll2 = Gll::parse(&frame2.fields).expect("parse");
     assert_eq!(gll, gll2);
@@ -32,7 +32,7 @@ fn gll_values() {
     assert_eq!(gll.status, Some('A'));
     assert_eq!(gll.mode, Some('D'));
     // half (b): canonical re-encode — mode always emitted, producing trailing comma if mode=Some
-    let s = gll.to_sentence("GP");
+    let s = gll.to_sentence("GP").expect("encode");
     let body = s.trim().trim_start_matches('$');
     let body = &body[..body.rfind('*').expect("cksum")];
     assert_eq!(body, "GPGLL,5958.613,N,02325.928,E,121022,A,D");
@@ -49,7 +49,7 @@ fn roundtrip() {
         status: Some('A'),
         mode: Some('A'),
     };
-    let sentence = original.to_sentence("GP");
+    let sentence = original.to_sentence("GP").expect("encode");
     let frame = parse_frame(sentence.trim()).expect("re-parse");
     let parsed = Gll::parse(&frame.fields).expect("parse");
     assert_eq!(original, parsed);

@@ -115,9 +115,9 @@ impl Xdr {
     /// Uses a greedy algorithm: fills as many groups as possible into each sentence before
     /// starting the next. A single group is always included per sentence even if its fields
     /// are unusually long. All groups are preserved across the returned sentences.
-    pub fn to_sentences(&self, talker: &str) -> Vec<String> {
+    pub fn to_sentences(&self, talker: &str) -> Result<Vec<String>, crate::EncodeError> {
         if self.groups.is_empty() {
-            return vec![self.to_sentence(talker)];
+            return Ok(vec![self.to_sentence(talker)?]);
         }
 
         let mut sentences = Vec::new();
@@ -129,7 +129,7 @@ impl Xdr {
                 let probe = Xdr {
                     groups: self.groups[start..end + 1].to_vec(),
                 };
-                if probe.to_sentence(talker).len() > 82 {
+                if probe.to_sentence(talker)?.len() > 82 {
                     break;
                 }
                 end += 1;
@@ -138,19 +138,19 @@ impl Xdr {
                 Xdr {
                     groups: self.groups[start..end].to_vec(),
                 }
-                .to_sentence(talker),
+                .to_sentence(talker)?,
             );
             start = end;
         }
 
-        sentences
+        Ok(sentences)
     }
 }
 
 impl NmeaEncodable for Xdr {
     const SENTENCE_TYPE: &str = "XDR";
 
-    fn encode(&self) -> Vec<String> {
+    fn encode(&self) -> Result<Vec<String>, crate::EncodeError> {
         let mut w = FieldWriter::new();
         for g in &self.groups {
             w.char(g.sensor_type);
@@ -182,7 +182,7 @@ mod tests {
     #[test]
     fn xdr_empty() {
         let xdr = Xdr { groups: vec![] };
-        let sentence = xdr.to_sentence("II");
+        let sentence = xdr.to_sentence("II").expect("encode");
         let frame = parse_frame(sentence.trim()).expect("valid");
         let xdr2 = Xdr::parse(&frame.fields).expect("parse");
         assert!(xdr2.groups.is_empty());
@@ -206,7 +206,7 @@ mod tests {
                 },
             ],
         };
-        let sentence = xdr.to_sentence("WI");
+        let sentence = xdr.to_sentence("WI").expect("encode");
         assert!(sentence.starts_with("$WIXDR,"));
         let frame = parse_frame(sentence.trim()).expect("re-parse");
         let xdr2 = Xdr::parse(&frame.fields).expect("re-parse XDR");
@@ -245,7 +245,7 @@ mod tests {
                 name: Some("Baro".to_string()),
             }],
         };
-        let mut fields = xdr.encode();
+        let mut fields = xdr.encode().expect("encode");
         fields.push("C".to_string()); // trailing incomplete field
         let field_refs: Vec<&str> = fields.iter().map(|s| s.as_str()).collect();
         let parsed = Xdr::parse(&field_refs).expect("parse XDR with trailing");
@@ -283,7 +283,7 @@ mod tests {
                 name: Some("Baro".to_string()),
             }],
         };
-        let sentence = xdr.to_sentence("WI");
+        let sentence = xdr.to_sentence("WI").expect("encode");
         let frame = parse_frame(sentence.trim()).expect("re-parse");
         let xdr2 = Xdr::parse(&frame.fields).expect("re-parse XDR");
         assert_eq!(xdr2.groups.len(), 1);
@@ -305,7 +305,7 @@ mod tests {
     #[test]
     fn xdr_to_sentences_empty() {
         let xdr = Xdr { groups: vec![] };
-        let sentences = xdr.to_sentences("II");
+        let sentences = xdr.to_sentences("II").expect("encode");
         assert_eq!(sentences.len(), 1);
         assert!(sentences[0].starts_with("$IIXDR"));
     }
@@ -329,7 +329,7 @@ mod tests {
                 },
             ],
         };
-        let sentences = xdr.to_sentences("WI");
+        let sentences = xdr.to_sentences("WI").expect("encode");
         assert_eq!(sentences.len(), 1);
         assert!(sentences[0].len() <= 82);
     }
@@ -347,7 +347,7 @@ mod tests {
             .collect();
         let total = groups.len();
         let xdr = Xdr { groups };
-        let sentences = xdr.to_sentences("WI");
+        let sentences = xdr.to_sentences("WI").expect("encode");
 
         // Must have produced more than one sentence
         assert!(

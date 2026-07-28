@@ -9,7 +9,7 @@ fn decode_encode() {
     let frame =
         parse_frame("$RATTM,02,1.43,170.5,T,0.16,264.4,T,1.42,36.9,N,,T,,,M*2A").expect("valid");
     let ttm = Ttm::parse(&frame.fields).expect("parse");
-    let sentence = ttm.to_sentence("RA");
+    let sentence = ttm.to_sentence("RA").expect("encode");
     let frame2 = parse_frame(sentence.trim()).expect("re-parse");
     let ttm2 = Ttm::parse(&frame2.fields).expect("parse");
     assert_eq!(ttm, ttm2);
@@ -41,7 +41,7 @@ fn roundtrip() {
         time: None,
         acq_type: Some('M'),
     };
-    let sentence = original.to_sentence("RA");
+    let sentence = original.to_sentence("RA").expect("encode");
     let frame = parse_frame(sentence.trim()).expect("re-parse");
     let parsed = Ttm::parse(&frame.fields).expect("parse");
     assert_eq!(original, parsed);

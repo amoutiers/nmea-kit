@@ -39,7 +39,7 @@ impl Mwd {
 impl NmeaEncodable for Mwd {
     const SENTENCE_TYPE: &str = "MWD";
 
-    fn encode(&self) -> Vec<String> {
+    fn encode(&self) -> Result<Vec<String>, crate::EncodeError> {
         let mut w = FieldWriter::new();
         w.f32(self.wind_dir_true);
         w.fixed('T');
@@ -76,7 +76,7 @@ mod tests {
             wind_speed_kts: Some(10.1),
             wind_speed_ms: None,
         };
-        let fields = mwd.encode();
+        let fields = mwd.encode().expect("encode");
         assert_eq!(fields[0], ""); // empty for None
         assert_eq!(fields[1], "T"); // fixed
         assert_eq!(fields[2], "46"); // mag
@@ -118,7 +118,7 @@ mod tests {
             wind_speed_kts: Some(12.4),
             wind_speed_ms: Some(6.4),
         };
-        assert_eq!(mwd.encode(), vec!["270", "T", "268.5", "M", "12.4", "N", "6.4", "M"]);
+        assert_eq!(mwd.encode().expect("encode"), vec!["270", "T", "268.5", "M", "12.4", "N", "6.4", "M"]);
     }
 
     #[test]
@@ -129,7 +129,7 @@ mod tests {
             wind_speed_kts: Some(12.4),
             wind_speed_ms: Some(6.4),
         };
-        let sentence = mwd.to_sentence("WI");
+        let sentence = mwd.to_sentence("WI").expect("encode");
         let frame = parse_frame(sentence.trim()).expect("re-parse");
         let mwd2 = Mwd::parse(&frame.fields).expect("re-parse MWD");
         assert_eq!(mwd, mwd2);

@@ -59,7 +59,7 @@ impl Gns {
 impl NmeaEncodable for Gns {
     const SENTENCE_TYPE: &str = "GNS";
 
-    fn encode(&self) -> Vec<String> {
+    fn encode(&self) -> Result<Vec<String>, crate::EncodeError> {
         let mut w = FieldWriter::new();
         w.string(self.time.as_deref());
         w.lat(self.lat);
@@ -142,7 +142,7 @@ mod tests {
             dgps_station: None,
             nav_status: Some('S'),
         };
-        let sentence = gns.to_sentence("GP");
+        let sentence = gns.to_sentence("GP").expect("encode");
         let frame = parse_frame(sentence.trim()).expect("re-parse GNS");
         let gns2 = Gns::parse(&frame.fields).expect("parse roundtrip GNS");
         assert_eq!(gns, gns2);

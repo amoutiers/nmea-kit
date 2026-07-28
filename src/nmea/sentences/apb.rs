@@ -65,7 +65,7 @@ impl Apb {
 impl NmeaEncodable for Apb {
     const SENTENCE_TYPE: &str = "APB";
 
-    fn encode(&self) -> Vec<String> {
+    fn encode(&self) -> Result<Vec<String>, crate::EncodeError> {
         let mut w = FieldWriter::new();
         w.char(self.lcgwarn);
         w.char(self.lccwarn);
@@ -110,7 +110,7 @@ mod tests {
             bear_steer_type: None,
             mode: None,
         }
-        .to_sentence("GP");
+        .to_sentence("GP").expect("encode");
         let frame = parse_frame(f.trim()).expect("valid");
         let a = Apb::parse(&frame.fields).expect("parse");
         assert!(a.lcgwarn.is_none());
@@ -137,7 +137,7 @@ mod tests {
             bear_steer_type: Some('M'),
             mode: Some('A'),
         };
-        let sentence = original.to_sentence("GP");
+        let sentence = original.to_sentence("GP").expect("encode");
         let frame = parse_frame(sentence.trim()).expect("re-parse");
         let parsed = Apb::parse(&frame.fields).expect("re-parse APB");
         assert_eq!(original, parsed);

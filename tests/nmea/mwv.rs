@@ -8,7 +8,7 @@ use nmea_kit::{NmeaSentence, parse_frame};
 fn decode_encode() {
     let frame = parse_frame("$IIMWV,336,R,13.41,N,A*22").expect("valid");
     let mwv = Mwv::parse(&frame.fields).expect("parse");
-    let sentence = mwv.to_sentence("II");
+    let sentence = mwv.to_sentence("II").expect("encode");
     let frame2 = parse_frame(sentence.trim()).expect("re-parse");
     let mwv2 = Mwv::parse(&frame2.fields).expect("parse");
     assert_eq!(mwv, mwv2);
@@ -30,7 +30,7 @@ fn mwv_values() {
     assert_eq!(mwv.speed_units, Some('N'));
     assert_eq!(mwv.status, Some('A'));
     // half (b): canonical body equals fixture body (byte-identical)
-    let s = mwv.to_sentence("II");
+    let s = mwv.to_sentence("II").expect("encode");
     let body = s.trim().trim_start_matches('$');
     let body = &body[..body.rfind('*').expect("cksum")];
     assert_eq!(body, "IIMWV,336,R,13.41,N,A");
@@ -45,7 +45,7 @@ fn roundtrip() {
         speed_units: Some('N'),
         status: Some('A'),
     };
-    let sentence = original.to_sentence("II");
+    let sentence = original.to_sentence("II").expect("encode");
     let frame = parse_frame(sentence.trim()).expect("re-parse");
     let parsed = Mwv::parse(&frame.fields).expect("parse");
     assert_eq!(original, parsed);

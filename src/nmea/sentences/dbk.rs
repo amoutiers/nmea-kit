@@ -34,7 +34,7 @@ impl Dbk {
 impl NmeaEncodable for Dbk {
     const SENTENCE_TYPE: &str = "DBK";
 
-    fn encode(&self) -> Vec<String> {
+    fn encode(&self) -> Result<Vec<String>, crate::EncodeError> {
         let mut w = FieldWriter::new();
         w.f32(self.depth_feet);
         w.fixed('f');
@@ -67,7 +67,7 @@ mod tests {
             depth_meters: Some(10.83),
             depth_fathoms: Some(5.85),
         };
-        let sentence = dbk.to_sentence("II");
+        let sentence = dbk.to_sentence("II").expect("encode");
         assert!(sentence.starts_with("$IIDBK,"));
         let frame = parse_frame(sentence.trim()).expect("re-parse");
         let dbk2 = Dbk::parse(&frame.fields).expect("re-parse DBK");

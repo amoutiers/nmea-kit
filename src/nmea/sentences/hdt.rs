@@ -23,7 +23,7 @@ impl Hdt {
 impl NmeaEncodable for Hdt {
     const SENTENCE_TYPE: &str = "HDT";
 
-    fn encode(&self) -> Vec<String> {
+    fn encode(&self) -> Result<Vec<String>, crate::EncodeError> {
         let mut w = FieldWriter::new();
         w.f32(self.heading_true);
         w.fixed('T');
@@ -68,7 +68,7 @@ mod tests {
         let hdt = Hdt {
             heading_true: Some(123.456),
         };
-        let sentence = hdt.to_sentence("GP");
+        let sentence = hdt.to_sentence("GP").expect("encode");
         let frame = parse_frame(sentence.trim()).expect("re-parse");
         let hdt2 = Hdt::parse(&frame.fields).expect("re-parse HDT");
         assert_eq!(hdt, hdt2);

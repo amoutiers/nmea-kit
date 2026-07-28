@@ -22,7 +22,7 @@ impl Ack {
 impl NmeaEncodable for Ack {
     const SENTENCE_TYPE: &str = "ACK";
 
-    fn encode(&self) -> Vec<String> {
+    fn encode(&self) -> Result<Vec<String>, crate::EncodeError> {
         let mut w = FieldWriter::new();
         w.string(self.alert_id.as_deref());
         w.finish()
@@ -36,7 +36,7 @@ mod tests {
 
     #[test]
     fn ack_empty() {
-        let s = Ack { alert_id: None }.to_sentence("VR");
+        let s = Ack { alert_id: None }.to_sentence("VR").expect("encode");
         let f = parse_frame(s.trim()).expect("valid");
         let a = Ack::parse(&f.fields).expect("parse");
         assert!(a.alert_id.is_none());
@@ -47,7 +47,7 @@ mod tests {
         let original = Ack {
             alert_id: Some("001".to_string()),
         };
-        let sentence = original.to_sentence("VR");
+        let sentence = original.to_sentence("VR").expect("encode");
         let frame = parse_frame(sentence.trim()).expect("re-parse");
         let parsed = Ack::parse(&frame.fields).expect("parse");
         assert_eq!(original, parsed);

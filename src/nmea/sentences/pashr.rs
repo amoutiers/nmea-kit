@@ -65,7 +65,7 @@ impl NmeaEncodable for Pashr {
     const SENTENCE_TYPE: &str = "PASHR";
     const PROPRIETARY: bool = true;
 
-    fn encode(&self) -> Vec<String> {
+    fn encode(&self) -> Result<Vec<String>, crate::EncodeError> {
         let mut w = FieldWriter::new();
         w.string(self.time.as_deref());
         w.f32(self.heading);
@@ -101,7 +101,7 @@ mod tests {
             gnss_quality: None,
             imu_alignment: None,
         }
-        .to_sentence("");
+        .to_sentence("").expect("encode");
         let f = parse_frame(s.trim()).expect("valid");
         let p = Pashr::parse(&f.fields).expect("parse");
         assert!(p.time.is_none());
@@ -122,7 +122,7 @@ mod tests {
             gnss_quality: Some(1),
             imu_alignment: Some(0),
         };
-        let sentence = original.to_sentence("");
+        let sentence = original.to_sentence("").expect("encode");
         let frame = parse_frame(sentence.trim()).expect("re-parse");
         let parsed = Pashr::parse(&frame.fields).expect("parse");
         assert_eq!(original, parsed);

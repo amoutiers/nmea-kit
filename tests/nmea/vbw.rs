@@ -7,7 +7,7 @@ use nmea_kit::{NmeaSentence, parse_frame};
 fn decode_encode() {
     let frame = parse_frame("$GPVBW,12.3,0.07,A,11.78,0.12,A*6F").expect("valid");
     let vbw = Vbw::parse(&frame.fields).expect("parse");
-    let sentence = vbw.to_sentence("GP");
+    let sentence = vbw.to_sentence("GP").expect("encode");
     let frame2 = parse_frame(sentence.trim()).expect("re-parse");
     let vbw2 = Vbw::parse(&frame2.fields).expect("parse");
     assert_eq!(vbw, vbw2);
@@ -33,7 +33,7 @@ fn roundtrip() {
         stern_trans_ground_spd: None,
         stern_ground_spd_status: None,
     };
-    let sentence = original.to_sentence("II");
+    let sentence = original.to_sentence("II").expect("encode");
     let frame = parse_frame(sentence.trim()).expect("re-parse");
     let parsed = Vbw::parse(&frame.fields).expect("parse");
     assert_eq!(original, parsed);

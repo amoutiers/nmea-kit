@@ -11,10 +11,10 @@ fn decode_encode() {
         wpt: Some("DEST".to_string()),
         mode: Some('A'),
     };
-    let sentence = wcv.to_sentence("GP");
+    let sentence = wcv.to_sentence("GP").expect("encode");
     let frame = parse_frame(sentence.trim()).expect("valid");
     let wcv2 = Wcv::parse(&frame.fields).expect("parse");
-    let sentence2 = wcv2.to_sentence("GP");
+    let sentence2 = wcv2.to_sentence("GP").expect("encode");
     let frame2 = parse_frame(sentence2.trim()).expect("re-parse");
     let wcv3 = Wcv::parse(&frame2.fields).expect("parse");
     assert_eq!(wcv2, wcv3);
@@ -27,7 +27,7 @@ fn dispatch() {
         wpt: Some("DEST".to_string()),
         mode: Some('A'),
     };
-    let sentence = wcv.to_sentence("GP");
+    let sentence = wcv.to_sentence("GP").expect("encode");
     let frame = parse_frame(sentence.trim()).expect("valid");
     assert!(matches!(NmeaSentence::parse(&frame), NmeaSentence::Wcv(_)));
 }
@@ -39,7 +39,7 @@ fn roundtrip() {
         wpt: Some("DEST".to_string()),
         mode: Some('A'),
     };
-    let sentence = original.to_sentence("GP");
+    let sentence = original.to_sentence("GP").expect("encode");
     let frame = parse_frame(sentence.trim()).expect("re-parse");
     let parsed = Wcv::parse(&frame.fields).expect("parse");
     assert_eq!(original, parsed);
@@ -55,7 +55,7 @@ fn wcv_values() {
     assert_eq!(x.mode, Some('A'));
 
     // (b) wire half
-    let s = x.to_sentence("II");
+    let s = x.to_sentence("II").expect("encode");
     let body = s.trim().trim_start_matches('$');
     let body = &body[..body.rfind('*').expect("cksum")];
     assert_eq!(body, "IIWCV,5.3,N,DEST,A");

@@ -29,7 +29,7 @@ impl Wcv {
 impl NmeaEncodable for Wcv {
     const SENTENCE_TYPE: &str = "WCV";
 
-    fn encode(&self) -> Vec<String> {
+    fn encode(&self) -> Result<Vec<String>, crate::EncodeError> {
         let mut w = FieldWriter::new();
         w.f32(self.vel);
         w.fixed('N');
@@ -51,7 +51,7 @@ mod tests {
             wpt: None,
             mode: None,
         }
-        .to_sentence("GP");
+        .to_sentence("GP").expect("encode");
         let frame = parse_frame(f.trim()).expect("valid");
         let w = Wcv::parse(&frame.fields).expect("parse");
         assert!(w.vel.is_none());
@@ -66,7 +66,7 @@ mod tests {
             wpt: Some("DEST".to_string()),
             mode: Some('A'),
         };
-        let sentence = original.to_sentence("GP");
+        let sentence = original.to_sentence("GP").expect("encode");
         let frame = parse_frame(sentence.trim()).expect("re-parse");
         let parsed = Wcv::parse(&frame.fields).expect("re-parse WCV");
         assert_eq!(original, parsed);
@@ -79,7 +79,7 @@ mod tests {
             wpt: Some("WAYPOINT".to_string()),
             mode: None,
         };
-        let sentence = wcv.to_sentence("GP");
+        let sentence = wcv.to_sentence("GP").expect("encode");
         let frame = parse_frame(sentence.trim()).expect("re-parse");
         let wcv2 = Wcv::parse(&frame.fields).expect("re-parse WCV");
         assert!((wcv2.vel.expect("vel") - 5.3).abs() < 0.01);

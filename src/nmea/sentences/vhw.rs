@@ -40,7 +40,7 @@ impl Vhw {
 impl NmeaEncodable for Vhw {
     const SENTENCE_TYPE: &str = "VHW";
 
-    fn encode(&self) -> Vec<String> {
+    fn encode(&self) -> Result<Vec<String>, crate::EncodeError> {
         let mut w = FieldWriter::new();
         w.f32(self.heading_true);
         w.fixed('T');
@@ -92,7 +92,7 @@ mod tests {
             speed_kts: Some(12.5),
             speed_kmh: Some(23.1),
         };
-        let sentence = original.to_sentence("SD");
+        let sentence = original.to_sentence("SD").expect("encode");
         let frame = parse_frame(sentence.trim()).expect("re-parse VHW sentence");
         let parsed = Vhw::parse(&frame.fields).expect("parse VHW from re-encoded frame");
 

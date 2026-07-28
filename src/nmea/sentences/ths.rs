@@ -27,7 +27,7 @@ impl Ths {
 impl NmeaEncodable for Ths {
     const SENTENCE_TYPE: &str = "THS";
 
-    fn encode(&self) -> Vec<String> {
+    fn encode(&self) -> Result<Vec<String>, crate::EncodeError> {
         let mut w = FieldWriter::new();
         w.f32(self.heading_true);
         w.char(self.mode);
@@ -54,7 +54,7 @@ mod tests {
             heading_true: None,
             mode: None,
         }
-        .to_sentence("GP");
+        .to_sentence("GP").expect("encode");
         let frame = parse_frame(f.trim()).expect("valid");
         let t = Ths::parse(&frame.fields).expect("parse");
         assert!(t.heading_true.is_none());
@@ -67,7 +67,7 @@ mod tests {
             heading_true: Some(77.52),
             mode: Some('E'),
         };
-        let sentence = original.to_sentence("GP");
+        let sentence = original.to_sentence("GP").expect("encode");
         let frame = parse_frame(sentence.trim()).expect("re-parse");
         let parsed = Ths::parse(&frame.fields).expect("re-parse THS");
         assert_eq!(original, parsed);

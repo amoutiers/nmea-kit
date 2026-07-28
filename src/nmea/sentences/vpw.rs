@@ -30,7 +30,7 @@ impl Vpw {
 impl NmeaEncodable for Vpw {
     const SENTENCE_TYPE: &str = "VPW";
 
-    fn encode(&self) -> Vec<String> {
+    fn encode(&self) -> Result<Vec<String>, crate::EncodeError> {
         let mut w = FieldWriter::new();
         w.f32(self.speed_knots);
         w.fixed('N');
@@ -51,7 +51,7 @@ mod tests {
             speed_knots: None,
             speed_ms: None,
         }
-        .to_sentence("II");
+        .to_sentence("II").expect("encode");
         let frame = parse_frame(f.trim()).expect("valid");
         let v = Vpw::parse(&frame.fields).expect("parse");
         assert!(v.speed_knots.is_none());
@@ -64,7 +64,7 @@ mod tests {
             speed_knots: Some(4.5),
             speed_ms: Some(6.7),
         };
-        let sentence = original.to_sentence("II");
+        let sentence = original.to_sentence("II").expect("encode");
         let frame = parse_frame(sentence.trim()).expect("re-parse");
         let parsed = Vpw::parse(&frame.fields).expect("re-parse VPW");
         assert_eq!(original, parsed);

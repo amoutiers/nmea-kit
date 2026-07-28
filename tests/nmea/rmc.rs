@@ -10,7 +10,7 @@ fn decode_encode() {
         parse_frame("$GPRMC,085412.000,A,5222.3198,N,00454.5784,E,0.58,251.34,030414,,,A*65")
             .expect("valid");
     let rmc = Rmc::parse(&frame.fields).expect("parse");
-    let sentence = rmc.to_sentence("GP");
+    let sentence = rmc.to_sentence("GP").expect("encode");
     let frame2 = parse_frame(sentence.trim()).expect("re-parse");
     let rmc2 = Rmc::parse(&frame2.fields).expect("parse");
     assert_eq!(rmc, rmc2);
@@ -44,7 +44,7 @@ fn rmc_values() {
     assert_eq!(rmc.pos_mode, Some('A'));
     assert_eq!(rmc.nav_status, None);
     // half (b): canonical re-encode
-    let s = rmc.to_sentence("GP");
+    let s = rmc.to_sentence("GP").expect("encode");
     let body = s.trim().trim_start_matches('$');
     let body = &body[..body.rfind('*').expect("cksum")];
     assert_eq!(
@@ -70,7 +70,7 @@ fn roundtrip() {
         pos_mode: Some('A'),
         nav_status: None,
     };
-    let sentence = original.to_sentence("GP");
+    let sentence = original.to_sentence("GP").expect("encode");
     let frame = parse_frame(sentence.trim()).expect("re-parse");
     let parsed = Rmc::parse(&frame.fields).expect("parse");
     assert_eq!(original, parsed);

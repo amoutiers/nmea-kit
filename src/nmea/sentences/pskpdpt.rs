@@ -48,7 +48,7 @@ impl NmeaEncodable for Pskpdpt {
     const SENTENCE_TYPE: &str = "PSKPDPT";
     const PROPRIETARY: bool = true;
 
-    fn encode(&self) -> Vec<String> {
+    fn encode(&self) -> Result<Vec<String>, crate::EncodeError> {
         let mut w = FieldWriter::new();
         w.f32(self.depth);
         w.f32(self.offset);
@@ -75,7 +75,7 @@ mod tests {
             channel: None,
             transducer_location: None,
         }
-        .to_sentence("");
+        .to_sentence("").expect("encode");
         let f = parse_frame(s.trim()).expect("valid");
         let p = Pskpdpt::parse(&f.fields).expect("parse");
         assert!(p.depth.is_none());
@@ -92,7 +92,7 @@ mod tests {
             channel: Some(3),
             transducer_location: None,
         };
-        let sentence = original.to_sentence("");
+        let sentence = original.to_sentence("").expect("encode");
         let frame = parse_frame(sentence.trim()).expect("re-parse");
         let parsed = Pskpdpt::parse(&frame.fields).expect("parse");
         assert_eq!(original, parsed);
@@ -141,7 +141,7 @@ mod tests {
             transducer_location: None,
         };
         // to_sentence ignores the talker for proprietary types.
-        let s = p.to_sentence("II");
+        let s = p.to_sentence("II").expect("encode");
         assert!(s.starts_with("$PSKPDPT,"), "got {s}");
         let frame = parse_frame(s.trim()).expect("re-parse");
         assert_eq!(frame.sentence_type, "PSKPDPT");

@@ -63,7 +63,7 @@ impl Bbm {
         ]
     }
 
-    pub fn to_sentence(&self, talker: &str) -> String {
+    pub fn to_sentence(&self, talker: &str) -> Result<String, crate::EncodeError> {
         let fields = self.encode();
         let field_refs: Vec<&str> = fields.iter().map(|s| s.as_str()).collect();
         crate::encode_frame('!', talker, Self::SENTENCE_TYPE, &field_refs)
@@ -86,7 +86,8 @@ mod tests {
             payload: None,
             fill_bits: None,
         }
-        .to_sentence("AI");
+        .to_sentence("AI")
+        .expect("encode");
         let f = parse_frame(s.trim()).expect("valid");
         let b = Bbm::parse(&f.fields).expect("parse");
         assert!(b.num_frags.is_none());
@@ -105,7 +106,7 @@ mod tests {
             payload: Some("test".to_string()),
             fill_bits: Some(0),
         };
-        let sentence = original.to_sentence("AI");
+        let sentence = original.to_sentence("AI").expect("encode");
         let frame = parse_frame(sentence.trim()).expect("re-parse");
         let parsed = Bbm::parse(&frame.fields).expect("parse");
         assert_eq!(original, parsed);

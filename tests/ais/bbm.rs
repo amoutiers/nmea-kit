@@ -20,7 +20,7 @@ fn bbm_values() {
 fn decode_encode() {
     let frame = parse_frame("!AIBBM,26,2,1,3,8,H77nSfPh4U=<E`H4U8G;:222220,2*6C").expect("valid");
     let bbm = Bbm::parse(&frame.fields).expect("parse");
-    let sentence2 = bbm.to_sentence("AI");
+    let sentence2 = bbm.to_sentence("AI").expect("encode");
     assert!(sentence2.starts_with("!AIBBM,"));
     let frame2 = parse_frame(sentence2.trim()).expect("re-parse");
     let bbm2 = Bbm::parse(&frame2.fields).expect("parse");
@@ -44,7 +44,7 @@ fn roundtrip() {
         payload: Some("testpayload".to_string()),
         fill_bits: Some(0),
     };
-    let sentence = original.to_sentence("AI");
+    let sentence = original.to_sentence("AI").expect("encode");
     let frame = parse_frame(sentence.trim()).expect("re-parse");
     let parsed = Bbm::parse(&frame.fields).expect("parse");
     assert_eq!(original, parsed);

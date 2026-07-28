@@ -9,7 +9,7 @@ fn decode_encode() {
     let frame = parse_frame("$GPBWC,220516,5130.02,N,00046.34,W,213.8,T,218.0,M,0004.6,N,EGLM*21")
         .expect("valid");
     let bwc = Bwc::parse(&frame.fields).expect("parse");
-    let sentence = bwc.to_sentence("GP");
+    let sentence = bwc.to_sentence("GP").expect("encode");
     let frame2 = parse_frame(sentence.trim()).expect("re-parse");
     let bwc2 = Bwc::parse(&frame2.fields).expect("parse");
     assert_eq!(bwc, bwc2);
@@ -36,7 +36,7 @@ fn roundtrip() {
         wpt: Some("004".to_string()),
         mode: Some('A'),
     };
-    let sentence = original.to_sentence("GP");
+    let sentence = original.to_sentence("GP").expect("encode");
     let frame = parse_frame(sentence.trim()).expect("re-parse");
     let parsed = Bwc::parse(&frame.fields).expect("parse");
     assert_eq!(original, parsed);
@@ -59,7 +59,7 @@ fn bwc_values() {
     assert_eq!(x.wpt.as_deref(), Some("EGLM"));
     assert!(x.mode.is_none());
     // (b) wire half
-    let s = x.to_sentence("GP");
+    let s = x.to_sentence("GP").expect("encode");
     let body = s.trim().trim_start_matches('$');
     let body = &body[..body.rfind('*').expect("cksum")];
     assert_eq!(

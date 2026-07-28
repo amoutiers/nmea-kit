@@ -63,7 +63,7 @@ impl Bwc {
 impl NmeaEncodable for Bwc {
     const SENTENCE_TYPE: &str = "BWC";
 
-    fn encode(&self) -> Vec<String> {
+    fn encode(&self) -> Result<Vec<String>, crate::EncodeError> {
         let mut w = FieldWriter::new();
         w.string(self.time.as_deref());
         w.lat(self.lat);
@@ -101,7 +101,7 @@ mod tests {
             wpt: None,
             mode: None,
         }
-        .to_sentence("GP");
+        .to_sentence("GP").expect("encode");
         let frame = parse_frame(f.trim()).expect("valid");
         let b = Bwc::parse(&frame.fields).expect("parse");
         assert!(b.time.is_none());
@@ -123,7 +123,7 @@ mod tests {
             wpt: Some("004".to_string()),
             mode: Some('A'),
         };
-        let sentence = original.to_sentence("GP");
+        let sentence = original.to_sentence("GP").expect("encode");
         let frame = parse_frame(sentence.trim()).expect("re-parse");
         let parsed = Bwc::parse(&frame.fields).expect("re-parse BWC");
         assert_eq!(original, parsed);
@@ -168,7 +168,7 @@ mod tests {
         let bwc = Bwc::parse(&frame.fields).expect("parse BWC");
         let lon = bwc.lon.expect("lon");
         assert!((lon - 46.34678).abs() < 1e-9, "f64 precision lost: {lon}");
-        let sentence = bwc.to_sentence("GP");
+        let sentence = bwc.to_sentence("GP").expect("encode");
         assert!(sentence.contains(",00046.34678,"), "leading zero lost: {sentence}");
     }
 }

@@ -7,7 +7,7 @@ use nmea_kit::{NmeaSentence, parse_frame};
 fn decode_encode() {
     let frame = parse_frame("$PGRME,3.3,M,4.9,M,6.0,M*25").expect("valid");
     let pgrme = Pgrme::parse(&frame.fields).expect("parse");
-    let sentence = pgrme.to_sentence("");
+    let sentence = pgrme.to_sentence("").expect("encode");
     let frame2 = parse_frame(sentence.trim()).expect("re-parse");
     let pgrme2 = Pgrme::parse(&frame2.fields).expect("parse");
     assert_eq!(pgrme, pgrme2);
@@ -29,7 +29,7 @@ fn roundtrip() {
         vertical: Some(4.9),
         spherical: Some(6.0),
     };
-    let sentence = original.to_sentence("");
+    let sentence = original.to_sentence("").expect("encode");
     let frame = parse_frame(sentence.trim()).expect("re-parse");
     let parsed = Pgrme::parse(&frame.fields).expect("parse");
     assert_eq!(original, parsed);
@@ -46,7 +46,7 @@ fn pgrme_values() {
 
     // (b) wire half — proprietary: to_sentence("") body starts with PGRME,
     // normalization: 6.0→6 via format!("{}", v)
-    let s = x.to_sentence("");
+    let s = x.to_sentence("").expect("encode");
     let body = s.trim().trim_start_matches('$');
     let body = &body[..body.rfind('*').expect("cksum")];
     assert_eq!(body, "PGRME,3.3,M,4.9,M,6,M");

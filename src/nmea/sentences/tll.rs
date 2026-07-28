@@ -56,7 +56,7 @@ impl Tll {
 impl NmeaEncodable for Tll {
     const SENTENCE_TYPE: &str = "TLL";
 
-    fn encode(&self) -> Vec<String> {
+    fn encode(&self) -> Result<Vec<String>, crate::EncodeError> {
         let mut w = FieldWriter::new();
         w.u8(self.target_num);
         w.lat(self.lat);
@@ -89,7 +89,7 @@ mod tests {
             status: None,
             ref_target: None,
         }
-        .to_sentence("RA");
+        .to_sentence("RA").expect("encode");
         let f = parse_frame(s.trim()).expect("valid");
         let t = Tll::parse(&f.fields).expect("parse");
         assert!(t.target_num.is_none());
@@ -109,7 +109,7 @@ mod tests {
             status: Some('T'),
             ref_target: None,
         };
-        let sentence = original.to_sentence("RA");
+        let sentence = original.to_sentence("RA").expect("encode");
         let frame = parse_frame(sentence.trim()).expect("re-parse");
         let parsed = Tll::parse(&frame.fields).expect("parse");
         assert_eq!(original, parsed);

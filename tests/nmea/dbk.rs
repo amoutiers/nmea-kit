@@ -8,7 +8,7 @@ use nmea_kit::{NmeaSentence, parse_frame};
 fn decode_encode() {
     let frame = parse_frame("$SDDBK,12.3,f,3.7,M,2.0,F*2F").expect("valid");
     let dbk = Dbk::parse(&frame.fields).expect("parse");
-    let sentence = dbk.to_sentence("SD");
+    let sentence = dbk.to_sentence("SD").expect("encode");
     let frame2 = parse_frame(sentence.trim()).expect("re-parse");
     let dbk2 = Dbk::parse(&frame2.fields).expect("parse");
     assert_eq!(dbk, dbk2);
@@ -27,7 +27,7 @@ fn roundtrip() {
         depth_meters: Some(10.83),
         depth_fathoms: Some(5.85),
     };
-    let sentence = original.to_sentence("II");
+    let sentence = original.to_sentence("II").expect("encode");
     let frame = parse_frame(sentence.trim()).expect("re-parse");
     let parsed = Dbk::parse(&frame.fields).expect("parse");
     assert_eq!(original, parsed);
@@ -42,7 +42,7 @@ fn dbk_values() {
     assert!((x.depth_meters.expect("depth_meters") - 3.7).abs() < 1e-2);
     assert!((x.depth_fathoms.expect("depth_fathoms") - 2.0).abs() < 1e-2);
     // (b) wire half
-    let s = x.to_sentence("SD");
+    let s = x.to_sentence("SD").expect("encode");
     let body = s.trim().trim_start_matches('$');
     let body = &body[..body.rfind('*').expect("cksum")];
     assert_eq!(body, "SDDBK,12.3,f,3.7,M,2,F");

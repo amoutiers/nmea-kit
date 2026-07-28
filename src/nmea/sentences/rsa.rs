@@ -32,7 +32,7 @@ impl Rsa {
 impl NmeaEncodable for Rsa {
     const SENTENCE_TYPE: &str = "RSA";
 
-    fn encode(&self) -> Vec<String> {
+    fn encode(&self) -> Result<Vec<String>, crate::EncodeError> {
         let mut w = FieldWriter::new();
         w.f32(self.starboard_angle);
         w.char(self.starboard_status);
@@ -65,7 +65,7 @@ mod tests {
             port_angle: None,
             port_status: None,
         }
-        .to_sentence("II");
+        .to_sentence("II").expect("encode");
         let frame = parse_frame(f.trim()).expect("valid");
         let r = Rsa::parse(&frame.fields).expect("parse");
         assert!(r.starboard_angle.is_none());
@@ -82,7 +82,7 @@ mod tests {
             port_angle: Some(-5.2),
             port_status: Some('A'),
         };
-        let sentence = original.to_sentence("II");
+        let sentence = original.to_sentence("II").expect("encode");
         let frame = parse_frame(sentence.trim()).expect("re-parse");
         let parsed = Rsa::parse(&frame.fields).expect("re-parse RSA");
         assert_eq!(original, parsed);

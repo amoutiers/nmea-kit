@@ -44,7 +44,7 @@ impl Gbs {
 impl NmeaEncodable for Gbs {
     const SENTENCE_TYPE: &str = "GBS";
 
-    fn encode(&self) -> Vec<String> {
+    fn encode(&self) -> Result<Vec<String>, crate::EncodeError> {
         let mut w = FieldWriter::new();
         w.string(self.time.as_deref());
         w.f32(self.err_lat);
@@ -135,7 +135,7 @@ mod tests {
             bias: Some(1.1),
             stddev: Some(0.8),
         };
-        let sentence = gbs.to_sentence("GP");
+        let sentence = gbs.to_sentence("GP").expect("encode");
         assert!(sentence.starts_with("$GPGBS,"));
         let frame = parse_frame(sentence.trim()).expect("re-parse");
         let gbs2 = Gbs::parse(&frame.fields).expect("re-parse GBS");

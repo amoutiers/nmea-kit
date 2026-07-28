@@ -44,7 +44,7 @@ impl Vtg {
 impl NmeaEncodable for Vtg {
     const SENTENCE_TYPE: &str = "VTG";
 
-    fn encode(&self) -> Vec<String> {
+    fn encode(&self) -> Result<Vec<String>, crate::EncodeError> {
         let mut w = FieldWriter::new();
         w.f32(self.course_true);
         w.fixed('T');
@@ -100,7 +100,7 @@ mod tests {
             speed_kmh: Some(9.26),
             mode: Some('A'),
         };
-        let s = v.to_sentence("GP");
+        let s = v.to_sentence("GP").expect("encode");
         let f = parse_frame(s.trim()).expect("re-parse VTG frame");
         let v2 = Vtg::parse(&f.fields).expect("re-parse VTG");
         assert_eq!(v, v2);

@@ -75,7 +75,7 @@ impl Gsv {
 impl NmeaEncodable for Gsv {
     const SENTENCE_TYPE: &str = "GSV";
 
-    fn encode(&self) -> Vec<String> {
+    fn encode(&self) -> Result<Vec<String>, crate::EncodeError> {
         let mut w = FieldWriter::new();
         w.u8(self.total_msgs);
         w.u8(self.msg_num);
@@ -107,7 +107,7 @@ mod tests {
             sats: vec![],
             signal_id: None,
         }
-        .to_sentence("GP");
+        .to_sentence("GP").expect("encode");
         let frame = parse_frame(f.trim()).expect("valid");
         let g = Gsv::parse(&frame.fields).expect("parse");
         assert!(g.total_msgs.is_none());
@@ -150,7 +150,7 @@ mod tests {
             ],
             signal_id: None,
         };
-        let sentence = original.to_sentence("GP");
+        let sentence = original.to_sentence("GP").expect("encode");
         let frame = parse_frame(sentence.trim()).expect("re-parse");
         let parsed = Gsv::parse(&frame.fields).expect("re-parse GSV");
         assert_eq!(original, parsed);
@@ -184,7 +184,7 @@ mod tests {
         assert_eq!(gsv.signal_id, Some('B'));
 
         // Round-trip must preserve the 'B' field.
-        let sentence = gsv.to_sentence("GB");
+        let sentence = gsv.to_sentence("GB").expect("encode");
         let frame2 = parse_frame(sentence.trim()).expect("re-parse");
         let gsv2 = Gsv::parse(&frame2.fields).expect("re-parse GSV");
         assert_eq!(gsv2.signal_id, Some('B'));

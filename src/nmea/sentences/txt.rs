@@ -38,7 +38,7 @@ impl Txt {
 impl NmeaEncodable for Txt {
     const SENTENCE_TYPE: &str = "TXT";
 
-    fn encode(&self) -> Vec<String> {
+    fn encode(&self) -> Result<Vec<String>, crate::EncodeError> {
         let mut w = FieldWriter::new();
         w.u8(self.num_msg);
         w.u8(self.msg_num);
@@ -61,7 +61,7 @@ mod tests {
             msg_type: None,
             text: None,
         }
-        .to_sentence("GP");
+        .to_sentence("GP").expect("encode");
         let frame = parse_frame(f.trim()).expect("valid");
         let t = Txt::parse(&frame.fields).expect("parse");
         assert!(t.num_msg.is_none());
@@ -78,7 +78,7 @@ mod tests {
             msg_type: Some(2),
             text: Some("u-blox ag - www.u-blox.com".to_string()),
         };
-        let sentence = original.to_sentence("GP");
+        let sentence = original.to_sentence("GP").expect("encode");
         let frame = parse_frame(sentence.trim()).expect("re-parse");
         let parsed = Txt::parse(&frame.fields).expect("re-parse TXT");
         assert_eq!(original, parsed);

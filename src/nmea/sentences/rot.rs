@@ -26,7 +26,7 @@ impl Rot {
 impl NmeaEncodable for Rot {
     const SENTENCE_TYPE: &str = "ROT";
 
-    fn encode(&self) -> Vec<String> {
+    fn encode(&self) -> Result<Vec<String>, crate::EncodeError> {
         let mut w = FieldWriter::new();
         w.f32(self.rate_of_turn);
         w.char(self.valid);
@@ -53,7 +53,7 @@ mod tests {
             rate_of_turn: Some(35.6),
             valid: Some('A'),
         };
-        let sentence = rot.to_sentence("GP");
+        let sentence = rot.to_sentence("GP").expect("encode");
         assert!(sentence.starts_with("$GPROT,"));
         let frame = parse_frame(sentence.trim()).expect("re-parse");
         let rot2 = Rot::parse(&frame.fields).expect("re-parse ROT");

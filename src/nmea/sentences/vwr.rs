@@ -43,7 +43,7 @@ impl Vwr {
 impl NmeaEncodable for Vwr {
     const SENTENCE_TYPE: &str = "VWR";
 
-    fn encode(&self) -> Vec<String> {
+    fn encode(&self) -> Result<Vec<String>, crate::EncodeError> {
         let mut w = FieldWriter::new();
         w.f32(self.angle);
         w.char(self.angle_lr);
@@ -71,7 +71,7 @@ mod tests {
             speed_ms: None,
             speed_kmh: None,
         }
-        .to_sentence("II");
+        .to_sentence("II").expect("encode");
         let frame = parse_frame(f.trim()).expect("valid");
         let v = Vwr::parse(&frame.fields).expect("parse");
         assert!(v.angle.is_none());
@@ -88,7 +88,7 @@ mod tests {
             speed_ms: Some(0.51),
             speed_kmh: Some(1.85),
         };
-        let sentence = original.to_sentence("II");
+        let sentence = original.to_sentence("II").expect("encode");
         let frame = parse_frame(sentence.trim()).expect("re-parse");
         let parsed = Vwr::parse(&frame.fields).expect("re-parse VWR");
         assert_eq!(original, parsed);

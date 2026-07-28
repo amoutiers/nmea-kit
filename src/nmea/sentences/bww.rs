@@ -44,7 +44,7 @@ impl Bww {
 impl NmeaEncodable for Bww {
     const SENTENCE_TYPE: &str = "BWW";
 
-    fn encode(&self) -> Vec<String> {
+    fn encode(&self) -> Result<Vec<String>, crate::EncodeError> {
         let mut w = FieldWriter::new();
         w.f32(self.bear_true);
         w.char(self.bear_true_type);
@@ -71,7 +71,7 @@ mod tests {
             wpt_dest: None,
             wpt_origin: None,
         }
-        .to_sentence("GP");
+        .to_sentence("GP").expect("encode");
         let f = parse_frame(s.trim()).expect("valid");
         let b = Bww::parse(&f.fields).expect("parse");
         assert!(b.bear_true.is_none());
@@ -88,7 +88,7 @@ mod tests {
             wpt_dest: Some("POINTB".to_string()),
             wpt_origin: Some("POINTA".to_string()),
         };
-        let sentence = original.to_sentence("GP");
+        let sentence = original.to_sentence("GP").expect("encode");
         let frame = parse_frame(sentence.trim()).expect("re-parse");
         let parsed = Bww::parse(&frame.fields).expect("parse");
         assert_eq!(original, parsed);

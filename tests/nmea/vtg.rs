@@ -8,7 +8,7 @@ use nmea_kit::{NmeaSentence, parse_frame};
 fn decode_encode() {
     let frame = parse_frame("$GPVTG,0.0,T,359.3,M,0.0,N,0.0,K,A*2F").expect("valid");
     let vtg = Vtg::parse(&frame.fields).expect("parse");
-    let sentence = vtg.to_sentence("GP");
+    let sentence = vtg.to_sentence("GP").expect("encode");
     let frame2 = parse_frame(sentence.trim()).expect("re-parse");
     let vtg2 = Vtg::parse(&frame2.fields).expect("parse");
     assert_eq!(vtg, vtg2);
@@ -30,7 +30,7 @@ fn vtg_values() {
     assert!((vtg.speed_kmh.expect("speed_kmh") - 0.0).abs() < 1e-4);
     assert_eq!(vtg.mode, Some('A'));
     // half (b): canonical re-encode — "0.0" → "0" for all zero f32 values
-    let s = vtg.to_sentence("GP");
+    let s = vtg.to_sentence("GP").expect("encode");
     let body = s.trim().trim_start_matches('$');
     let body = &body[..body.rfind('*').expect("cksum")];
     assert_eq!(body, "GPVTG,0,T,359.3,M,0,N,0,K,A");
@@ -45,7 +45,7 @@ fn roundtrip() {
         speed_kmh: Some(9.26),
         mode: Some('A'),
     };
-    let sentence = original.to_sentence("GP");
+    let sentence = original.to_sentence("GP").expect("encode");
     let frame = parse_frame(sentence.trim()).expect("re-parse");
     let parsed = Vtg::parse(&frame.fields).expect("parse");
     assert_eq!(original, parsed);

@@ -7,7 +7,7 @@ use nmea_kit::parse_frame;
 fn decode_encode() {
     let frame = parse_frame("$HCHBT,1.5,A,1*23").expect("valid");
     let hbt = Hbt::parse(&frame.fields).expect("parse");
-    let sentence = hbt.to_sentence("HC");
+    let sentence = hbt.to_sentence("HC").expect("encode");
     let frame2 = parse_frame(sentence.trim()).expect("re-parse");
     let hbt2 = Hbt::parse(&frame2.fields).expect("parse");
     assert_eq!(hbt, hbt2);
@@ -20,7 +20,7 @@ fn roundtrip() {
         operation_status: Some('A'),
         msg_id: Some(1),
     };
-    let sentence = original.to_sentence("HC");
+    let sentence = original.to_sentence("HC").expect("encode");
     let frame = parse_frame(sentence.trim()).expect("re-parse");
     let parsed = Hbt::parse(&frame.fields).expect("parse");
     assert_eq!(original, parsed);

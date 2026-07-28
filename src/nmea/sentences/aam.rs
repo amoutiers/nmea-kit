@@ -35,7 +35,7 @@ impl Aam {
 impl NmeaEncodable for Aam {
     const SENTENCE_TYPE: &str = "AAM";
 
-    fn encode(&self) -> Vec<String> {
+    fn encode(&self) -> Result<Vec<String>, crate::EncodeError> {
         let mut w = FieldWriter::new();
         w.char(self.arrce);
         w.char(self.perp);
@@ -60,7 +60,7 @@ mod tests {
             cunit: None,
             wpt: None,
         }
-        .to_sentence("GP");
+        .to_sentence("GP").expect("encode");
         let frame = parse_frame(f.trim()).expect("valid");
         let a = Aam::parse(&frame.fields).expect("parse");
         assert!(a.arrce.is_none());
@@ -79,7 +79,7 @@ mod tests {
             cunit: Some('N'),
             wpt: Some("DEST".to_string()),
         };
-        let sentence = original.to_sentence("GP");
+        let sentence = original.to_sentence("GP").expect("encode");
         let frame = parse_frame(sentence.trim()).expect("re-parse");
         let parsed = Aam::parse(&frame.fields).expect("re-parse AAM");
         assert_eq!(original, parsed);

@@ -42,7 +42,7 @@ impl Arc {
 impl NmeaEncodable for Arc {
     const SENTENCE_TYPE: &str = "ARC";
 
-    fn encode(&self) -> Vec<String> {
+    fn encode(&self) -> Result<Vec<String>, crate::EncodeError> {
         let mut w = FieldWriter::new();
         w.string(self.time.as_deref());
         w.string(self.manufacturer.as_deref());
@@ -67,7 +67,7 @@ mod tests {
             instance: None,
             command: None,
         }
-        .to_sentence("RA");
+        .to_sentence("RA").expect("encode");
         let f = parse_frame(s.trim()).expect("valid");
         let a = Arc::parse(&f.fields).expect("parse");
         assert!(a.time.is_none());
@@ -83,7 +83,7 @@ mod tests {
             instance: Some(1),
             command: Some('A'),
         };
-        let sentence = original.to_sentence("RA");
+        let sentence = original.to_sentence("RA").expect("encode");
         let frame = parse_frame(sentence.trim()).expect("re-parse");
         let parsed = Arc::parse(&frame.fields).expect("parse");
         assert_eq!(original, parsed);

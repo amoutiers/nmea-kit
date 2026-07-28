@@ -8,7 +8,7 @@ use nmea_kit::{NmeaSentence, parse_frame};
 fn decode_encode() {
     let frame = parse_frame("$SDHDG,181.9,,,0.6,E*32").expect("valid");
     let hdg = Hdg::parse(&frame.fields).expect("parse");
-    let sentence = hdg.to_sentence("SD");
+    let sentence = hdg.to_sentence("SD").expect("encode");
     let frame2 = parse_frame(sentence.trim()).expect("re-parse");
     let hdg2 = Hdg::parse(&frame2.fields).expect("parse");
     assert_eq!(hdg, hdg2);
@@ -30,7 +30,7 @@ fn hdg_values() {
     assert!((hdg.variation.expect("variation") - 0.6).abs() < 1e-4);
     assert_eq!(hdg.variation_ew, Some('E'));
     // half (b): canonical body equals fixture body (byte-identical)
-    let s = hdg.to_sentence("SD");
+    let s = hdg.to_sentence("SD").expect("encode");
     let body = s.trim().trim_start_matches('$');
     let body = &body[..body.rfind('*').expect("cksum")];
     assert_eq!(body, "SDHDG,181.9,,,0.6,E");
@@ -45,7 +45,7 @@ fn roundtrip() {
         variation: Some(0.6),
         variation_ew: Some('E'),
     };
-    let sentence = original.to_sentence("SD");
+    let sentence = original.to_sentence("SD").expect("encode");
     let frame = parse_frame(sentence.trim()).expect("re-parse");
     let parsed = Hdg::parse(&frame.fields).expect("parse");
     assert_eq!(original, parsed);

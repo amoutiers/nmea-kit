@@ -44,7 +44,7 @@ impl Vlw {
 impl NmeaEncodable for Vlw {
     const SENTENCE_TYPE: &str = "VLW";
 
-    fn encode(&self) -> Vec<String> {
+    fn encode(&self) -> Result<Vec<String>, crate::EncodeError> {
         let mut w = FieldWriter::new();
         w.f32(self.total_water_dist);
         w.char(self.total_water_dist_unit);
@@ -75,7 +75,7 @@ mod tests {
             ground_dist: None,
             ground_dist_unit: None,
         }
-        .to_sentence("II");
+        .to_sentence("II").expect("encode");
         let frame = parse_frame(f.trim()).expect("valid");
         let v = Vlw::parse(&frame.fields).expect("parse");
         assert!(v.total_water_dist.is_none());
@@ -96,7 +96,7 @@ mod tests {
             ground_dist: None,
             ground_dist_unit: None,
         };
-        let sentence = original.to_sentence("II");
+        let sentence = original.to_sentence("II").expect("encode");
         let frame = parse_frame(sentence.trim()).expect("re-parse");
         let parsed = Vlw::parse(&frame.fields).expect("re-parse VLW");
         assert_eq!(original, parsed);

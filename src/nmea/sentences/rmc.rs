@@ -59,7 +59,7 @@ impl Rmc {
 impl NmeaEncodable for Rmc {
     const SENTENCE_TYPE: &str = "RMC";
 
-    fn encode(&self) -> Vec<String> {
+    fn encode(&self) -> Result<Vec<String>, crate::EncodeError> {
         let mut w = FieldWriter::new();
         w.string(self.time.as_deref());
         w.char(self.status);
@@ -150,7 +150,7 @@ mod tests {
         let rmc = Rmc::parse(&frame.fields).expect("parse RMC");
         assert_eq!(rmc.nav_status, Some('V'));
 
-        let sentence = rmc.to_sentence("GN");
+        let sentence = rmc.to_sentence("GN").expect("encode");
         let frame2 = parse_frame(sentence.trim()).expect("re-parse");
         let rmc2 = Rmc::parse(&frame2.fields).expect("re-parse");
         assert_eq!(rmc2.nav_status, Some('V'));
@@ -173,7 +173,7 @@ mod tests {
             pos_mode: Some('A'),
             nav_status: None,
         };
-        let sentence = rmc.to_sentence("GP");
+        let sentence = rmc.to_sentence("GP").expect("encode");
         let frame = parse_frame(sentence.trim()).expect("re-parse RMC");
         let rmc2 = Rmc::parse(&frame.fields).expect("parse roundtrip RMC");
         assert_eq!(rmc, rmc2);

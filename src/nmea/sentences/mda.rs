@@ -80,7 +80,7 @@ impl Mda {
 impl NmeaEncodable for Mda {
     const SENTENCE_TYPE: &str = "MDA";
 
-    fn encode(&self) -> Vec<String> {
+    fn encode(&self) -> Result<Vec<String>, crate::EncodeError> {
         let mut w = FieldWriter::new();
         w.f32(self.baro_inches);
         w.char(self.baro_inches_unit);
@@ -135,7 +135,7 @@ mod tests {
             wind_speed_ms: None,
             wind_speed_ms_unit: None,
         }
-        .to_sentence("WI");
+        .to_sentence("WI").expect("encode");
         let frame = parse_frame(f.trim()).expect("valid");
         let m = Mda::parse(&frame.fields).expect("parse");
         assert!(m.baro_inches.is_none());
@@ -167,7 +167,7 @@ mod tests {
             wind_speed_ms: Some(6.2),
             wind_speed_ms_unit: Some('M'),
         };
-        let sentence = original.to_sentence("WI");
+        let sentence = original.to_sentence("WI").expect("encode");
         let frame = parse_frame(sentence.trim()).expect("re-parse");
         let parsed = Mda::parse(&frame.fields).expect("re-parse MDA");
         assert_eq!(original, parsed);

@@ -44,7 +44,7 @@ impl Dtm {
 impl NmeaEncodable for Dtm {
     const SENTENCE_TYPE: &str = "DTM";
 
-    fn encode(&self) -> Vec<String> {
+    fn encode(&self) -> Result<Vec<String>, crate::EncodeError> {
         let mut w = FieldWriter::new();
         w.string(self.datum.as_deref());
         w.string(self.sub_datum.as_deref());
@@ -75,7 +75,7 @@ mod tests {
             alt_offset: None,
             ref_datum: None,
         }
-        .to_sentence("GP");
+        .to_sentence("GP").expect("encode");
         let frame = parse_frame(f.trim()).expect("valid");
         let d = Dtm::parse(&frame.fields).expect("parse");
         assert!(d.datum.is_none());
@@ -94,7 +94,7 @@ mod tests {
             alt_offset: Some(0.0),
             ref_datum: Some("W84".to_string()),
         };
-        let sentence = original.to_sentence("GP");
+        let sentence = original.to_sentence("GP").expect("encode");
         let frame = parse_frame(sentence.trim()).expect("re-parse");
         let parsed = Dtm::parse(&frame.fields).expect("re-parse DTM");
         assert_eq!(original, parsed);

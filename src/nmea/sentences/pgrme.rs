@@ -39,7 +39,7 @@ impl NmeaEncodable for Pgrme {
     const SENTENCE_TYPE: &str = "PGRME";
     const PROPRIETARY: bool = true;
 
-    fn encode(&self) -> Vec<String> {
+    fn encode(&self) -> Result<Vec<String>, crate::EncodeError> {
         let mut w = FieldWriter::new();
         w.f32(self.horizontal);
         w.fixed('M');
@@ -63,7 +63,7 @@ mod tests {
             vertical: None,
             spherical: None,
         }
-        .to_sentence("");
+        .to_sentence("").expect("encode");
         let f = parse_frame(s.trim()).expect("valid");
         let p = Pgrme::parse(&f.fields).expect("parse");
         assert!(p.horizontal.is_none());
@@ -78,7 +78,7 @@ mod tests {
             vertical: Some(4.9),
             spherical: Some(6.0),
         };
-        let sentence = original.to_sentence("");
+        let sentence = original.to_sentence("").expect("encode");
         let frame = parse_frame(sentence.trim()).expect("re-parse");
         let parsed = Pgrme::parse(&frame.fields).expect("parse");
         assert_eq!(original, parsed);

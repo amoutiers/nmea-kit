@@ -147,21 +147,45 @@ pub fn parse_frame(line: &str) -> Result<NmeaFrame<'_>, FrameError> {
 
 /// Encode fields into a valid NMEA 0183 sentence string.
 ///
-/// Computes XOR checksum and appends `*XX\r\n`.
+/// Computes the XOR checksum and appends `*XX\r\n`.
 ///
-/// Fields must not contain the `,` or `*` delimiters (except free-text such as TXT,
-/// which is inherently ambiguous on the wire); `encode_frame` does not escape them.
+/// Returns an [`EncodeError`](crate::EncodeError) when the prefix is not `$`/`!`,
+/// the talker or sentence type is not ASCII, the sentence type is empty, or a field
+/// contains `,`, `*`, `\r`, `\n`, or a non-ASCII character.
 ///
 /// # Examples
 ///
 /// ```
 /// use nmea_kit::encode_frame;
 ///
-/// let sentence = encode_frame('$', "WI", "MWD", &["270.0", "T", "268.5", "M", "12.4", "N", "6.4", "M"]);
+/// let sentence = encode_frame('$', "WI", "MWD", &["270.0", "T", "268.5", "M", "12.4", "N", "6.4", "M"]).expect("valid");
 /// assert!(sentence.starts_with("$WIMWD,"));
 /// assert!(sentence.ends_with("\r\n"));
 /// ```
-pub fn encode_frame(prefix: char, talker: &str, sentence_type: &str, fields: &[&str]) -> String {
+pub fn encode_frame(
+    prefix: char,
+    talker: &str,
+    sentence_type: &str,
+    fields: &[&str],
+) -> Result<String, crate::EncodeError> {
+    if prefix != '$' && prefix != '!' {
+        return Err(crate::EncodeError::InvalidPrefix(prefix));
+    }
+    if !talker.is_ascii() || !sentence_type.is_ascii() {
+        return Err(crate::EncodeError::NonAsciiAddress);
+    }
+    if sentence_type.is_empty() {
+        return Err(crate::EncodeError::InvalidAddress);
+    }
+    for field in fields {
+        if let Some(c) = field
+            .chars()
+            .find(|&c| !c.is_ascii() || matches!(c, ',' | '*' | '\r' | '\n'))
+        {
+            return Err(crate::EncodeError::InvalidFieldCharacter(c));
+        }
+    }
+
     let body = if fields.is_empty() {
         format!("{talker}{sentence_type}")
     } else {
@@ -169,7 +193,7 @@ pub fn encode_frame(prefix: char, talker: &str, sentence_type: &str, fields: &[&
     };
 
     let checksum = body.bytes().fold(0u8, |acc, b| acc ^ b);
-    format!("{prefix}{body}*{checksum:02X}\r\n")
+    Ok(format!("{prefix}{body}*{checksum:02X}\r\n"))
 }
 
 /// Strip an optional IEC 61162-450 tag block from the beginning of the line.
@@ -244,7 +268,7 @@ mod tests {
 
     #[test]
     fn encode_no_fields() {
-        let result = encode_frame('$', "GP", "RMC", &[]);
+        let result = encode_frame('$', "GP", "RMC", &[]).expect("encode");
         assert!(result.starts_with("$GPRMC*"));
     }
 
@@ -255,7 +279,8 @@ mod tests {
             "WI",
             "MWD",
             &["270.0", "T", "268.5", "M", "12.4", "N", "6.4", "M"],
-        );
+        )
+        .expect("encode");
         assert!(result.starts_with("$WIMWD,270.0,T,268.5,M,12.4,N,6.4,M*"));
         assert!(result.ends_with("\r\n"));
         // Verify checksum is valid by re-parsing
@@ -270,10 +295,60 @@ mod tests {
             "GP",
             "APB",
             &["", "", "", "", "", "", "", "", "", "", "", "", "", ""],
-        );
+        )
+        .expect("encode");
         let frame = parse_frame(result.trim()).expect("should re-parse");
         assert_eq!(frame.sentence_type, "APB");
         assert!(frame.fields.iter().all(|f| f.is_empty()));
+    }
+
+    #[test]
+    fn encode_frame_rejects_invalid_prefix() {
+        assert_eq!(
+            encode_frame('X', "GP", "RMC", &[]),
+            Err(crate::EncodeError::InvalidPrefix('X'))
+        );
+    }
+
+    #[test]
+    fn encode_frame_rejects_non_ascii_address() {
+        assert_eq!(
+            encode_frame('$', "G\u{e9}", "RMC", &["1"]),
+            Err(crate::EncodeError::NonAsciiAddress)
+        );
+    }
+
+    #[test]
+    fn encode_frame_rejects_empty_sentence_type() {
+        assert_eq!(
+            encode_frame('$', "GP", "", &[]),
+            Err(crate::EncodeError::InvalidAddress)
+        );
+    }
+
+    #[test]
+    fn encode_frame_rejects_bad_field_characters() {
+        assert_eq!(
+            encode_frame('$', "GP", "TXT", &["a,b"]),
+            Err(crate::EncodeError::InvalidFieldCharacter(','))
+        );
+        assert_eq!(
+            encode_frame('$', "GP", "TXT", &["a\rb"]),
+            Err(crate::EncodeError::InvalidFieldCharacter('\r'))
+        );
+        assert!(matches!(
+            encode_frame('$', "GP", "TXT", &["\u{b0}"]),
+            Err(crate::EncodeError::InvalidFieldCharacter(_))
+        ));
+    }
+
+    #[test]
+    fn encode_frame_roundtrips_valid_input() {
+        let s = encode_frame('$', "WI", "MWD", &["270.0", "T"]).expect("encode");
+        let frame = parse_frame(s.trim()).expect("re-parse");
+        assert_eq!(frame.talker, "WI");
+        assert_eq!(frame.sentence_type, "MWD");
+        assert_eq!(frame.fields, vec!["270.0", "T"]);
     }
 
     #[test]
@@ -471,7 +546,8 @@ mod tests {
             frame1.talker,
             frame1.sentence_type,
             &frame1.fields,
-        );
+        )
+        .expect("encode");
         let frame2 = parse_frame(encoded.trim()).expect("parse re-encoded");
         assert_eq!(frame1.talker, frame2.talker);
         assert_eq!(frame1.sentence_type, frame2.sentence_type);

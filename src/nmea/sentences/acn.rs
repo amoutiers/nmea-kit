@@ -44,7 +44,7 @@ impl Acn {
 impl NmeaEncodable for Acn {
     const SENTENCE_TYPE: &str = "ACN";
 
-    fn encode(&self) -> Vec<String> {
+    fn encode(&self) -> Result<Vec<String>, crate::EncodeError> {
         let mut w = FieldWriter::new();
         w.string(self.time.as_deref());
         w.string(self.manufacturer.as_deref());
@@ -71,7 +71,7 @@ mod tests {
             command: None,
             state: None,
         }
-        .to_sentence("RA");
+        .to_sentence("RA").expect("encode");
         let f = parse_frame(s.trim()).expect("valid");
         let a = Acn::parse(&f.fields).expect("parse");
         assert!(a.time.is_none());
@@ -88,7 +88,7 @@ mod tests {
             command: Some('A'),
             state: Some('C'),
         };
-        let sentence = original.to_sentence("RA");
+        let sentence = original.to_sentence("RA").expect("encode");
         let frame = parse_frame(sentence.trim()).expect("re-parse");
         let parsed = Acn::parse(&frame.fields).expect("parse");
         assert_eq!(original, parsed);

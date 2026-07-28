@@ -3,6 +3,8 @@
 //! [`FieldReader`] reads fields sequentially from a parsed frame.
 //! [`FieldWriter`] builds fields sequentially for encoding.
 
+use crate::EncodeError;
+
 /// Sequential field reader for NMEA sentence parsing.
 ///
 /// Wraps a slice of `&str` fields and reads them in order,
@@ -153,6 +155,7 @@ impl<'a> FieldReader<'a> {
 /// Builds a `Vec<String>` of field values in wire order.
 pub(crate) struct FieldWriter {
     fields: Vec<String>,
+    error: Option<EncodeError>,
 }
 
 // Shared logic for f32/f64 writers: non-finite → empty, -0.0 → "0".
@@ -177,7 +180,10 @@ macro_rules! push_optional_float {
 )]
 impl FieldWriter {
     pub(crate) fn new() -> Self {
-        Self { fields: Vec::new() }
+        Self {
+            fields: Vec::new(),
+            error: None,
+        }
     }
 
     /// Write an optional f32. `None` → empty field. Non-finite → empty field. `-0.0` → `"0"`.
@@ -263,19 +269,30 @@ impl FieldWriter {
     }
 
     /// Format a coordinate by zero-padding the integer part to `int_width` digits and
-    /// keeping the fractional part as the shortest `f64` representation. Assumes a
-    /// non-negative magnitude — the N/S·E/W sign lives in a separate indicator field.
+    /// keeping the fractional part as the shortest `f64` representation. The value must
+    /// be a non-negative magnitude — the N/S·E/W sign lives in a separate indicator
+    /// field. Non-finite or negative values record `EncodeError::InvalidCoordinate`
+    /// (surfaced by `finish()`) and emit an empty field. `-0.0` is normalized to `0.0`.
     fn push_coord(&mut self, value: Option<f64>, int_width: usize) {
-        self.fields.push(match value {
-            Some(v) => {
-                debug_assert!(v >= 0.0, "coordinate magnitude must be non-negative; sign belongs in the N/S·E/W field");
-                let s = format!("{v}");
-                match s.split_once('.') {
-                    Some((int, frac)) => format!("{int:0>int_width$}.{frac}"),
-                    None => format!("{s:0>int_width$}.0"),
+        let v = match value {
+            Some(v) if v.is_finite() && v >= 0.0 => v,
+            Some(_) => {
+                if self.error.is_none() {
+                    self.error = Some(EncodeError::InvalidCoordinate);
                 }
+                self.fields.push(String::new());
+                return;
             }
-            None => String::new(),
+            None => {
+                self.fields.push(String::new());
+                return;
+            }
+        };
+        let v = if v == 0.0 { 0.0 } else { v }; // normalize -0.0
+        let s = format!("{v}");
+        self.fields.push(match s.split_once('.') {
+            Some((int, frac)) => format!("{int:0>int_width$}.{frac}"),
+            None => format!("{s:0>int_width$}.0"),
         });
     }
 
@@ -284,14 +301,34 @@ impl FieldWriter {
         self.fields.push(c.to_string());
     }
 
-    /// Write an optional string. `None` → empty field.
+    /// Write an optional string. `None` → empty field. A value containing `,`, `*`,
+    /// `\r`, `\n`, or a non-ASCII character records `EncodeError::InvalidFieldCharacter`
+    /// (surfaced by `finish()`) and emits an empty field.
     pub(crate) fn string(&mut self, value: Option<&str>) {
-        self.fields.push(value.unwrap_or("").to_string());
+        match value {
+            Some(s) => {
+                if let Some(c) = s
+                    .chars()
+                    .find(|&c| !c.is_ascii() || matches!(c, ',' | '*' | '\r' | '\n'))
+                {
+                    if self.error.is_none() {
+                        self.error = Some(EncodeError::InvalidFieldCharacter(c));
+                    }
+                    self.fields.push(String::new());
+                } else {
+                    self.fields.push(s.to_string());
+                }
+            }
+            None => self.fields.push(String::new()),
+        }
     }
 
-    /// Consume and return the built field list.
-    pub(crate) fn finish(self) -> Vec<String> {
-        self.fields
+    /// Consume and return the built field list, or the first recorded encode error.
+    pub(crate) fn finish(self) -> Result<Vec<String>, EncodeError> {
+        match self.error {
+            Some(e) => Err(e),
+            None => Ok(self.fields),
+        }
     }
 }
 
@@ -315,7 +352,7 @@ impl Default for FieldWriter {
 ///     use nmea_kit::nmea::{NmeaEncodable, sentences::Dpt};
 ///
 ///     let dpt = Dpt { depth: Some(4.1), offset: Some(0.0), rangescale: None };
-///     let sentence = dpt.to_sentence("II");
+///     let sentence = dpt.to_sentence("II").expect("encode");
 ///     assert!(sentence.starts_with("$IIDPT,"));
 /// }
 /// ```
@@ -335,15 +372,15 @@ pub trait NmeaEncodable {
     const PROPRIETARY: bool = false;
 
     /// Encode fields into a `Vec` of strings in wire order.
-    fn encode(&self) -> Vec<String>;
+    fn encode(&self) -> Result<Vec<String>, EncodeError>;
 
     /// Encode into a complete NMEA 0183 sentence with checksum and `\r\n`.
     ///
     /// For standard sentences the `talker` is prepended to `SENTENCE_TYPE`. For
     /// proprietary sentences (`PROPRIETARY == true`) the `talker` is ignored — a
     /// proprietary address carries no talker — and `SENTENCE_TYPE` is the full address.
-    fn to_sentence(&self, talker: &str) -> String {
-        let fields = self.encode();
+    fn to_sentence(&self, talker: &str) -> Result<String, EncodeError> {
+        let fields = self.encode()?;
         let field_refs: Vec<&str> = fields.iter().map(|s| s.as_str()).collect();
         let talker = if Self::PROPRIETARY { "" } else { talker };
         crate::encode_frame('$', talker, Self::SENTENCE_TYPE, &field_refs)
@@ -445,7 +482,7 @@ mod tests {
         w.fixed('T');
         w.f32(None);
         w.fixed('M');
-        let fields = w.finish();
+        let fields = w.finish().expect("encode");
         assert_eq!(fields, vec!["270", "T", "", "M"]);
     }
 
@@ -483,7 +520,7 @@ mod tests {
         w.f32(Some(f32::NAN));        // -> "" (not "NaN")
         w.f64(Some(f64::INFINITY));   // -> "" (not "inf")
         w.f64(Some(-0.0));            // -> "0" (not "-0")
-        assert_eq!(w.finish(), vec!["", "", "0"]);
+        assert_eq!(w.finish().expect("encode"), vec!["", "", "0"]);
     }
 
     #[test]
@@ -504,7 +541,7 @@ mod tests {
         w.lon(Some(1131.0));     // 011°31'      → no fractional part
         w.lat(Some(4807.038));   // already 4 digits, unchanged
         w.lat(None);             // empty field
-        let fields = w.finish();
+        let fields = w.finish().expect("encode");
         assert_eq!(fields, vec!["00454.5784", "0837.038", "01131.0", "4807.038", ""]);
     }
 
@@ -515,6 +552,49 @@ mod tests {
         w.lon(Some(0.0));       // meridian → "00000.0"
         w.lat(Some(1131.0));    // 11°31.0' → "1131.0"
         w.lon(Some(1131.0));    // → "01131.0"
-        assert_eq!(w.finish(), vec!["0000.0", "00000.0", "1131.0", "01131.0"]);
+        assert_eq!(
+            w.finish().expect("encode"),
+            vec!["0000.0", "00000.0", "1131.0", "01131.0"]
+        );
+    }
+
+    #[test]
+    fn writer_coord_rejects_nan_and_negative() {
+        let mut w = FieldWriter::new();
+        w.lat(Some(f64::NAN));
+        assert_eq!(w.finish(), Err(EncodeError::InvalidCoordinate));
+
+        let mut w = FieldWriter::new();
+        w.lon(Some(f64::INFINITY));
+        assert_eq!(w.finish(), Err(EncodeError::InvalidCoordinate));
+
+        let mut w = FieldWriter::new();
+        w.lat(Some(-4807.038));
+        assert_eq!(w.finish(), Err(EncodeError::InvalidCoordinate));
+    }
+
+    #[test]
+    fn writer_coord_normalizes_neg_zero() {
+        let mut w = FieldWriter::new();
+        w.lat(Some(-0.0));
+        assert_eq!(w.finish().expect("encode"), vec!["0000.0"]);
+    }
+
+    #[test]
+    fn writer_string_rejects_delimiters() {
+        let mut w = FieldWriter::new();
+        w.string(Some("a,b"));
+        assert_eq!(w.finish(), Err(EncodeError::InvalidFieldCharacter(',')));
+
+        let mut w = FieldWriter::new();
+        w.string(Some("line\r\nbreak"));
+        assert_eq!(w.finish(), Err(EncodeError::InvalidFieldCharacter('\r')));
+
+        let mut w = FieldWriter::new();
+        w.string(Some("caf\u{e9}")); // non-ASCII
+        assert!(matches!(
+            w.finish(),
+            Err(EncodeError::InvalidFieldCharacter(_))
+        ));
     }
 }

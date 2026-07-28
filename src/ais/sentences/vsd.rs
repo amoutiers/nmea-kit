@@ -70,7 +70,7 @@ impl Vsd {
         ]
     }
 
-    pub fn to_sentence(&self, talker: &str) -> String {
+    pub fn to_sentence(&self, talker: &str) -> Result<String, crate::EncodeError> {
         let fields = self.encode();
         let field_refs: Vec<&str> = fields.iter().map(|s| s.as_str()).collect();
         crate::encode_frame('$', talker, Self::SENTENCE_TYPE, &field_refs)
@@ -95,7 +95,8 @@ mod tests {
             nav_status: None,
             regional: None,
         }
-        .to_sentence("RA");
+        .to_sentence("RA")
+        .expect("encode");
         let f = parse_frame(s.trim()).expect("valid");
         let v = Vsd::parse(&f.fields).expect("parse");
         assert!(v.type_of_ship.is_none());
@@ -115,7 +116,7 @@ mod tests {
             nav_status: Some(8),
             regional: None,
         };
-        let sentence = original.to_sentence("RA");
+        let sentence = original.to_sentence("RA").expect("encode");
         let frame = parse_frame(sentence.trim()).expect("re-parse");
         let parsed = Vsd::parse(&frame.fields).expect("parse");
         assert_eq!(original, parsed);

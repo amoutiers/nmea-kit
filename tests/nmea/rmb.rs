@@ -10,7 +10,7 @@ fn decode_encode() {
         parse_frame("$ECRMB,A,0.000,L,001,002,4653.550,N,07115.984,W,2.505,334.205,0.000,V*04")
             .expect("valid");
     let rmb = Rmb::parse(&frame.fields).expect("parse");
-    let sentence = rmb.to_sentence("EC");
+    let sentence = rmb.to_sentence("EC").expect("encode");
     let frame2 = parse_frame(sentence.trim()).expect("re-parse");
     let rmb2 = Rmb::parse(&frame2.fields).expect("parse");
     assert_eq!(rmb, rmb2);
@@ -42,7 +42,7 @@ fn roundtrip() {
         arrstatus: Some('V'),
         valstatus: Some('A'),
     };
-    let sentence = original.to_sentence("EC");
+    let sentence = original.to_sentence("EC").expect("encode");
     let frame = parse_frame(sentence.trim()).expect("re-parse");
     let parsed = Rmb::parse(&frame.fields).expect("parse");
     assert_eq!(original, parsed);

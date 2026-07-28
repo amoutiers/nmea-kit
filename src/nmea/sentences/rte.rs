@@ -43,7 +43,7 @@ impl Rte {
 impl NmeaEncodable for Rte {
     const SENTENCE_TYPE: &str = "RTE";
 
-    fn encode(&self) -> Vec<String> {
+    fn encode(&self) -> Result<Vec<String>, crate::EncodeError> {
         let mut w = FieldWriter::new();
         w.u8(self.num_sentences);
         w.u8(self.sentence_num);
@@ -70,7 +70,7 @@ mod tests {
             name: None,
             idents: vec![],
         }
-        .to_sentence("II");
+        .to_sentence("II").expect("encode");
         let f = parse_frame(s.trim()).expect("valid");
         let r = Rte::parse(&f.fields).expect("parse");
         assert!(r.num_sentences.is_none());
@@ -93,7 +93,7 @@ mod tests {
                 "415".to_string(),
             ],
         };
-        let sentence = original.to_sentence("II");
+        let sentence = original.to_sentence("II").expect("encode");
         let frame = parse_frame(sentence.trim()).expect("re-parse");
         let parsed = Rte::parse(&frame.fields).expect("parse");
         assert_eq!(original, parsed);

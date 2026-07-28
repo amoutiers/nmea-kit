@@ -10,7 +10,7 @@ fn decode_encode() {
         parse_frame("$WIMDA,,I,+0.985,B,+03.1,C,+5.6,C,40.0,3.0,+3.4,C,90.0,T,85.0,M,10.0,N,,M*1A")
             .expect("valid");
     let mda = Mda::parse(&frame.fields).expect("parse");
-    let sentence = mda.to_sentence("WI");
+    let sentence = mda.to_sentence("WI").expect("encode");
     let frame2 = parse_frame(sentence.trim()).expect("re-parse");
     let mda2 = Mda::parse(&frame2.fields).expect("parse");
     assert_eq!(mda, mda2);
@@ -48,7 +48,7 @@ fn roundtrip() {
         wind_speed_ms: Some(6.2),
         wind_speed_ms_unit: Some('M'),
     };
-    let sentence = original.to_sentence("WI");
+    let sentence = original.to_sentence("WI").expect("encode");
     let frame = parse_frame(sentence.trim()).expect("re-parse");
     let parsed = Mda::parse(&frame.fields).expect("parse");
     assert_eq!(original, parsed);

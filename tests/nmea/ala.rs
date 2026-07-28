@@ -39,7 +39,7 @@ fn roundtrip() {
         ack_state: Some('V'),
         message: Some("Test alarm".into()),
     };
-    let sentence = original.to_sentence("FR");
+    let sentence = original.to_sentence("FR").expect("encode");
     let frame = parse_frame(sentence.trim()).expect("re-parse");
     assert_eq!(Ala::parse(&frame.fields).expect("parse"), original);
 }

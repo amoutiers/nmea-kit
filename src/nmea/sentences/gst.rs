@@ -44,7 +44,7 @@ impl Gst {
 impl NmeaEncodable for Gst {
     const SENTENCE_TYPE: &str = "GST";
 
-    fn encode(&self) -> Vec<String> {
+    fn encode(&self) -> Result<Vec<String>, crate::EncodeError> {
         let mut w = FieldWriter::new();
         w.string(self.time.as_deref());
         w.f32(self.range_rms);
@@ -118,7 +118,7 @@ mod tests {
             std_lon: Some(0.49),
             std_alt: Some(1.1),
         };
-        let sentence = gst.to_sentence("GP");
+        let sentence = gst.to_sentence("GP").expect("encode");
         assert!(sentence.starts_with("$GPGST,"));
         let frame = parse_frame(sentence.trim()).expect("re-parse");
         let gst2 = Gst::parse(&frame.fields).expect("re-parse GST");

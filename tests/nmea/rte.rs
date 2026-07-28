@@ -8,7 +8,7 @@ use nmea_kit::{NmeaSentence, parse_frame};
 fn decode_encode() {
     let frame = parse_frame("$IIRTE,4,1,c,Rte 1,411,412,413,414,415*6F").expect("valid");
     let rte = Rte::parse(&frame.fields).expect("parse");
-    let sentence = rte.to_sentence("II");
+    let sentence = rte.to_sentence("II").expect("encode");
     let frame2 = parse_frame(sentence.trim()).expect("re-parse");
     let rte2 = Rte::parse(&frame2.fields).expect("parse");
     assert_eq!(rte, rte2);
@@ -35,7 +35,7 @@ fn roundtrip() {
             "415".to_string(),
         ],
     };
-    let sentence = original.to_sentence("II");
+    let sentence = original.to_sentence("II").expect("encode");
     let frame = parse_frame(sentence.trim()).expect("re-parse");
     let parsed = Rte::parse(&frame.fields).expect("parse");
     assert_eq!(original, parsed);

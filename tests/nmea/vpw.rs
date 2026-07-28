@@ -8,7 +8,7 @@ use nmea_kit::{NmeaSentence, parse_frame};
 fn decode_encode() {
     let frame = parse_frame("$IIVPW,4.5,N,6.7,M*52").expect("valid");
     let vpw = Vpw::parse(&frame.fields).expect("parse");
-    let sentence = vpw.to_sentence("II");
+    let sentence = vpw.to_sentence("II").expect("encode");
     let frame2 = parse_frame(sentence.trim()).expect("re-parse");
     let vpw2 = Vpw::parse(&frame2.fields).expect("parse");
     assert_eq!(vpw, vpw2);
@@ -26,7 +26,7 @@ fn roundtrip() {
         speed_knots: Some(4.5),
         speed_ms: Some(6.7),
     };
-    let sentence = original.to_sentence("II");
+    let sentence = original.to_sentence("II").expect("encode");
     let frame = parse_frame(sentence.trim()).expect("re-parse");
     let parsed = Vpw::parse(&frame.fields).expect("parse");
     assert_eq!(original, parsed);
@@ -42,7 +42,7 @@ fn vpw_values() {
     assert!((x.speed_ms.expect("speed_ms") - 6.7).abs() < 1e-4);
 
     // (b) wire half — fixed 'N'/'M' indicators always emitted
-    let s = x.to_sentence("II");
+    let s = x.to_sentence("II").expect("encode");
     let body = s.trim().trim_start_matches('$');
     let body = &body[..body.rfind('*').expect("cksum")];
     assert_eq!(body, "IIVPW,4.5,N,6.7,M");

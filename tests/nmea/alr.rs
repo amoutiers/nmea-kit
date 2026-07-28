@@ -19,7 +19,7 @@ fn alr_values() {
 fn decode_encode() {
     let frame = parse_frame("$RAALR,220516,001,A,A,Bilge pump alarm1*4C").expect("valid");
     let alr = Alr::parse(&frame.fields).expect("parse");
-    let sentence = alr.to_sentence("RA");
+    let sentence = alr.to_sentence("RA").expect("encode");
     let frame2 = parse_frame(sentence.trim()).expect("re-parse");
     let alr2 = Alr::parse(&frame2.fields).expect("parse");
     assert_eq!(alr, alr2);
@@ -40,7 +40,7 @@ fn roundtrip() {
         state: Some('A'),
         description: Some("Bilge pump alarm1".to_string()),
     };
-    let sentence = original.to_sentence("RA");
+    let sentence = original.to_sentence("RA").expect("encode");
     let frame = parse_frame(sentence.trim()).expect("re-parse");
     let parsed = Alr::parse(&frame.fields).expect("parse");
     assert_eq!(original, parsed);

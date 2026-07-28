@@ -72,7 +72,7 @@ impl Rsd {
 impl NmeaEncodable for Rsd {
     const SENTENCE_TYPE: &str = "RSD";
 
-    fn encode(&self) -> Vec<String> {
+    fn encode(&self) -> Result<Vec<String>, crate::EncodeError> {
         let mut w = FieldWriter::new();
         w.f32(self.origin1_range);
         w.f32(self.origin1_bearing);
@@ -113,7 +113,7 @@ mod tests {
             range_unit: None,
             display_rotation: None,
         }
-        .to_sentence("RA");
+        .to_sentence("RA").expect("encode");
         let f = parse_frame(s.trim()).expect("valid");
         let r = Rsd::parse(&f.fields).expect("parse");
         assert!(r.origin1_range.is_none());
@@ -137,7 +137,7 @@ mod tests {
             range_unit: Some('N'),
             display_rotation: Some('H'),
         };
-        let sentence = original.to_sentence("RA");
+        let sentence = original.to_sentence("RA").expect("encode");
         let frame = parse_frame(sentence.trim()).expect("re-parse");
         let parsed = Rsd::parse(&frame.fields).expect("parse");
         assert_eq!(original, parsed);

@@ -59,7 +59,7 @@ impl Bec {
 impl NmeaEncodable for Bec {
     const SENTENCE_TYPE: &str = "BEC";
 
-    fn encode(&self) -> Vec<String> {
+    fn encode(&self) -> Result<Vec<String>, crate::EncodeError> {
         let mut w = FieldWriter::new();
         w.string(self.time.as_deref());
         w.lat(self.lat);
@@ -95,7 +95,7 @@ mod tests {
             dist: None,
             wpt: None,
         }
-        .to_sentence("GP");
+        .to_sentence("GP").expect("encode");
         let f = parse_frame(s.trim()).expect("valid");
         let b = Bec::parse(&f.fields).expect("parse");
         assert!(b.time.is_none());
@@ -115,7 +115,7 @@ mod tests {
             dist: Some(4.6),
             wpt: Some("EGLM".to_string()),
         };
-        let sentence = original.to_sentence("GP");
+        let sentence = original.to_sentence("GP").expect("encode");
         let frame = parse_frame(sentence.trim()).expect("re-parse");
         let parsed = Bec::parse(&frame.fields).expect("parse");
         assert_eq!(original, parsed);

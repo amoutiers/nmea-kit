@@ -48,7 +48,7 @@ impl Vbw {
 impl NmeaEncodable for Vbw {
     const SENTENCE_TYPE: &str = "VBW";
 
-    fn encode(&self) -> Vec<String> {
+    fn encode(&self) -> Result<Vec<String>, crate::EncodeError> {
         let mut w = FieldWriter::new();
         w.f32(self.long_water_spd);
         w.f32(self.trans_water_spd);
@@ -128,7 +128,7 @@ mod tests {
             stern_trans_ground_spd: None,
             stern_ground_spd_status: None,
         };
-        let sentence = original.to_sentence("II");
+        let sentence = original.to_sentence("II").expect("encode");
         let f = parse_frame(sentence.trim()).expect("re-parse VBW frame");
         let parsed = Vbw::parse(&f.fields).expect("parse VBW from re-encoded frame");
         assert_eq!(original, parsed);

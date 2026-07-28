@@ -8,7 +8,7 @@ use nmea_kit::{NmeaSentence, parse_frame};
 fn decode_encode() {
     let frame = parse_frame("$GPGSA,A,3,04,05,,09,12,,,24,,,,,2.5,1.3,2.1*39").expect("valid");
     let gsa = Gsa::parse(&frame.fields).expect("parse");
-    let sentence = gsa.to_sentence("GP");
+    let sentence = gsa.to_sentence("GP").expect("encode");
     let frame2 = parse_frame(sentence.trim()).expect("re-parse");
     let gsa2 = Gsa::parse(&frame2.fields).expect("parse");
     assert_eq!(gsa, gsa2);
@@ -44,7 +44,7 @@ fn roundtrip() {
         vdop: Some(2.1),
         system_id: None,
     };
-    let sentence = original.to_sentence("GP");
+    let sentence = original.to_sentence("GP").expect("encode");
     let frame = parse_frame(sentence.trim()).expect("re-parse");
     let parsed = Gsa::parse(&frame.fields).expect("parse");
     assert_eq!(original, parsed);

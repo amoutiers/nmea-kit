@@ -13,7 +13,7 @@ fn dispatch() {
 fn decode_encode() {
     let frame = parse_frame("$IIWPL,5503.4530,N,01037.2742,E,411*6F").expect("valid");
     let wpl = Wpl::parse(&frame.fields).expect("parse");
-    let sentence = wpl.to_sentence("II");
+    let sentence = wpl.to_sentence("II").expect("encode");
     let frame2 = parse_frame(sentence.trim()).expect("re-parse");
     let wpl2 = Wpl::parse(&frame2.fields).expect("parse");
     assert_eq!(wpl, wpl2);
@@ -28,7 +28,7 @@ fn roundtrip() {
         ew: Some('E'),
         ident: Some("411".to_string()),
     };
-    let sentence = original.to_sentence("II");
+    let sentence = original.to_sentence("II").expect("encode");
     let frame = parse_frame(sentence.trim()).expect("re-parse");
     let parsed = Wpl::parse(&frame.fields).expect("parse");
     assert_eq!(original, parsed);

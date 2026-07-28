@@ -23,7 +23,7 @@ fn decode_encode() {
     let frame = parse_frame("!AIABM,26,2,1,3381581370,3,8,177KQJ5000G?tO`K>RA1wUbN0TKH,0*02")
         .expect("valid");
     let abm = Abm::parse(&frame.fields).expect("parse");
-    let sentence2 = abm.to_sentence("AI");
+    let sentence2 = abm.to_sentence("AI").expect("encode");
     assert!(sentence2.starts_with("!AIABM,"));
     let frame2 = parse_frame(sentence2.trim()).expect("re-parse");
     let abm2 = Abm::parse(&frame2.fields).expect("parse");
@@ -49,7 +49,7 @@ fn roundtrip() {
         payload: Some("testpayload".to_string()),
         fill_bits: Some(0),
     };
-    let sentence = original.to_sentence("AI");
+    let sentence = original.to_sentence("AI").expect("encode");
     let frame = parse_frame(sentence.trim()).expect("re-parse");
     let parsed = Abm::parse(&frame.fields).expect("parse");
     assert_eq!(original, parsed);

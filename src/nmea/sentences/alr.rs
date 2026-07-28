@@ -42,7 +42,7 @@ impl Alr {
 impl NmeaEncodable for Alr {
     const SENTENCE_TYPE: &str = "ALR";
 
-    fn encode(&self) -> Vec<String> {
+    fn encode(&self) -> Result<Vec<String>, crate::EncodeError> {
         let mut w = FieldWriter::new();
         w.string(self.time.as_deref());
         w.string(self.alarm_id.as_deref());
@@ -67,7 +67,7 @@ mod tests {
             state: None,
             description: None,
         }
-        .to_sentence("RA");
+        .to_sentence("RA").expect("encode");
         let f = parse_frame(s.trim()).expect("valid");
         let a = Alr::parse(&f.fields).expect("parse");
         assert!(a.time.is_none());
@@ -83,7 +83,7 @@ mod tests {
             state: Some('A'),
             description: Some("Bilge pump alarm1".to_string()),
         };
-        let sentence = original.to_sentence("RA");
+        let sentence = original.to_sentence("RA").expect("encode");
         let frame = parse_frame(sentence.trim()).expect("re-parse");
         let parsed = Alr::parse(&frame.fields).expect("parse");
         assert_eq!(original, parsed);

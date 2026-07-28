@@ -62,7 +62,7 @@ impl Rmb {
 impl NmeaEncodable for Rmb {
     const SENTENCE_TYPE: &str = "RMB";
 
-    fn encode(&self) -> Vec<String> {
+    fn encode(&self) -> Result<Vec<String>, crate::EncodeError> {
         let mut w = FieldWriter::new();
         w.char(self.status);
         w.f32(self.ctrkerr);
@@ -122,7 +122,7 @@ mod tests {
             arrstatus: Some('V'),
             valstatus: Some('A'),
         };
-        let sentence = rmb.to_sentence("EC");
+        let sentence = rmb.to_sentence("EC").expect("encode");
         assert!(sentence.starts_with("$ECRMB,"));
         let frame = parse_frame(sentence.trim()).expect("re-parse");
         let rmb2 = Rmb::parse(&frame.fields).expect("re-parse RMB");

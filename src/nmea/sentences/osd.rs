@@ -56,7 +56,7 @@ impl Osd {
 impl NmeaEncodable for Osd {
     const SENTENCE_TYPE: &str = "OSD";
 
-    fn encode(&self) -> Vec<String> {
+    fn encode(&self) -> Result<Vec<String>, crate::EncodeError> {
         let mut w = FieldWriter::new();
         w.f32(self.heading);
         w.char(self.heading_status);
@@ -89,7 +89,7 @@ mod tests {
             vessel_drift: None,
             speed_units: None,
         }
-        .to_sentence("RA");
+        .to_sentence("RA").expect("encode");
         let f = parse_frame(s.trim()).expect("valid");
         let o = Osd::parse(&f.fields).expect("parse");
         assert!(o.heading.is_none());
@@ -109,7 +109,7 @@ mod tests {
             vessel_drift: None,
             speed_units: Some('N'),
         };
-        let sentence = original.to_sentence("RA");
+        let sentence = original.to_sentence("RA").expect("encode");
         let frame = parse_frame(sentence.trim()).expect("re-parse");
         let parsed = Osd::parse(&frame.fields).expect("parse");
         assert_eq!(original, parsed);

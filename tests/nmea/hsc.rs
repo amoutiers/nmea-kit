@@ -8,7 +8,7 @@ use nmea_kit::{NmeaSentence, parse_frame};
 fn decode_encode() {
     let frame = parse_frame("$FTHSC,40.12,T,39.11,M*5E").expect("valid");
     let hsc = Hsc::parse(&frame.fields).expect("parse");
-    let sentence = hsc.to_sentence("FT");
+    let sentence = hsc.to_sentence("FT").expect("encode");
     let frame2 = parse_frame(sentence.trim()).expect("re-parse");
     let hsc2 = Hsc::parse(&frame2.fields).expect("parse");
     assert_eq!(hsc, hsc2);
@@ -30,7 +30,7 @@ fn hsc_values() {
     assert_eq!(hsc.status, None);
 
     // Fixed-indicator type (T, M): pin the exact canonical body.
-    let sentence = hsc.to_sentence("FT");
+    let sentence = hsc.to_sentence("FT").expect("encode");
     let body = sentence
         .trim()
         .trim_start_matches('$')
@@ -47,7 +47,7 @@ fn roundtrip() {
         cmd_heading_mag: Some(39.11),
         status: Some('A'),
     };
-    let sentence = original.to_sentence("FT");
+    let sentence = original.to_sentence("FT").expect("encode");
     let frame = parse_frame(sentence.trim()).expect("re-parse");
     let parsed = Hsc::parse(&frame.fields).expect("parse");
     assert_eq!(original, parsed);

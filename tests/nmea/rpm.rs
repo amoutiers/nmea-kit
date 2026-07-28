@@ -8,7 +8,7 @@ use nmea_kit::{NmeaSentence, parse_frame};
 fn decode_encode() {
     let frame = parse_frame("$IIRPM,E,1,2418.2,10.5,A*5F").expect("valid");
     let rpm = Rpm::parse(&frame.fields).expect("parse");
-    let sentence = rpm.to_sentence("II");
+    let sentence = rpm.to_sentence("II").expect("encode");
     let frame2 = parse_frame(sentence.trim()).expect("re-parse");
     let rpm2 = Rpm::parse(&frame2.fields).expect("parse");
     assert_eq!(rpm, rpm2);
@@ -29,7 +29,7 @@ fn roundtrip() {
         pitch: Some(10.5),
         status: Some('A'),
     };
-    let sentence = original.to_sentence("II");
+    let sentence = original.to_sentence("II").expect("encode");
     let frame = parse_frame(sentence.trim()).expect("re-parse");
     let parsed = Rpm::parse(&frame.fields).expect("parse");
     assert_eq!(original, parsed);

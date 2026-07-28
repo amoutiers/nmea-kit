@@ -19,7 +19,7 @@ fn arc_values() {
 fn decode_encode() {
     let frame = parse_frame("$RAARC,220516,TCK,002,1,A*73").expect("valid");
     let arc = Arc::parse(&frame.fields).expect("parse");
-    let sentence = arc.to_sentence("RA");
+    let sentence = arc.to_sentence("RA").expect("encode");
     let frame2 = parse_frame(sentence.trim()).expect("re-parse");
     let arc2 = Arc::parse(&frame2.fields).expect("parse");
     assert_eq!(arc, arc2);
@@ -40,7 +40,7 @@ fn roundtrip() {
         instance: Some(1),
         command: Some('A'),
     };
-    let sentence = original.to_sentence("RA");
+    let sentence = original.to_sentence("RA").expect("encode");
     let frame = parse_frame(sentence.trim()).expect("re-parse");
     let parsed = Arc::parse(&frame.fields).expect("parse");
     assert_eq!(original, parsed);

@@ -80,7 +80,7 @@ impl Ttm {
 impl NmeaEncodable for Ttm {
     const SENTENCE_TYPE: &str = "TTM";
 
-    fn encode(&self) -> Vec<String> {
+    fn encode(&self) -> Result<Vec<String>, crate::EncodeError> {
         let mut w = FieldWriter::new();
         w.u8(self.target_num);
         w.f32(self.dist);
@@ -125,7 +125,7 @@ mod tests {
             time: None,
             acq_type: None,
         }
-        .to_sentence("RA");
+        .to_sentence("RA").expect("encode");
         let f = parse_frame(s.trim()).expect("valid");
         let t = Ttm::parse(&f.fields).expect("parse");
         assert!(t.target_num.is_none());
@@ -152,7 +152,7 @@ mod tests {
             time: None,
             acq_type: Some('M'),
         };
-        let sentence = original.to_sentence("RA");
+        let sentence = original.to_sentence("RA").expect("encode");
         let frame = parse_frame(sentence.trim()).expect("re-parse");
         let parsed = Ttm::parse(&frame.fields).expect("parse");
         assert_eq!(original, parsed);

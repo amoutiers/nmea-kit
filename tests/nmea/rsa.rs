@@ -8,7 +8,7 @@ use nmea_kit::{NmeaSentence, parse_frame};
 fn decode_encode() {
     let frame = parse_frame("$IIRSA,10.5,A,,V*4D").expect("valid");
     let rsa = Rsa::parse(&frame.fields).expect("parse");
-    let sentence = rsa.to_sentence("II");
+    let sentence = rsa.to_sentence("II").expect("encode");
     let frame2 = parse_frame(sentence.trim()).expect("re-parse");
     let rsa2 = Rsa::parse(&frame2.fields).expect("parse");
     assert_eq!(rsa, rsa2);
@@ -28,7 +28,7 @@ fn roundtrip() {
         port_angle: Some(-5.2),
         port_status: Some('A'),
     };
-    let sentence = original.to_sentence("II");
+    let sentence = original.to_sentence("II").expect("encode");
     let frame = parse_frame(sentence.trim()).expect("re-parse");
     let parsed = Rsa::parse(&frame.fields).expect("parse");
     assert_eq!(original, parsed);

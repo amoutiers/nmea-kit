@@ -52,7 +52,7 @@ impl Ala {
 impl NmeaEncodable for Ala {
     const SENTENCE_TYPE: &str = "ALA";
 
-    fn encode(&self) -> Vec<String> {
+    fn encode(&self) -> Result<Vec<String>, crate::EncodeError> {
         let mut w = FieldWriter::new();
         w.string(self.time.as_deref());
         w.string(self.system.as_deref());
@@ -83,7 +83,7 @@ mod tests {
             ack_state: None,
             message: None,
         }
-        .to_sentence("FR");
+        .to_sentence("FR").expect("encode");
         let f = parse_frame(s.trim()).expect("valid");
         let a = Ala::parse(&f.fields).expect("parse");
         assert!(a.time.is_none());
@@ -104,7 +104,7 @@ mod tests {
             ack_state: Some('V'),
             message: Some("Test alarm".to_string()),
         };
-        let sentence = original.to_sentence("FR");
+        let sentence = original.to_sentence("FR").expect("encode");
         let frame = parse_frame(sentence.trim()).expect("re-parse");
         let parsed = Ala::parse(&frame.fields).expect("parse");
         assert_eq!(original, parsed);

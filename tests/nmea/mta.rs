@@ -8,7 +8,7 @@ use nmea_kit::{NmeaSentence, parse_frame};
 fn decode_encode() {
     let frame = parse_frame("$IIMTA,17.2,C*01").expect("valid");
     let mta = Mta::parse(&frame.fields).expect("parse");
-    let sentence = mta.to_sentence("II");
+    let sentence = mta.to_sentence("II").expect("encode");
     let frame2 = parse_frame(sentence.trim()).expect("re-parse");
     let mta2 = Mta::parse(&frame2.fields).expect("parse");
     assert_eq!(mta, mta2);
@@ -26,7 +26,7 @@ fn roundtrip() {
         temperature: Some(17.2),
         units: Some('C'),
     };
-    let sentence = original.to_sentence("II");
+    let sentence = original.to_sentence("II").expect("encode");
     let frame = parse_frame(sentence.trim()).expect("re-parse");
     let parsed = Mta::parse(&frame.fields).expect("parse");
     assert_eq!(original, parsed);

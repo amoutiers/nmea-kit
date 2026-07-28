@@ -8,7 +8,7 @@ use nmea_kit::{NmeaSentence, parse_frame};
 fn decode_encode() {
     let frame = parse_frame("$HEROT,0.0,A*2B").expect("valid");
     let rot = Rot::parse(&frame.fields).expect("parse");
-    let sentence = rot.to_sentence("HE");
+    let sentence = rot.to_sentence("HE").expect("encode");
     let frame2 = parse_frame(sentence.trim()).expect("re-parse");
     let rot2 = Rot::parse(&frame2.fields).expect("parse");
     assert_eq!(rot, rot2);
@@ -26,7 +26,7 @@ fn roundtrip() {
         rate_of_turn: Some(35.6),
         valid: Some('A'),
     };
-    let sentence = original.to_sentence("GP");
+    let sentence = original.to_sentence("GP").expect("encode");
     let frame = parse_frame(sentence.trim()).expect("re-parse");
     let parsed = Rot::parse(&frame.fields).expect("parse");
     assert_eq!(original, parsed);

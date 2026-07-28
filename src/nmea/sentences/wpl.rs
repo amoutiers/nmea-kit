@@ -40,7 +40,7 @@ impl Wpl {
 impl NmeaEncodable for Wpl {
     const SENTENCE_TYPE: &str = "WPL";
 
-    fn encode(&self) -> Vec<String> {
+    fn encode(&self) -> Result<Vec<String>, crate::EncodeError> {
         let mut w = FieldWriter::new();
         w.lat(self.lat);
         w.char(self.ns);
@@ -65,7 +65,7 @@ mod tests {
             ew: None,
             ident: None,
         }
-        .to_sentence("II");
+        .to_sentence("II").expect("encode");
         let f = parse_frame(s.trim()).expect("valid");
         let w = Wpl::parse(&f.fields).expect("parse");
         assert!(w.lat.is_none());
@@ -81,7 +81,7 @@ mod tests {
             ew: Some('E'),
             ident: Some("411".to_string()),
         };
-        let sentence = original.to_sentence("II");
+        let sentence = original.to_sentence("II").expect("encode");
         let frame = parse_frame(sentence.trim()).expect("re-parse");
         let parsed = Wpl::parse(&frame.fields).expect("parse");
         assert_eq!(original, parsed);

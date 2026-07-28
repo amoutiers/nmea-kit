@@ -35,7 +35,7 @@ impl Vdr {
 impl NmeaEncodable for Vdr {
     const SENTENCE_TYPE: &str = "VDR";
 
-    fn encode(&self) -> Vec<String> {
+    fn encode(&self) -> Result<Vec<String>, crate::EncodeError> {
         let mut w = FieldWriter::new();
         w.f32(self.direction_true);
         w.fixed('T');
@@ -59,7 +59,7 @@ mod tests {
             direction_mag: None,
             speed_knots: None,
         }
-        .to_sentence("II");
+        .to_sentence("II").expect("encode");
         let frame = parse_frame(f.trim()).expect("valid");
         let v = Vdr::parse(&frame.fields).expect("parse");
         assert!(v.direction_true.is_none());
@@ -74,7 +74,7 @@ mod tests {
             direction_mag: Some(12.3),
             speed_knots: Some(1.2),
         };
-        let sentence = original.to_sentence("II");
+        let sentence = original.to_sentence("II").expect("encode");
         let frame = parse_frame(sentence.trim()).expect("re-parse");
         let parsed = Vdr::parse(&frame.fields).expect("re-parse VDR");
         assert_eq!(original, parsed);
