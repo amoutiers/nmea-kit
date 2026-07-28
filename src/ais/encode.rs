@@ -1,4 +1,5 @@
 use crate::EncodeError;
+use crate::ais::transmit::PositionTimestamp;
 
 pub(crate) struct BitWriter {
     bits: Vec<u8>,
@@ -129,6 +130,119 @@ pub(crate) fn encode_timestamp(value: Option<u8>) -> Result<u32, EncodeError> {
         None => Ok(60),
         Some(value) if value <= 59 => Ok(u32::from(value)),
         Some(_) => Err(EncodeError::InvalidAisField("timestamp")),
+    }
+}
+
+pub(crate) fn encode_position_timestamp(value: PositionTimestamp) -> Result<u32, EncodeError> {
+    match value {
+        PositionTimestamp::Exact(value) if value <= 59 => Ok(u32::from(value)),
+        PositionTimestamp::Exact(_) => Err(EncodeError::InvalidAisField("timestamp")),
+        PositionTimestamp::NotAvailable => Ok(60),
+        PositionTimestamp::ManualInput => Ok(61),
+        PositionTimestamp::DeadReckoning => Ok(62),
+        PositionTimestamp::Inoperative => Ok(63),
+    }
+}
+
+pub(crate) fn encode_epfd(value: u8) -> Result<u32, EncodeError> {
+    match value {
+        0..=9 | 12..=15 => Ok(u32::from(value)),
+        _ => Err(EncodeError::InvalidAisField("position_fixing_device")),
+    }
+}
+
+pub(crate) fn encode_utc_year(value: Option<u16>) -> Result<u32, EncodeError> {
+    match value {
+        None => Ok(0),
+        Some(value) if (1..=9_999).contains(&value) => Ok(u32::from(value)),
+        Some(_) => Err(EncodeError::InvalidAisField("year")),
+    }
+}
+
+pub(crate) fn encode_utc_month(value: Option<u8>) -> Result<u32, EncodeError> {
+    match value {
+        None => Ok(0),
+        Some(value) if (1..=12).contains(&value) => Ok(u32::from(value)),
+        Some(_) => Err(EncodeError::InvalidAisField("month")),
+    }
+}
+
+pub(crate) fn encode_utc_day(value: Option<u8>) -> Result<u32, EncodeError> {
+    match value {
+        None => Ok(0),
+        Some(value) if (1..=31).contains(&value) => Ok(u32::from(value)),
+        Some(_) => Err(EncodeError::InvalidAisField("day")),
+    }
+}
+
+pub(crate) fn encode_utc_hour(value: Option<u8>) -> Result<u32, EncodeError> {
+    match value {
+        None => Ok(24),
+        Some(value) if value <= 23 => Ok(u32::from(value)),
+        Some(_) => Err(EncodeError::InvalidAisField("hour")),
+    }
+}
+
+pub(crate) fn encode_utc_minute_or_second(
+    value: Option<u8>,
+    field: &'static str,
+) -> Result<u32, EncodeError> {
+    match value {
+        None => Ok(60),
+        Some(value) if value <= 59 => Ok(u32::from(value)),
+        Some(_) => Err(EncodeError::InvalidAisField(field)),
+    }
+}
+
+pub(crate) fn encode_sar_altitude(value: Option<u16>) -> Result<u32, EncodeError> {
+    match value {
+        None => Ok(4_095),
+        Some(value) if value <= 4_094 => Ok(u32::from(value)),
+        Some(_) => Err(EncodeError::InvalidAisField("altitude")),
+    }
+}
+
+pub(crate) fn encode_integer_sog(value: Option<u16>) -> Result<u32, EncodeError> {
+    match value {
+        None => Ok(1_023),
+        Some(value) if value <= 1_022 => Ok(u32::from(value)),
+        Some(_) => Err(EncodeError::InvalidAisField("sog")),
+    }
+}
+
+pub(crate) fn encode_long_range_sog(value: Option<u8>) -> Result<u32, EncodeError> {
+    match value {
+        None => Ok(63),
+        Some(value) if value <= 62 => Ok(u32::from(value)),
+        Some(_) => Err(EncodeError::InvalidAisField("sog")),
+    }
+}
+
+pub(crate) fn encode_long_range_cog(value: Option<u16>) -> Result<u32, EncodeError> {
+    match value {
+        None => Ok(511),
+        Some(value) if value <= 359 => Ok(u32::from(value)),
+        Some(_) => Err(EncodeError::InvalidAisField("cog")),
+    }
+}
+
+pub(crate) fn encode_long_range_longitude(value: Option<f64>) -> Result<i32, EncodeError> {
+    match value {
+        None => Ok(108_600),
+        Some(value) if value.is_finite() && (-180.0..=180.0).contains(&value) => {
+            Ok((value * 600.0).round() as i32)
+        }
+        Some(_) => Err(EncodeError::InvalidAisField("longitude")),
+    }
+}
+
+pub(crate) fn encode_long_range_latitude(value: Option<f64>) -> Result<i32, EncodeError> {
+    match value {
+        None => Ok(54_600),
+        Some(value) if value.is_finite() && (-90.0..=90.0).contains(&value) => {
+            Ok((value * 600.0).round() as i32)
+        }
+        Some(_) => Err(EncodeError::InvalidAisField("latitude")),
     }
 }
 

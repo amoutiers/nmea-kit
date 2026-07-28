@@ -12,7 +12,7 @@ Bidirectional NMEA 0183 parser/encoder with AIS decoding and transponder-message
 | **License** | MIT OR Apache-2.0 |
 | **NMEA sentences** | 64 (bidirectional: parse + encode) |
 | **AIS application sentences** | 2 (bidirectional: parse + encode) |
-| **AIS message types** | 24 decoded; Types 1/2/3, 5, 18 and 24 also encoded |
+| **AIS message types** | All numeric Types 1-27 decoded; Types 1/2/3, 4, 5, 9, 11, 12, 14, 18, 19, 21, 24 and 27 also encoded |
 
 - **Shared frame layer** — handles `$` (NMEA) and `!` (AIS) framing, IEC 61162-450 tag blocks
 - **No `nom`, no proc-macro** — `FieldReader`/`FieldWriter` helpers for clean sequential parsing
@@ -98,9 +98,10 @@ let sentences = report
 // `sentences` contains complete, checksummed !AIVDM lines ready for the simulator.
 ```
 
-`AisTransmitOptions::vdo()` emits `!AIVDO` instead. Type 5 reports automatically use two
-fragments and therefore require `.with_sequence_id(0..=9)`. Every emitted line is at most 82
-characters, including the checksum and CRLF terminator.
+`AisTransmitOptions::vdo()` emits `!AIVDO` instead. Messages that require several fragments,
+including Type 5 and long Type 12/14 safety text, require `.with_sequence_id(0..=9)`. Every
+emitted line is at most 82 characters, including the checksum and CRLF terminator. The crate
+constructs sentences only: the simulator owns cadence, TDMA access, and reactions to Type 15.
 
 ### Encode an AIS application-layer sentence
 
@@ -142,7 +143,7 @@ flowchart TD
 
 **NMEA content** uses `FieldReader`/`FieldWriter` for sequential field parsing and encoding. Each sentence type is a standalone struct with `parse()`, `encode()`, and `to_sentence()`. Parsing is lenient: `parse()` always returns `Some` for known types, mapping missing or malformed fields to `None`. This is intentional for marine instruments that often produce partial data.
 
-**AIS content** decodes AIVDM/AIVDO 6-bit ASCII armor into a bitstream, handles multi-fragment reassembly, and extracts typed fields. `ais::transmit` encodes complete `!AIVDM` or `!AIVDO` lines for Types 1/2/3, 5, 18 and 24. It owns sentence fragmentation, while the simulator remains responsible for choosing its emission cadence. The `!`-prefixed AIS application sentences ABM and BBM live under `ais::sentences`. VSD is a conventional NMEA sentence (`$--VSD`) exposed under `nmea::sentences`.
+**AIS content** decodes AIVDM/AIVDO 6-bit ASCII armor into a bitstream, handles multi-fragment reassembly, and extracts typed fields. `ais::transmit` encodes complete `!AIVDM` or `!AIVDO` lines for Types 1/2/3, 4, 5, 9, 11, 12, 14, 18, 19, 21, 24 and 27. It owns sentence fragmentation, while the simulator remains responsible for choosing its emission cadence. The `!`-prefixed AIS application sentences ABM and BBM live under `ais::sentences`. VSD is a conventional NMEA sentence (`$--VSD`) exposed under `nmea::sentences`.
 
 ## Supported types
 
@@ -179,37 +180,37 @@ flowchart TD
 | Type(s) | Decoded struct      | Encoded model | Description                                          |
 | ------- | ------------------- | ------------- | ---------------------------------------------------- |
 | 1, 2, 3 | `PositionReport`    | `ClassAPosition` | Class A position report                           |
-| 4       | `BaseStationReport` |               | Base station UTC + position                          |
+| 4       | `BaseStationReport` | `BaseStation` | Base station UTC + position                          |
 | 5       | `StaticVoyageData`  | `ClassAStaticVoyage` | Static and voyage data (Class A)                |
 | 6       | `BinaryAddressed`   |               | Addressed binary message (DAC/FID + data)            |
 | 7, 13   | `BinaryAck`         |               | Binary / safety acknowledge                          |
 | 8       | `BinaryBroadcast`   |               | Binary broadcast message (DAC/FID + data)            |
-| 9       | `SarAircraftReport` |               | Standard SAR aircraft position                       |
+| 9       | `SarAircraftReport` | `SarAircraft` | Standard SAR aircraft position                       |
 | 10      | `UtcDateInquiry`    |               | UTC/date inquiry                                     |
-| 11      | `UtcDateResponse`   |               | UTC/date response (mobile station)                   |
-| 12      | `SafetyAddressed`   |               | Addressed safety-related message                     |
-| 14      | `SafetyBroadcast`   |               | Safety-related broadcast message                     |
+| 11      | `UtcDateResponse`   | `UtcDateResponse` | UTC/date response (mobile station)                |
+| 12      | `SafetyAddressed`   | `SafetyAddressed` | Addressed safety-related message                   |
+| 14      | `SafetyBroadcast`   | `SafetyBroadcast` | Safety-related broadcast message                   |
 | 15      | `Interrogation`     |               | Interrogation (request data from vessel)             |
 | 16      | `AssignmentModeCommand` |            | Assigned mode command                                |
 | 17      | `DgnssBroadcast`    |               | DGNSS correction broadcast                           |
 | 18      | `PositionReport`    | `ClassBPosition` | Class B standard position                         |
-| 19      | `PositionReport`    |               | Class B+ extended position                           |
+| 19      | `PositionReport`    | `ClassBExtendedPosition` | Class B+ extended position             |
 | 20      | `DataLinkManagement` |              | FATDMA slot reservations                             |
-| 21      | `AidToNavigation`   |               | Aid-to-navigation report (buoys, beacons)            |
+| 21      | `AidToNavigation`   | `AidToNavigation` | Aid-to-navigation report (buoys, beacons)          |
 | 22      | `ChannelManagement` |               | Channel management                                   |
 | 23      | `GroupAssignment`   |               | Group assignment command                             |
 | 24      | `StaticDataReport`  | `ClassBStaticPartA`, `ClassBStaticPartB` | Static data report (Class B) |
 | 25      | `BinarySingleSlot`  |               | Single-slot binary message                           |
 | 26      | `BinaryMultiSlot`   |               | Multiple-slot binary message                         |
-| 27      | `LongRangePosition` |               | Long range position (satellite AIS, 1/10 minute precision) |
+| 27      | `LongRangePosition` | `LongRangePosition` | Long range position (satellite AIS, 1/10 minute precision) |
 
 ### Key improvements over existing crates
 
 | Issue                  | `nmea` 0.7 / `ais` 0.12             | `nmea-kit`                               |
 | ---------------------- | ----------------------------------- | ---------------------------------------- |
 | NMEA sentence coverage | ~10 types, rest manual              | 64 NMEA types + 2 AIS application sentences |
-| AIS message coverage   | ~5 types                            | 24 decoder families covering all numeric Types 1-27 |
-| Encoding               | Read-only                           | All NMEA + Types 1/2/3, 5, 18, 24         |
+| AIS message coverage   | ~5 types                            | All numeric Types 1-27                    |
+| Encoding               | Read-only                           | All NMEA + Types 1/2/3, 4, 5, 9, 11, 12, 14, 18, 19, 21, 24, 27 |
 | Error distinction      | Can't tell unsupported vs malformed | Frame errors vs content errors           |
 | AIS lat/lon precision  | `f32` (11m error)                   | `f64`                                    |
 | AIS sentinels          | 91/181/511 leak to caller           | Filtered to `None` at decode             |

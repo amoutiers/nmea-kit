@@ -1,10 +1,10 @@
 use crate::EncodeError;
 use crate::ais::encode::{
-    BitWriter, encode_cog, encode_heading, encode_latitude, encode_longitude, encode_sog,
-    encode_timestamp,
+    BitWriter, encode_cog, encode_epfd, encode_heading, encode_latitude, encode_longitude,
+    encode_position_timestamp, encode_sog, encode_timestamp,
 };
 
-use super::{AisEncodable, AisTransmitOptions, encode_payload};
+use super::{AisEncodable, AisTransmitOptions, PositionTimestamp, encode_payload};
 
 /// AIS Type 18 communication-state selector and its 19-bit state value.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -46,6 +46,31 @@ pub struct ClassBPosition {
     pub assigned_mode: bool,
     pub raim: bool,
     pub communication_state: ClassBCommunicationState,
+}
+
+/// AIS Type 19 Class B+ extended position report.
+#[derive(Debug, Clone, PartialEq)]
+pub struct ClassBExtendedPosition {
+    pub repeat_indicator: u8,
+    pub mmsi: u32,
+    pub sog: Option<f32>,
+    pub position_accuracy: bool,
+    pub longitude: Option<f64>,
+    pub latitude: Option<f64>,
+    pub cog: Option<f32>,
+    pub heading: Option<u16>,
+    pub timestamp: PositionTimestamp,
+    pub vessel_name: String,
+    pub ship_type: u8,
+    pub dimension_to_bow: u16,
+    pub dimension_to_stern: u16,
+    pub dimension_to_port: u8,
+    pub dimension_to_starboard: u8,
+    pub position_fixing_device: u8,
+    /// `false` means the DTE is available.
+    pub dte: bool,
+    pub assigned_mode: bool,
+    pub raim: bool,
 }
 
 /// AIS Type 24 Part A static data report.
@@ -105,6 +130,44 @@ impl AisEncodable for ClassBPosition {
     }
 }
 
+impl AisEncodable for ClassBExtendedPosition {
+    fn to_sentences(&self, options: AisTransmitOptions) -> Result<Vec<String>, EncodeError> {
+        let mut writer = BitWriter::new();
+        writer.push_u32(19, 6, "message_type")?;
+        writer.push_u32(u32::from(self.repeat_indicator), 2, "repeat_indicator")?;
+        writer.push_u32(self.mmsi, 30, "mmsi")?;
+        writer.push_spare(8);
+        writer.push_u32(encode_sog(self.sog)?, 10, "sog")?;
+        writer.push_bool(self.position_accuracy);
+        writer.push_i32(encode_longitude(self.longitude)?, 28, "longitude")?;
+        writer.push_i32(encode_latitude(self.latitude)?, 27, "latitude")?;
+        writer.push_u32(encode_cog(self.cog)?, 12, "cog")?;
+        writer.push_u32(encode_heading(self.heading)?, 9, "heading")?;
+        writer.push_u32(encode_position_timestamp(self.timestamp)?, 6, "timestamp")?;
+        writer.push_spare(4);
+        writer.push_text(&self.vessel_name, 20, "vessel_name")?;
+        writer.push_u32(u32::from(self.ship_type), 8, "ship_type")?;
+        writer.push_u32(u32::from(self.dimension_to_bow), 9, "dimension_to_bow")?;
+        writer.push_u32(u32::from(self.dimension_to_stern), 9, "dimension_to_stern")?;
+        writer.push_u32(u32::from(self.dimension_to_port), 6, "dimension_to_port")?;
+        writer.push_u32(
+            u32::from(self.dimension_to_starboard),
+            6,
+            "dimension_to_starboard",
+        )?;
+        writer.push_u32(
+            encode_epfd(self.position_fixing_device)?,
+            4,
+            "position_fixing_device",
+        )?;
+        writer.push_bool(self.raim);
+        writer.push_bool(self.dte);
+        writer.push_bool(self.assigned_mode);
+        writer.push_spare(4);
+        encode_payload(&writer.finish(), options)
+    }
+}
+
 impl AisEncodable for ClassBStaticPartA {
     fn to_sentences(&self, options: AisTransmitOptions) -> Result<Vec<String>, EncodeError> {
         let mut writer = BitWriter::new();
@@ -138,7 +201,7 @@ impl AisEncodable for ClassBStaticPartB {
             "dimension_to_starboard",
         )?;
         writer.push_u32(
-            u32::from(self.position_fixing_device),
+            encode_epfd(self.position_fixing_device)?,
             4,
             "position_fixing_device",
         )?;

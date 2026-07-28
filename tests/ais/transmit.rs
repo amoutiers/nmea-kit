@@ -1,11 +1,282 @@
+use nmea_kit::ais::armor::{decode_armor, extract_u32};
 use nmea_kit::ais::messages::NavigationStatus;
 use nmea_kit::ais::transmit::{
-    AisChannel, AisEncodable, AisTransmitOptions, ClassAPosition, ClassAPositionType,
-    ClassAStaticVoyage, ClassBCommunicationState, ClassBPosition, ClassBStaticPartA,
-    ClassBStaticPartB,
+    AidToNavigation, AisChannel, AisEncodable, AisTransmitOptions, BaseStation, ClassAPosition,
+    ClassAPositionType, ClassAStaticVoyage, ClassBCommunicationState, ClassBExtendedPosition,
+    ClassBPosition, ClassBStaticPartA, ClassBStaticPartB, LongRangePosition, PositionTimestamp,
+    SafetyAddressed, SafetyBroadcast, SarAircraft, UtcDateResponse,
 };
 use nmea_kit::ais::{AisMessage, AisParser};
 use nmea_kit::{EncodeError, parse_frame};
+
+fn decode_lines(lines: &[String]) -> AisMessage {
+    let mut parser = AisParser::new();
+    let mut decoded = None;
+    for line in lines {
+        decoded = parser.decode(&parse_frame(line).expect("parse encoded AIS sentence"));
+    }
+    decoded.expect("decode encoded AIS message")
+}
+
+fn payload_bits(line: &str) -> Vec<u8> {
+    let frame = parse_frame(line).expect("parse encoded AIS sentence");
+    let payload = frame.fields[4];
+    let fill_bits = frame.fields[5].parse::<u8>().expect("parse fill bits");
+    decode_armor(payload, fill_bits).expect("decode emitted armor")
+}
+
+#[test]
+fn safety_messages_encode_to_decodable_sentences() {
+    let addressed = SafetyAddressed {
+        repeat_indicator: 0,
+        mmsi: 244_670_316,
+        sequence: 2,
+        destination_mmsi: 235_009_217,
+        retransmit: false,
+        text: "KEEP CLEAR".to_string(),
+    };
+    let broadcast = SafetyBroadcast {
+        repeat_indicator: 0,
+        mmsi: addressed.mmsi,
+        text: "MAYDAY TEST".to_string(),
+    };
+
+    let addressed_lines = addressed
+        .to_sentences(AisTransmitOptions::vdm(AisChannel::A))
+        .expect("encode addressed safety");
+    let broadcast_lines = broadcast
+        .to_sentences(AisTransmitOptions::vdm(AisChannel::A))
+        .expect("encode broadcast safety");
+
+    assert!(matches!(
+        decode_lines(&addressed_lines),
+        AisMessage::SafetyAddressed(value)
+            if value.mmsi == addressed.mmsi
+                && value.dest_mmsi == addressed.destination_mmsi
+                && value.sequence == addressed.sequence
+                && value.text == addressed.text
+    ));
+    assert!(matches!(
+        decode_lines(&broadcast_lines),
+        AisMessage::Safety(value) if value.mmsi == broadcast.mmsi && value.text == broadcast.text
+    ));
+}
+
+#[test]
+fn safety_broadcast_fragments_and_preserves_terminal_at_bit() {
+    let broadcast = SafetyBroadcast {
+        repeat_indicator: 0,
+        mmsi: 244_670_316,
+        text: format!("{}@", "A".repeat(160)),
+    };
+    assert_eq!(
+        broadcast.to_sentences(AisTransmitOptions::vdm(AisChannel::A)),
+        Err(EncodeError::MissingAisSequenceId)
+    );
+    let lines = broadcast
+        .to_sentences(AisTransmitOptions::vdm(AisChannel::A).with_sequence_id(6))
+        .expect("encode fragmented safety broadcast");
+    assert_eq!(lines.len(), 3);
+    let last_bits = payload_bits(lines.last().expect("last fragment"));
+    assert_eq!(extract_u32(&last_bits, last_bits.len() - 6, 6), Some(0));
+}
+
+#[test]
+fn specialized_station_reports_encode_to_decodable_sentences() {
+    let base = BaseStation {
+        repeat_indicator: 0,
+        mmsi: 111_222_333,
+        year: Some(2026),
+        month: Some(7),
+        day: Some(28),
+        hour: Some(12),
+        minute: Some(30),
+        second: Some(15),
+        position_accuracy: true,
+        longitude: Some(2.352_2),
+        latitude: Some(48.856_6),
+        position_fixing_device: 1,
+        transmission_control: false,
+        raim: true,
+        communication_state: 42,
+    };
+    let utc = UtcDateResponse {
+        repeat_indicator: base.repeat_indicator,
+        mmsi: base.mmsi,
+        year: base.year,
+        month: base.month,
+        day: base.day,
+        hour: base.hour,
+        minute: base.minute,
+        second: base.second,
+        position_accuracy: base.position_accuracy,
+        longitude: base.longitude,
+        latitude: base.latitude,
+        position_fixing_device: base.position_fixing_device,
+        transmission_control: base.transmission_control,
+        raim: base.raim,
+        communication_state: base.communication_state,
+    };
+    let sar = SarAircraft {
+        repeat_indicator: 0,
+        mmsi: 111_222_334,
+        altitude: Some(300),
+        sog: Some(120),
+        position_accuracy: true,
+        longitude: Some(2.352_2),
+        latitude: Some(48.856_6),
+        cog: Some(91.2),
+        timestamp: PositionTimestamp::DeadReckoning,
+        regional_application: 0,
+        dte: false,
+        assigned_mode: false,
+        raim: false,
+        communication_state: ClassBCommunicationState::Sotdma(0),
+    };
+    let aton = AidToNavigation {
+        repeat_indicator: 0,
+        mmsi: 992_001_001,
+        aid_type: 1,
+        name: "TEST BUOY".to_string(),
+        longitude: Some(2.352_2),
+        latitude: Some(48.856_6),
+        position_accuracy: true,
+        dimension_to_bow: 2,
+        dimension_to_stern: 2,
+        dimension_to_port: 1,
+        dimension_to_starboard: 1,
+        position_fixing_device: 1,
+        timestamp: PositionTimestamp::Inoperative,
+        off_position: false,
+        regional_application: 0,
+        raim: false,
+        virtual_aid: false,
+        assigned_mode: false,
+        name_extension: Some("WEST".to_string()),
+    };
+
+    for report in [
+        base.to_sentences(AisTransmitOptions::vdm(AisChannel::A)),
+        utc.to_sentences(AisTransmitOptions::vdm(AisChannel::A)),
+        sar.to_sentences(AisTransmitOptions::vdm(AisChannel::A)),
+        aton.to_sentences(AisTransmitOptions::vdm(AisChannel::A)),
+    ] {
+        let lines = report.expect("encode specialized station report");
+        assert_eq!(lines.len(), 1);
+        assert!(parse_frame(&lines[0]).is_ok());
+    }
+
+    assert!(matches!(
+        decode_lines(
+            &base
+                .to_sentences(AisTransmitOptions::vdm(AisChannel::A))
+                .expect("base")
+        ),
+        AisMessage::BaseStation(_)
+    ));
+    assert!(matches!(
+        decode_lines(
+            &utc.to_sentences(AisTransmitOptions::vdm(AisChannel::A))
+                .expect("utc")
+        ),
+        AisMessage::UtcDateResponse(_)
+    ));
+    let sar_lines = sar
+        .to_sentences(AisTransmitOptions::vdm(AisChannel::A))
+        .expect("sar");
+    assert_eq!(extract_u32(&payload_bits(&sar_lines[0]), 128, 6), Some(62));
+    let aton_lines = aton
+        .to_sentences(AisTransmitOptions::vdm(AisChannel::A))
+        .expect("aton");
+    assert_eq!(extract_u32(&payload_bits(&aton_lines[0]), 253, 6), Some(63));
+    assert!(matches!(
+        decode_lines(&aton_lines),
+        AisMessage::AidToNavigation(_)
+    ));
+}
+
+#[test]
+fn specialized_station_reports_reject_reserved_epfd() {
+    let report = BaseStation {
+        repeat_indicator: 0,
+        mmsi: 111_222_333,
+        year: None,
+        month: None,
+        day: None,
+        hour: None,
+        minute: None,
+        second: None,
+        position_accuracy: false,
+        longitude: None,
+        latitude: None,
+        position_fixing_device: 10,
+        transmission_control: false,
+        raim: false,
+        communication_state: 0,
+    };
+    assert_eq!(
+        report.to_sentences(AisTransmitOptions::vdm(AisChannel::A)),
+        Err(EncodeError::InvalidAisField("position_fixing_device"))
+    );
+}
+
+#[test]
+fn class_b_extended_and_long_range_reports_encode_to_decodable_sentences() {
+    let extended = ClassBExtendedPosition {
+        repeat_indicator: 0,
+        mmsi: 235_009_217,
+        sog: Some(5.4),
+        position_accuracy: true,
+        longitude: Some(2.352_2),
+        latitude: Some(48.856_6),
+        cog: Some(91.2),
+        heading: Some(91),
+        timestamp: PositionTimestamp::ManualInput,
+        vessel_name: "SIM BOAT".to_string(),
+        ship_type: 37,
+        dimension_to_bow: 8,
+        dimension_to_stern: 4,
+        dimension_to_port: 2,
+        dimension_to_starboard: 2,
+        position_fixing_device: 1,
+        dte: false,
+        assigned_mode: false,
+        raim: true,
+    };
+    let long_range = LongRangePosition {
+        mmsi: extended.mmsi,
+        position_accuracy: true,
+        raim: false,
+        navigation_status: NavigationStatus::UnderWayEngine,
+        longitude: Some(2.35),
+        latitude: Some(48.85),
+        sog: Some(5),
+        cog: Some(91),
+        gnss_position_status: true,
+    };
+
+    let extended_lines = extended
+        .to_sentences(AisTransmitOptions::vdm(AisChannel::B))
+        .expect("encode type 19");
+    let long_range_lines = long_range
+        .to_sentences(AisTransmitOptions::vdm(AisChannel::B))
+        .expect("encode type 27");
+
+    assert_eq!(
+        extract_u32(&payload_bits(&extended_lines[0]), 133, 6),
+        Some(61)
+    );
+    assert_eq!(
+        extract_u32(&payload_bits(&long_range_lines[0]), 6, 2),
+        Some(3)
+    );
+    assert!(
+        matches!(decode_lines(&extended_lines), AisMessage::Position(value) if value.msg_type == 19 && value.mmsi == extended.mmsi)
+    );
+    assert!(
+        matches!(decode_lines(&long_range_lines), AisMessage::LongRangePosition(value) if value.mmsi == long_range.mmsi && value.nav_status == Some(long_range.navigation_status))
+    );
+}
 
 #[test]
 fn class_a_position_encodes_to_a_decodable_vdm_sentence() {
@@ -79,6 +350,13 @@ fn class_a_static_voyage_encodes_to_two_decodable_vdm_fragments() {
         destination: "LE HAVRE".to_string(),
         dte: false,
     };
+
+    let mut reserved_epfd = report.clone();
+    reserved_epfd.position_fixing_device = 10;
+    assert_eq!(
+        reserved_epfd.to_sentences(AisTransmitOptions::vdm(AisChannel::A).with_sequence_id(3)),
+        Err(EncodeError::InvalidAisField("position_fixing_device"))
+    );
 
     let lines = report
         .to_sentences(AisTransmitOptions::vdm(AisChannel::A).with_sequence_id(3))
@@ -219,6 +497,13 @@ fn class_b_static_parts_encode_to_decodable_vdm_sentences() {
         position_fixing_device: 1,
         vdes_capabilities: 0,
     };
+
+    let mut reserved_epfd = part_b.clone();
+    reserved_epfd.position_fixing_device = 11;
+    assert_eq!(
+        reserved_epfd.to_sentences(AisTransmitOptions::vdm(AisChannel::A)),
+        Err(EncodeError::InvalidAisField("position_fixing_device"))
+    );
 
     let part_a_line = part_a
         .to_sentences(AisTransmitOptions::vdm(AisChannel::A))

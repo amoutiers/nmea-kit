@@ -9,7 +9,7 @@ Bidirectional NMEA 0183 parser/encoder + AIS decoder and transponder-message enc
 | Dependencies | 0 |
 | NMEA sentences | 64 (bidirectional) |
 | AIS application sentences | 2 (bidirectional) |
-| AIS message types | 24 decoded; Types 1/2/3, 5, 18 and 24 also encoded |
+| AIS message types | All numeric Types 1-27 decoded; Types 1/2/3, 4, 5, 9, 11, 12, 14, 18, 19, 21, 24 and 27 also encoded |
 | Tests | 747, 0 failures |
 | Unsafe blocks | 0 |
 
@@ -219,7 +219,7 @@ AIS types use bit-level extraction from decoded 6-bit armor. The transponder enc
 - Bit extraction uses manual `Vec<u8>` (one byte per bit), not `bitvec`
 - `AisParser::reset()` clears in-progress fragment buffers
 
-`ais::transmit` is stateless: callers select `AisChannel` and `AisSentenceKind` through `AisTransmitOptions`, then call `AisEncodable::to_sentences()`. It emits Types 1/2/3 (`ClassAPosition`), 5 (`ClassAStaticVoyage`), 18 (`ClassBPosition`), and Type 24 parts A/B (`ClassBStaticPartA` / `ClassBStaticPartB`). It splits armor at 60 characters, requires a sequence ID for multi-fragment output, and never schedules transmission cycles.
+`ais::transmit` is stateless: callers select `AisChannel` and `AisSentenceKind` through `AisTransmitOptions`, then call `AisEncodable::to_sentences()`. It emits Types 1/2/3 (`ClassAPosition`), 4 (`BaseStation`), 5 (`ClassAStaticVoyage`), 9 (`SarAircraft`), 11 (`UtcDateResponse`), 12 (`SafetyAddressed`), 14 (`SafetyBroadcast`), 18 (`ClassBPosition`), 19 (`ClassBExtendedPosition`), 21 (`AidToNavigation`), 24 parts A/B (`ClassBStaticPartA` / `ClassBStaticPartB`), and 27 (`LongRangePosition`). It splits armor at 60 characters, requires a sequence ID for multi-fragment output, and never schedules transmission cycles.
 
 Helper functions in `position_a.rs` are `pub(crate)` — shared by `position_b.rs` and `position_b_ext.rs`.
 
@@ -244,7 +244,7 @@ cargo fmt                                                # format
 
 - No `nom`, no proc-macro, no `syn`/`quote` — keep compile times minimal
 - Zero dependencies (serde was removed as unused)
-- AIS AIVDM/AIVDO Types 1/2/3, 5, 18 and 24 are bidirectional; all other supported AIS Types 1-27 are decode-only. ABM/BBM and NMEA VSD are bidirectional
+- AIS AIVDM/AIVDO Types 1/2/3, 4, 5, 9, 11, 12, 14, 18, 19, 21, 24 and 27 are bidirectional; all other supported AIS Types 1-27 are decode-only. ABM/BBM and NMEA VSD are bidirectional
 - No `unwrap()` in library code — `expect("description")` in tests only
 - No `panic!`, `todo!`, or `#[allow(dead_code)]` in `src/`
 - Edition 2024, MSRV 1.85.0

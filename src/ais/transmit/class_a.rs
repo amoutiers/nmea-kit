@@ -1,7 +1,7 @@
 use crate::EncodeError;
 use crate::ais::encode::{
-    BitWriter, encode_cog, encode_heading, encode_latitude, encode_longitude, encode_rot,
-    encode_sog, encode_timestamp,
+    BitWriter, encode_cog, encode_epfd, encode_heading, encode_latitude, encode_longitude,
+    encode_rot, encode_sog, encode_timestamp,
 };
 use crate::ais::messages::NavigationStatus;
 
@@ -119,7 +119,7 @@ impl AisEncodable for ClassAStaticVoyage {
             "dimension_to_starboard",
         )?;
         writer.push_u32(
-            u32::from(self.position_fixing_device),
+            encode_epfd(self.position_fixing_device)?,
             4,
             "position_fixing_device",
         )?;
