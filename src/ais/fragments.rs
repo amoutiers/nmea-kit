@@ -88,7 +88,7 @@ impl FragmentCollector {
         let msg_id_str = fields[2];
         let channel_field = fields[3];
         let channel_index = channel_index(channel_field)?;
-        let channel = channel_field.chars().next().unwrap_or('A');
+        let channel = if channel_index == 0 { 'A' } else { 'B' };
         let payload = fields[4];
         let fill_bits: u8 = fields[5].parse().ok().filter(|&n| n <= 5)?;
 
@@ -98,6 +98,9 @@ impl FragmentCollector {
 
         // Single-fragment message — return immediately
         if total == 1 {
+            if payload.len() > MAX_PAYLOAD_SIZE {
+                return None;
+            }
             return Some(AisPayload {
                 payload: payload.to_string(),
                 fill_bits,
@@ -215,6 +218,35 @@ mod tests {
         assert_eq!(p.payload, "13u@Dt002s000000000000000000");
         assert_eq!(p.fill_bits, 0);
         assert_eq!(p.channel, 'A');
+    }
+
+    #[test]
+    fn single_fragment_enforces_payload_limit() {
+        let mut c = FragmentCollector::new();
+        let oversized = "A".repeat(MAX_PAYLOAD_SIZE + 1);
+        assert!(
+            c.process(&["1", "1", "", "A", oversized.as_str(), "0"])
+                .is_none(),
+            "single-fragment payload over MAX_PAYLOAD_SIZE must be rejected"
+        );
+        let at_limit = "A".repeat(MAX_PAYLOAD_SIZE);
+        assert!(
+            c.process(&["1", "1", "", "A", at_limit.as_str(), "0"])
+                .is_some()
+        );
+    }
+
+    #[test]
+    fn numeric_channel_normalizes_to_letter() {
+        let mut c = FragmentCollector::new();
+        let p = c
+            .process(&["1", "1", "", "1", "13u@Dt002s000000000000000000", "0"])
+            .expect("valid single fragment");
+        assert_eq!(p.channel, 'A');
+        let p = c
+            .process(&["1", "1", "", "2", "13u@Dt002s000000000000000000", "0"])
+            .expect("valid single fragment");
+        assert_eq!(p.channel, 'B');
     }
 
     #[test]
