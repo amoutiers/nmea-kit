@@ -19,7 +19,7 @@ pub struct SarAircraftReport {
     pub latitude: Option<f64>,
     /// Course over ground in 1/10 degree. None if not available (3600).
     pub cog: Option<f32>,
-    /// UTC second (0-59). None if not available (60).
+    /// UTC second (0-59). None if unavailable or reserved (60-63).
     pub timestamp: Option<u8>,
     /// DTE flag.
     pub dte: bool,
@@ -63,10 +63,34 @@ impl SarAircraftReport {
             longitude: decode_longitude(lon_raw),
             latitude: decode_latitude(lat_raw),
             cog: decode_cog(cog_raw),
-            timestamp: if ts_raw == 60 { None } else { Some(ts_raw) },
+            timestamp: if ts_raw >= 60 { None } else { Some(ts_raw) },
             dte,
             assigned,
             raim,
         })
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::ais::messages::test_helpers::set_bits;
+
+    #[test]
+    fn timestamp_filters_reserved_values() {
+        for timestamp in [60u32, 61, 62, 63] {
+            let mut bits = vec![0u8; 168];
+            set_bits(&mut bits, 0, 6, 9);
+            set_bits(&mut bits, 128, 6, timestamp);
+            let msg = SarAircraftReport::decode(&bits).expect("decode");
+            assert_eq!(msg.timestamp, None, "timestamp {timestamp} must be None");
+        }
+        let mut bits = vec![0u8; 168];
+        set_bits(&mut bits, 0, 6, 9);
+        set_bits(&mut bits, 128, 6, 59);
+        assert_eq!(
+            SarAircraftReport::decode(&bits).expect("decode").timestamp,
+            Some(59)
+        );
     }
 }

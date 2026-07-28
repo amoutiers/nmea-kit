@@ -29,15 +29,15 @@ pub struct BaseStationReport {
     pub mmsi: u32,
     /// UTC year (e.g. 2024). `None` if not available (raw = 0).
     pub year: Option<u16>,
-    /// UTC month (1–12). `None` if not available (raw = 0).
+    /// UTC month (1–12). `None` if not available or reserved (raw = 0 or 13–15).
     pub month: Option<u8>,
     /// UTC day (1–31). `None` if not available (raw = 0).
     pub day: Option<u8>,
-    /// UTC hour (0–23). `None` if not available (raw = 24).
+    /// UTC hour (0–23). `None` if not available or reserved (raw = 24–31).
     pub hour: Option<u8>,
-    /// UTC minute (0–59). `None` if not available (raw = 60).
+    /// UTC minute (0–59). `None` if not available or reserved (raw = 60–63).
     pub minute: Option<u8>,
-    /// UTC second (0–59). `None` if not available (raw = 60).
+    /// UTC second (0–59). `None` if not available or reserved (raw = 60–63).
     pub second: Option<u8>,
     /// High position accuracy (DGPS / differential fix).
     pub position_accuracy: bool,
@@ -75,19 +75,19 @@ impl BaseStationReport {
             } else {
                 Some(year_raw as u16)
             },
-            month: if month_raw == 0 {
+            month: if month_raw == 0 || month_raw > 12 {
                 None
             } else {
                 Some(month_raw)
             },
             day: if day_raw == 0 { None } else { Some(day_raw) },
-            hour: if hour_raw == 24 { None } else { Some(hour_raw) },
-            minute: if minute_raw == 60 {
+            hour: if hour_raw >= 24 { None } else { Some(hour_raw) },
+            minute: if minute_raw >= 60 {
                 None
             } else {
                 Some(minute_raw)
             },
-            second: if second_raw == 60 {
+            second: if second_raw >= 60 {
                 None
             } else {
                 Some(second_raw)
@@ -102,6 +102,8 @@ impl BaseStationReport {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+    use crate::ais::messages::test_helpers::set_bits;
     use crate::ais::{AisMessage, AisParser};
     use crate::parse_frame;
 
@@ -137,5 +139,21 @@ mod tests {
         } else {
             panic!("expected BaseStation, got {msg:?}");
         }
+    }
+
+    #[test]
+    fn reserved_time_values_are_none() {
+        fn decode_type4(offset: usize, len: usize, value: u32) -> BaseStationReport {
+            let mut bits = vec![0u8; 168];
+            set_bits(&mut bits, 0, 6, 4);
+            set_bits(&mut bits, offset, len, value);
+            BaseStationReport::decode(&bits).expect("decode")
+        }
+
+        assert_eq!(decode_type4(52, 4, 13).month, None);
+        assert_eq!(decode_type4(61, 5, 25).hour, None);
+        assert_eq!(decode_type4(66, 6, 61).minute, None);
+        assert_eq!(decode_type4(72, 6, 62).second, None);
+        assert_eq!(decode_type4(52, 4, 12).month, Some(12));
     }
 }

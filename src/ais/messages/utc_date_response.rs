@@ -10,11 +10,11 @@ use crate::ais::armor::{extract_i32, extract_u32};
 pub struct UtcDateResponse {
     pub mmsi: u32,
     pub year: Option<u16>,  // 0 = not available
-    pub month: Option<u8>,  // 0 = not available
+    pub month: Option<u8>,  // 0 = not available; 13-15 reserved
     pub day: Option<u8>,    // 0 = not available
-    pub hour: Option<u8>,   // 24 = not available
-    pub minute: Option<u8>, // 60 = not available
-    pub second: Option<u8>, // 60 = not available
+    pub hour: Option<u8>,   // 24 = not available; 25-31 reserved
+    pub minute: Option<u8>, // 60 = not available; 61-63 reserved
+    pub second: Option<u8>, // 60 = not available; 61-63 reserved
     pub position_accuracy: bool,
     pub longitude: Option<f64>,
     pub latitude: Option<f64>,
@@ -44,19 +44,19 @@ impl UtcDateResponse {
             } else {
                 Some(year_raw as u16)
             },
-            month: if month_raw == 0 {
+            month: if month_raw == 0 || month_raw > 12 {
                 None
             } else {
                 Some(month_raw)
             },
             day: if day_raw == 0 { None } else { Some(day_raw) },
-            hour: if hour_raw == 24 { None } else { Some(hour_raw) },
-            minute: if minute_raw == 60 {
+            hour: if hour_raw >= 24 { None } else { Some(hour_raw) },
+            minute: if minute_raw >= 60 {
                 None
             } else {
                 Some(minute_raw)
             },
-            second: if second_raw == 60 {
+            second: if second_raw >= 60 {
                 None
             } else {
                 Some(second_raw)
@@ -66,5 +66,30 @@ impl UtcDateResponse {
             latitude: decode_latitude(lat_raw),
             type_of_epfd: epfd,
         })
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::ais::messages::test_helpers::set_bits;
+
+    fn decode_type11(offset: usize, len: usize, value: u32) -> UtcDateResponse {
+        let mut bits = vec![0u8; 168];
+        set_bits(&mut bits, 0, 6, 11);
+        set_bits(&mut bits, offset, len, value);
+        UtcDateResponse::decode(&bits).expect("decode")
+    }
+
+    #[test]
+    fn reserved_time_values_are_none() {
+        assert_eq!(decode_type11(52, 4, 13).month, None);
+        assert_eq!(decode_type11(61, 5, 24).hour, None);
+        assert_eq!(decode_type11(61, 5, 25).hour, None);
+        assert_eq!(decode_type11(66, 6, 61).minute, None);
+        assert_eq!(decode_type11(72, 6, 62).second, None);
+        assert_eq!(decode_type11(52, 4, 12).month, Some(12));
+        assert_eq!(decode_type11(61, 5, 23).hour, Some(23));
+        assert_eq!(decode_type11(66, 6, 59).minute, Some(59));
     }
 }
