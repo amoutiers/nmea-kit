@@ -10,7 +10,7 @@
 )]
 //! # nmea-kit
 //!
-//! Bidirectional NMEA 0183 parser/encoder with AIS message decoding.
+//! Bidirectional NMEA 0183 parser/encoder with AIS decoding and transponder-message encoding.
 //!
 //! ## Architecture
 //!
@@ -30,12 +30,12 @@
 //! - [`parse_frame`] / [`encode_frame`] — frame layer (always available)
 //! - [`NmeaSentence`] — dispatch enum for all typed NMEA sentences
 //! - [`NmeaEncodable`] — trait for encoding NMEA sentences to wire format
-//! - [`ais`] — AIS decoder (behind `ais` feature) and `!`-prefixed AIS application sentences
+//! - [`ais`] — AIS decoder, transponder-message encoder, and `!`-prefixed AIS application sentences
 //!
 //! ## Features
 //!
 //! - `nmea` (default) — all 64 NMEA sentence types
-//! - `ais` (default) — 16 AIS message types (read-only decode) + ABM/BBM application sentences
+//! - `ais` (default) — 16 decoded AIS message types, encoder support for Types 1/2/3, 5, 18 and 24, plus ABM/BBM application sentences
 //! - `dbs`, `dbt`, `dpt`, … — individual sentence types
 
 mod error;

@@ -46,6 +46,29 @@ pub fn decode_armor(payload: &str, fill_bits: u8) -> Option<Vec<u8>> {
     Some(bits)
 }
 
+/// Encode AIS bits as 6-bit ASCII armor.
+///
+/// Returns the armored payload and the number of zero fill bits appended to its final
+/// 6-bit character. Callers provide bits MSB first.
+pub(crate) fn encode_armor(bits: &[u8]) -> (String, u8) {
+    let fill_bits = ((6 - bits.len() % 6) % 6) as u8;
+    let char_count = (bits.len() + usize::from(fill_bits)) / 6;
+    let mut payload = String::with_capacity(char_count);
+
+    for char_index in 0..char_count {
+        let mut value = 0u8;
+        for bit_index in 0..6 {
+            let offset = char_index * 6 + bit_index;
+            let bit = bits.get(offset).copied().unwrap_or(0) & 1;
+            value = (value << 1) | bit;
+        }
+        let byte = if value < 40 { value + 48 } else { value + 56 };
+        payload.push(char::from(byte));
+    }
+
+    (payload, fill_bits)
+}
+
 /// Extract an unsigned integer from a bit slice at the given offset and length.
 pub fn extract_u32(bits: &[u8], offset: usize, len: usize) -> Option<u32> {
     if len > 32 {
@@ -114,6 +137,13 @@ mod tests {
         assert_eq!(bits.len(), 12);
         assert_eq!(&bits[..6], &[0, 0, 0, 0, 0, 0]);
         assert_eq!(&bits[6..12], &[0, 0, 0, 0, 0, 1]);
+    }
+
+    #[test]
+    fn encode_roundtrip_preserves_non_byte_aligned_bits() {
+        let bits = vec![1, 0, 1, 0, 1, 0, 1];
+        let (payload, fill_bits) = encode_armor(&bits);
+        assert_eq!(decode_armor(&payload, fill_bits), Some(bits));
     }
 
     #[test]

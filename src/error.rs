@@ -62,6 +62,18 @@ pub enum EncodeError {
     InvalidFieldCharacter(char),
     /// Coordinate magnitude is NaN, infinite, or negative.
     InvalidCoordinate,
+    /// An AIS field is outside the range or format permitted by its bit layout.
+    InvalidAisField(&'static str),
+    /// AIS text exceeds the fixed-width field that carries it.
+    AisTextTooLong {
+        field: &'static str,
+        max_chars: usize,
+        actual_chars: usize,
+    },
+    /// A multi-fragment AIS payload requires a sequential message ID.
+    MissingAisSequenceId,
+    /// An AIS payload exceeds the five-fragment transmission limit.
+    TooManyAisFragments,
 }
 
 impl core::fmt::Display for EncodeError {
@@ -75,6 +87,27 @@ impl core::fmt::Display for EncodeError {
             }
             Self::InvalidCoordinate => {
                 write!(f, "coordinate magnitude is NaN, infinite, or negative")
+            }
+            Self::InvalidAisField(field) => write!(f, "invalid AIS field {field}"),
+            Self::AisTextTooLong {
+                field,
+                max_chars,
+                actual_chars,
+            } => write!(
+                f,
+                "AIS field {field} is too long: {actual_chars} characters, maximum {max_chars}"
+            ),
+            Self::MissingAisSequenceId => {
+                write!(
+                    f,
+                    "multi-fragment AIS payload requires a sequential message ID"
+                )
+            }
+            Self::TooManyAisFragments => {
+                write!(
+                    f,
+                    "AIS payload exceeds the five-fragment transmission limit"
+                )
             }
         }
     }

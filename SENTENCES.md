@@ -171,13 +171,13 @@ Sources : go-nmea, gpsd.
 - [x] ABM — Addressed Binary Message
 - [x] BBM — Broadcast Binary Message
 
-### Message Types (decoded from AIVDM/AIVDO)
+### Message Types (decoded from AIVDM/AIVDO; selected types also encoded)
 
-- [x] Type 1 — Class A Position Report (under way, engine)
-- [x] Type 2 — Class A Position Report (at anchor)
-- [x] Type 3 — Class A Position Report (special maneuver)
+- [x] Type 1 — Class A Position Report (under way, engine) [decode + encode]
+- [x] Type 2 — Class A Position Report (at anchor) [decode + encode]
+- [x] Type 3 — Class A Position Report (special maneuver) [decode + encode]
 - [x] Type 4 — Base Station Report (UTC + position)
-- [x] Type 5 — Static and Voyage Related Data (Class A)
+- [x] Type 5 — Static and Voyage Related Data (Class A) [decode + encode]
 - [x] Type 6 — Addressed Binary Message
 - [x] Type 7 — Binary Acknowledge
 - [x] Type 8 — Binary Broadcast Message
@@ -190,13 +190,13 @@ Sources : go-nmea, gpsd.
 - [x] Type 15 — Interrogation
 - [ ] Type 16 — Assignment Mode Command
 - [ ] Type 17 — DGNSS Broadcast Binary Message
-- [x] Type 18 — Standard Class B Position Report
+- [x] Type 18 — Standard Class B Position Report [decode + encode]
 - [x] Type 19 — Extended Class B Position Report
 - [ ] Type 20 — Data Link Management
 - [x] Type 21 — Aid-to-Navigation Report
 - [ ] Type 22 — Channel Management
 - [ ] Type 23 — Group Assignment Command
-- [x] Type 24 — Static Data Report (Class B)
+- [x] Type 24 — Static Data Report (Class B) [decode + encode]
 - [ ] Type 25 — Single Slot Binary Message
 - [ ] Type 26 — Multiple Slot Binary Message
 - [x] Type 27 — Long Range Position Report (satellite AIS)

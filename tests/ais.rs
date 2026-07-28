@@ -8,6 +8,9 @@ mod bbm;
 #[path = "ais/parser.rs"]
 mod parser;
 #[cfg(feature = "ais")]
+#[path = "ais/transmit.rs"]
+mod transmit;
+#[cfg(feature = "ais")]
 #[path = "ais/type1.rs"]
 mod type1;
 #[cfg(feature = "ais")]

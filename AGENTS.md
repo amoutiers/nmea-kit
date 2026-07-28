@@ -1,6 +1,6 @@
 # nmea-kit
 
-Bidirectional NMEA 0183 parser/encoder + AIS decoder. Zero dependencies. MIT/Apache-2.0.
+Bidirectional NMEA 0183 parser/encoder + AIS decoder and transponder-message encoder. Zero dependencies. MIT/Apache-2.0.
 
 | Key | Value |
 |---|---|
@@ -9,7 +9,8 @@ Bidirectional NMEA 0183 parser/encoder + AIS decoder. Zero dependencies. MIT/Apa
 | Dependencies | 0 |
 | NMEA sentences | 64 (bidirectional) |
 | AIS application sentences | 2 (bidirectional) |
-| Tests | 721, 0 failures |
+| AIS message types | 16 decoded; Types 1/2/3, 5, 18 and 24 also encoded |
+| Tests | 735, 0 failures |
 | Unsafe blocks | 0 |
 
 For contribution workflow, test rules, and the sentence-type checklist see [CONTRIBUTING.md](CONTRIBUTING.md).
@@ -47,15 +48,18 @@ decimal_to_ddmm(decimal: f64) -> f64 // decimal degrees → DDMM.MMMM
 // AIS decoder and !-prefixed application-layer sentences
 use nmea_kit::ais::{AisParser, AisMessage};
 use nmea_kit::ais::sentences::{Abm, Bbm, AisSentence};
+use nmea_kit::ais::transmit::{AisChannel, AisEncodable, AisTransmitOptions, ClassAPosition};
 
 let mut parser = AisParser::new();
 parser.decode(&frame) -> Option<AisMessage>    // None while awaiting fragments
 parser.reset()                                  // clear fragment buffers
+message.to_sentences(AisTransmitOptions::vdm(AisChannel::A)) -> Result<Vec<String>, EncodeError>
 ```
 
 ### Error model
 
-- **Encode layer**: all encode APIs return `Result<_, EncodeError>`. Variants: `InvalidPrefix`, `NonAsciiAddress`, `EmptySentenceType`, `InvalidFieldCharacter`, `InvalidCoordinate`.
+- **Frame layer**: `parse_frame()` returns `Result<NmeaFrame, FrameError>`. Variants: `Empty`, `InvalidPrefix`, `MalformedChecksum`, `BadChecksum`, `MalformedTagBlock`, `BadTagChecksum`, `TooShort`, `NonAsciiAddress`. When a tag-block checksum is present it is validated, and `tag_block` excludes its `*hh` suffix.
+- **Encode layer**: all encode APIs return `Result<_, EncodeError>`. Variants: `InvalidPrefix`, `NonAsciiAddress`, `EmptySentenceType`, `InvalidFieldCharacter`, `InvalidCoordinate`, `InvalidAisField`, `AisTextTooLong`, `MissingAisSequenceId`, `TooManyAisFragments`.
 - **NMEA content**: `parse()` always returns `Some`. Missing/malformed fields → `None` inside the struct. Intentional for marine instruments that send partial data.
 - **AIS content**: `decode()` returns `Option<AisMessage>`. `None` = awaiting fragments or decode failure.
 - **No panics**: 0 `panic!`, 0 `unwrap()`, 0 `todo!` in library code.
@@ -163,8 +167,10 @@ src/nmea/sentences/*.rs → one file per sentence type (struct + parse + encode)
 src/ais/mod.rs          → AisParser + AisMessage enum
 src/ais/sentences/*.rs  → !-prefixed AIS application-layer NMEA sentences: ABM, BBM
 src/ais/armor.rs        → 6-bit ASCII decode + bit extraction
+src/ais/encode.rs       → bit writer, AIS text/position quantization, 6-bit armor encoding
 src/ais/fragments.rs    → multi-fragment reassembly
 src/ais/messages/*.rs   → one file per AIS message type
+src/ais/transmit/*.rs   → stateless AIVDM/AIVDO encoder models for a simulated transponder
 ```
 
 ## Key patterns
@@ -196,7 +202,7 @@ when `talker` is empty.
 
 ### AIS message implementation
 
-AIS types use bit-level extraction from decoded 6-bit armor:
+AIS types use bit-level extraction from decoded 6-bit armor. The transponder encoder uses a matching bit writer, armor encoder, and NMEA frame encoder:
 
 - `extract_u32(bits, offset, len)` / `extract_i32(bits, offset, len)` for numeric fields
 - `extract_string(bits, offset, num_chars)` for AIS 6-bit text
@@ -204,6 +210,8 @@ AIS types use bit-level extraction from decoded 6-bit armor:
 - All lat/lon use `f64` (not `f32`), heading uses `u16` (integer degrees per AIS spec)
 - Bit extraction uses manual `Vec<u8>` (one byte per bit), not `bitvec`
 - `AisParser::reset()` clears in-progress fragment buffers
+
+`ais::transmit` is stateless: callers select `AisChannel` and `AisSentenceKind` through `AisTransmitOptions`, then call `AisEncodable::to_sentences()`. It emits Types 1/2/3 (`ClassAPosition`), 5 (`ClassAStaticVoyage`), 18 (`ClassBPosition`), and Type 24 parts A/B (`ClassBStaticPartA` / `ClassBStaticPartB`). It splits armor at 60 characters, requires a sequence ID for multi-fragment output, and never schedules transmission cycles.
 
 Helper functions in `position_a.rs` are `pub(crate)` — shared by `position_b.rs` and `position_b_ext.rs`.
 
@@ -228,7 +236,7 @@ cargo fmt                                                # format
 
 - No `nom`, no proc-macro, no `syn`/`quote` — keep compile times minimal
 - Zero dependencies (serde was removed as unused)
-- AIS AIVDM/AIVDO message decoding is read-only; ABM/BBM and NMEA VSD are bidirectional
+- AIS AIVDM/AIVDO Types 1/2/3, 5, 18 and 24 are bidirectional; the remaining supported AIS message types are decode-only. ABM/BBM and NMEA VSD are bidirectional
 - No `unwrap()` in library code — `expect("description")` in tests only
 - No `panic!`, `todo!`, or `#[allow(dead_code)]` in `src/`
 - Edition 2024, MSRV 1.85.0

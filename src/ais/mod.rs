@@ -28,11 +28,15 @@
 #[cfg(feature = "ais")]
 pub mod armor;
 #[cfg(feature = "ais")]
+mod encode;
+#[cfg(feature = "ais")]
 pub mod fragments;
 #[cfg(feature = "ais")]
 pub mod messages;
 #[cfg(any(feature = "abm", feature = "bbm"))]
 pub mod sentences;
+#[cfg(feature = "ais")]
+pub mod transmit;
 
 #[cfg(feature = "ais")]
 pub use messages::*;

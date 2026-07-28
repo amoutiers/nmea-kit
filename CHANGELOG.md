@@ -4,6 +4,9 @@ All notable changes to nmea-kit are documented here.
 
 ## [Unreleased]
 
+### Added
+- AIS transponder-message encoding for `!AIVDM` and `!AIVDO`: Types 1/2/3, 5, 18, and 24. The encoder validates bit-field values and AIS text, adds the checksum, and fragments payloads at 60 armor characters.
+
 ## [0.8.0] — 2026-07-27
 
 ### Changed (breaking)

@@ -106,7 +106,7 @@ with standard 3-char sentence types.
 - No `unwrap()` in library code — `expect("description")` in tests only
 - No `panic!`, `todo!`, or `#[allow(dead_code)]` in `src/`
 - Rust edition 2024, MSRV 1.85.0
-- AIS is read-only — encoding would go behind an `ais-encode` feature (not yet implemented)
+- The `ais` feature includes decoding plus stateless `!AIVDM`/`!AIVDO` encoding for Types 1/2/3, 5, 18, and 24; emission scheduling remains outside the crate
 
 ## Known design issues
 
