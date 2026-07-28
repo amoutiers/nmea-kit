@@ -86,7 +86,7 @@ impl Xdr {
             let value = if fields[i + 1].is_empty() {
                 None
             } else {
-                fields[i + 1].parse::<f32>().ok()
+                fields[i + 1].parse::<f32>().ok().filter(|value| value.is_finite())
             };
             let unit = if fields[i + 2].is_empty() {
                 None
@@ -289,6 +289,16 @@ mod tests {
         assert_eq!(xdr2.groups.len(), 1);
         assert!(xdr2.groups[0].value.is_none());
         assert_eq!(xdr2.groups[0].unit, Some('B'));
+    }
+
+    #[test]
+    fn xdr_rejects_non_finite_values() {
+        let xdr = Xdr::parse(&["P", "NaN", "B", "Sensor"]).expect("parse");
+        assert_eq!(xdr.groups[0].value, None);
+        let xdr = Xdr::parse(&["P", "inf", "B", "Sensor"]).expect("parse");
+        assert_eq!(xdr.groups[0].value, None);
+        let xdr = Xdr::parse(&["P", "1.01408", "B", "Barometer"]).expect("parse");
+        assert_eq!(xdr.groups[0].value, Some(1.01408));
     }
 
     #[test]

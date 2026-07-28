@@ -71,13 +71,16 @@ macro_rules! nmea_sentences {
                     _ => {}
                 }
 
-                // Proprietary table — full address in `sentence_type`.
-                match frame.sentence_type {
-                    $(
-                        #[cfg(feature = $pfeat)]
-                        $pwire => try_parse!(sentences::$pvariant::parse, $pvariant),
-                    )*
-                    _ => {}
+                // Proprietary table — full address in `sentence_type`, only for
+                // proprietary frames (talker is empty per the frame parser).
+                if frame.talker.is_empty() {
+                    match frame.sentence_type {
+                        $(
+                            #[cfg(feature = $pfeat)]
+                            $pwire => try_parse!(sentences::$pvariant::parse, $pvariant),
+                        )*
+                        _ => {}
+                    }
                 }
 
                 Self::from_frame(frame)
@@ -183,10 +186,26 @@ nmea_sentences![
 
 #[cfg(test)]
 mod tests {
-    #[cfg(any(feature = "pskpdpt", feature = "rmc"))]
+    #[cfg(any(feature = "pgrme", feature = "pskpdpt", feature = "rmc"))]
     use super::*;
-    #[cfg(any(feature = "pskpdpt", feature = "rmc"))]
+    #[cfg(any(feature = "pgrme", feature = "pskpdpt", feature = "rmc"))]
     use crate::parse_frame;
+
+    #[test]
+    #[cfg(feature = "pgrme")]
+    fn proprietary_dispatch_requires_empty_talker() {
+        let frame = NmeaFrame {
+            prefix: '$',
+            talker: "GP",
+            sentence_type: "PGRME",
+            fields: vec!["1", "2", "3"],
+            tag_block: None,
+        };
+        assert!(matches!(
+            NmeaSentence::parse(&frame),
+            NmeaSentence::Unknown { .. }
+        ));
+    }
 
     #[test]
     #[cfg(feature = "rmc")]
