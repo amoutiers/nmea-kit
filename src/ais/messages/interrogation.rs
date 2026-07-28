@@ -8,6 +8,7 @@ use crate::ais::armor::extract_u32;
 /// Variable length: 88–160 bits.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Interrogation {
+    pub repeat_indicator: u8,
     pub mmsi: u32,
     /// First interrogated MMSI.
     pub mmsi_1: u32,
@@ -32,6 +33,7 @@ impl Interrogation {
         if bits.len() < 88 {
             return None;
         }
+        let repeat_indicator = extract_u32(bits, 6, 2)? as u8;
         let mmsi = extract_u32(bits, 8, 30)?;
         let mmsi_1 = extract_u32(bits, 40, 30)?;
         let msg_type_1_1 = extract_u32(bits, 70, 6)? as u8;
@@ -65,6 +67,7 @@ impl Interrogation {
         };
 
         Some(Self {
+            repeat_indicator,
             mmsi,
             mmsi_1,
             msg_type_1_1,

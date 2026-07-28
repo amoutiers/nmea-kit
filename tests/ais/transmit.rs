@@ -40,10 +40,17 @@ fn class_a_position_encodes_to_a_decodable_vdm_sentence() {
         AisMessage::Position(position) => {
             assert_eq!(position.msg_type, 1);
             assert_eq!(position.mmsi, report.mmsi);
+            assert_eq!(position.repeat_indicator, report.repeat_indicator);
             assert_eq!(position.latitude, report.latitude);
             assert_eq!(position.longitude, report.longitude);
             assert_eq!(position.cog, report.cog);
             assert_eq!(position.heading, report.heading);
+            assert_eq!(position.maneuver_indicator, Some(report.maneuver_indicator));
+            assert_eq!(position.raim, report.raim);
+            assert_eq!(
+                position.communication_state,
+                Some(report.communication_state)
+            );
         }
         other => panic!("expected position report, got {other:?}"),
     }
@@ -95,6 +102,20 @@ fn class_a_static_voyage_encodes_to_two_decodable_vdm_fragments() {
             assert_eq!(data.callsign, report.callsign);
             assert_eq!(data.vessel_name, report.vessel_name);
             assert_eq!(data.ship_type, report.ship_type);
+            assert_eq!(data.repeat_indicator, report.repeat_indicator);
+            assert_eq!(data.ais_version, report.ais_version);
+            assert_eq!(data.dimension_to_bow, report.dimension_to_bow);
+            assert_eq!(data.dimension_to_stern, report.dimension_to_stern);
+            assert_eq!(data.dimension_to_port, report.dimension_to_port);
+            assert_eq!(data.dimension_to_starboard, report.dimension_to_starboard);
+            assert_eq!(data.position_fixing_device, report.position_fixing_device);
+            assert_eq!(data.eta_month, report.eta_month);
+            assert_eq!(data.eta_day, report.eta_day);
+            assert_eq!(data.eta_hour, report.eta_hour);
+            assert_eq!(data.eta_minute, report.eta_minute);
+            assert_eq!(data.draught_meters, report.draught_meters);
+            assert_eq!(data.destination, report.destination);
+            assert_eq!(data.dte, report.dte);
         }
         other => panic!("expected static voyage data, got {other:?}"),
     }
@@ -151,10 +172,26 @@ fn class_b_position_encodes_to_a_decodable_vdm_sentence() {
         AisMessage::Position(position) => {
             assert_eq!(position.msg_type, 18);
             assert_eq!(position.mmsi, report.mmsi);
+            assert_eq!(position.repeat_indicator, report.repeat_indicator);
             assert_eq!(position.latitude, report.latitude);
             assert_eq!(position.longitude, report.longitude);
             assert_eq!(position.cog, report.cog);
             assert_eq!(position.heading, report.heading);
+            assert_eq!(position.raim, report.raim);
+            assert_eq!(position.communication_state, Some(0));
+            assert_eq!(
+                position.class_b,
+                Some(nmea_kit::ais::ClassBPositionMetadata {
+                    transmit_power_low: report.transmit_power_low,
+                    class_b_cs: report.class_b_cs,
+                    display_available: report.display_available,
+                    dsc_capable: report.dsc_capable,
+                    full_band_capable: report.full_band_capable,
+                    message_22_capable: report.message_22_capable,
+                    assigned_mode: report.assigned_mode,
+                    communication_state_selector: true,
+                })
+            );
         }
         other => panic!("expected Class B position report, got {other:?}"),
     }
@@ -203,13 +240,41 @@ fn class_b_static_parts_encode_to_decodable_vdm_sentences() {
         .expect("decode type 24B");
     assert!(matches!(
         decoded_a,
-        AisMessage::StaticReport(nmea_kit::ais::StaticDataReport::PartA { mmsi, vessel_name })
-            if mmsi == part_a.mmsi && vessel_name == part_a.vessel_name
+        AisMessage::StaticReport(nmea_kit::ais::StaticDataReport::PartA {
+            repeat_indicator,
+            mmsi,
+            vessel_name,
+        }) if repeat_indicator == part_a.repeat_indicator && mmsi == part_a.mmsi && vessel_name == part_a.vessel_name
     ));
     assert!(matches!(
         decoded_b,
-        AisMessage::StaticReport(nmea_kit::ais::StaticDataReport::PartB { mmsi, callsign, ship_type })
-            if mmsi == part_b.mmsi && callsign == part_b.callsign && ship_type == part_b.ship_type
+        AisMessage::StaticReport(nmea_kit::ais::StaticDataReport::PartB {
+            repeat_indicator,
+            mmsi,
+            manufacturer_id,
+            model_code,
+            serial_number,
+            callsign,
+            ship_type,
+            dimension_to_bow,
+            dimension_to_stern,
+            dimension_to_port,
+            dimension_to_starboard,
+            position_fixing_device,
+            vdes_capabilities,
+        }) if repeat_indicator == part_b.repeat_indicator
+            && mmsi == part_b.mmsi
+            && manufacturer_id == part_b.manufacturer_id
+            && model_code == part_b.model_code
+            && serial_number == part_b.serial_number
+            && callsign == part_b.callsign
+            && ship_type == part_b.ship_type
+            && dimension_to_bow == part_b.dimension_to_bow
+            && dimension_to_stern == part_b.dimension_to_stern
+            && dimension_to_port == part_b.dimension_to_port
+            && dimension_to_starboard == part_b.dimension_to_starboard
+            && position_fixing_device == part_b.position_fixing_device
+            && vdes_capabilities == part_b.vdes_capabilities
     ));
 }
 
@@ -241,6 +306,50 @@ fn class_a_static_voyage_requires_sequence_id_for_fragments() {
         report.to_sentences(AisTransmitOptions::vdm(AisChannel::A)),
         Err(EncodeError::MissingAisSequenceId)
     );
+}
+
+#[test]
+fn class_a_static_voyage_encodes_unavailable_eta_with_ais_sentinels() {
+    let report = ClassAStaticVoyage {
+        repeat_indicator: 0,
+        mmsi: 366_123_456,
+        ais_version: 0,
+        imo: 0,
+        callsign: String::new(),
+        vessel_name: "SIMULATOR".to_string(),
+        ship_type: 0,
+        dimension_to_bow: 0,
+        dimension_to_stern: 0,
+        dimension_to_port: 0,
+        dimension_to_starboard: 0,
+        position_fixing_device: 0,
+        eta_month: None,
+        eta_day: None,
+        eta_hour: None,
+        eta_minute: None,
+        draught_meters: None,
+        destination: String::new(),
+        dte: false,
+    };
+    let lines = report
+        .to_sentences(AisTransmitOptions::vdm(AisChannel::A).with_sequence_id(0))
+        .expect("encode type 5");
+    let mut parser = AisParser::new();
+    assert!(
+        parser
+            .decode(&parse_frame(&lines[0]).expect("parse first fragment"))
+            .is_none()
+    );
+    let decoded = parser
+        .decode(&parse_frame(&lines[1]).expect("parse second fragment"))
+        .expect("decode type 5");
+    let AisMessage::StaticVoyage(data) = decoded else {
+        panic!("expected static voyage data");
+    };
+    assert_eq!(data.eta_month, None);
+    assert_eq!(data.eta_day, None);
+    assert_eq!(data.eta_hour, None);
+    assert_eq!(data.eta_minute, None);
 }
 
 #[test]

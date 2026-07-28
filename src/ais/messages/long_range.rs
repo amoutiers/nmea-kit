@@ -24,6 +24,7 @@ use super::common::NavigationStatus;
 /// - bit   94:    GNSS position status
 #[derive(Debug, Clone, PartialEq)]
 pub struct LongRangePosition {
+    pub repeat_indicator: u8,
     pub mmsi: u32,
     /// High position accuracy (DGPS / differential fix).
     pub position_accuracy: bool,
@@ -50,6 +51,7 @@ impl LongRangePosition {
             return None;
         }
 
+        let repeat_indicator = extract_u32(bits, 6, 2)? as u8;
         let mmsi = extract_u32(bits, 8, 30)?;
         let accuracy = extract_u32(bits, 38, 1)? == 1;
         let raim = extract_u32(bits, 39, 1)? == 1;
@@ -79,6 +81,7 @@ impl LongRangePosition {
         };
 
         Some(Self {
+            repeat_indicator,
             mmsi,
             position_accuracy: accuracy,
             raim,

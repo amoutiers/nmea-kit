@@ -9,6 +9,7 @@ use crate::ais::armor::{extract_i32, extract_u32};
 /// Unlike vessel position reports, altitude is in meters and SOG is in whole knots (not 1/10).
 #[derive(Debug, Clone, PartialEq)]
 pub struct SarAircraftReport {
+    pub repeat_indicator: u8,
     pub mmsi: u32,
     /// Altitude in meters. None if not available (4095).
     pub altitude: Option<u16>,
@@ -21,12 +22,18 @@ pub struct SarAircraftReport {
     pub cog: Option<f32>,
     /// UTC second (0-59). None if unavailable or reserved (60-63).
     pub timestamp: Option<u8>,
+    /// Eight regional-application bits reserved for a regional use.
+    pub regional_application: u8,
     /// DTE flag.
     pub dte: bool,
     /// Assigned mode flag.
     pub assigned: bool,
     /// RAIM flag.
     pub raim: bool,
+    /// `true` selects the ITDMA communication-state format; otherwise SOTDMA.
+    pub communication_state_selector: bool,
+    /// Raw 19-bit communication state.
+    pub communication_state: u32,
 }
 
 impl SarAircraftReport {
@@ -34,6 +41,7 @@ impl SarAircraftReport {
         if bits.len() < 168 {
             return None;
         }
+        let repeat_indicator = extract_u32(bits, 6, 2)? as u8;
         let mmsi = extract_u32(bits, 8, 30)?;
         let alt_raw = extract_u32(bits, 38, 12)?;
         let sog_raw = extract_u32(bits, 50, 10)?;
@@ -42,12 +50,16 @@ impl SarAircraftReport {
         let lat_raw = extract_i32(bits, 89, 27)?;
         let cog_raw = extract_u32(bits, 116, 12)?;
         let ts_raw = extract_u32(bits, 128, 6)? as u8;
+        let regional_application = extract_u32(bits, 134, 8)? as u8;
         // ITU-R M.1371 Type 9: regional/reserved 134-141, DTE@142, spare 143-145,
         // assigned@146, RAIM@147.
         let dte = extract_u32(bits, 142, 1)? == 1; // Note: DTE=0 means "DTE ready"
         let assigned = extract_u32(bits, 146, 1)? == 1;
         let raim = extract_u32(bits, 147, 1)? == 1;
+        let communication_state_selector = extract_u32(bits, 148, 1)? == 1;
+        let communication_state = extract_u32(bits, 149, 19)?;
         Some(Self {
+            repeat_indicator,
             mmsi,
             altitude: if alt_raw == 4095 {
                 None
@@ -64,9 +76,12 @@ impl SarAircraftReport {
             latitude: decode_latitude(lat_raw),
             cog: decode_cog(cog_raw),
             timestamp: if ts_raw >= 60 { None } else { Some(ts_raw) },
+            regional_application,
             dte,
             assigned,
             raim,
+            communication_state_selector,
+            communication_state,
         })
     }
 }
@@ -92,5 +107,21 @@ mod tests {
             SarAircraftReport::decode(&bits).expect("decode").timestamp,
             Some(59)
         );
+    }
+
+    #[test]
+    fn type9_retains_radio_metadata() {
+        let mut bits = vec![0u8; 168];
+        set_bits(&mut bits, 0, 6, 9);
+        set_bits(&mut bits, 6, 2, 2);
+        set_bits(&mut bits, 134, 8, 0xA5);
+        set_bits(&mut bits, 148, 1, 1);
+        set_bits(&mut bits, 149, 19, 0x5_4321);
+
+        let report = SarAircraftReport::decode(&bits).expect("decode");
+        assert_eq!(report.repeat_indicator, 2);
+        assert_eq!(report.regional_application, 0xA5);
+        assert!(report.communication_state_selector);
+        assert_eq!(report.communication_state, 0x5_4321);
     }
 }

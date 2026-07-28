@@ -182,21 +182,21 @@ Sources : go-nmea, gpsd.
 - [x] Type 7 — Binary Acknowledge
 - [x] Type 8 — Binary Broadcast Message
 - [x] Type 9 — Standard SAR Aircraft Position Report
-- [ ] Type 10 — UTC/Date Inquiry
+- [x] Type 10 — UTC/Date Inquiry
 - [x] Type 11 — UTC/Date Response
 - [x] Type 12 — Addressed Safety-Related Message
 - [x] Type 13 — Safety-Related Acknowledge
 - [x] Type 14 — Safety-Related Broadcast Message
 - [x] Type 15 — Interrogation
-- [ ] Type 16 — Assignment Mode Command
-- [ ] Type 17 — DGNSS Broadcast Binary Message
+- [x] Type 16 — Assignment Mode Command
+- [x] Type 17 — DGNSS Broadcast Binary Message
 - [x] Type 18 — Standard Class B Position Report [decode + encode]
 - [x] Type 19 — Extended Class B Position Report
-- [ ] Type 20 — Data Link Management
+- [x] Type 20 — Data Link Management
 - [x] Type 21 — Aid-to-Navigation Report
-- [ ] Type 22 — Channel Management
-- [ ] Type 23 — Group Assignment Command
+- [x] Type 22 — Channel Management
+- [x] Type 23 — Group Assignment Command
 - [x] Type 24 — Static Data Report (Class B) [decode + encode]
-- [ ] Type 25 — Single Slot Binary Message
-- [ ] Type 26 — Multiple Slot Binary Message
+- [x] Type 25 — Single Slot Binary Message
+- [x] Type 26 — Multiple Slot Binary Message
 - [x] Type 27 — Long Range Position Report (satellite AIS)

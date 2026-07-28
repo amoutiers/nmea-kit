@@ -16,6 +16,7 @@ pub struct AckEntry {
 #[derive(Debug, Clone, PartialEq)]
 pub struct BinaryAck {
     pub msg_type: u8,
+    pub repeat_indicator: u8,
     pub mmsi: u32,
     /// Up to 4 acknowledgement entries.
     pub acks: Vec<AckEntry>,
@@ -27,6 +28,7 @@ impl BinaryAck {
             return None;
         }
         let msg_type = extract_u32(bits, 0, 6)? as u8;
+        let repeat_indicator = extract_u32(bits, 6, 2)? as u8;
         let mmsi = extract_u32(bits, 8, 30)?;
         let mut acks = Vec::new();
         // Each ack entry is 32 bits (30 MMSI + 2 sequence), starting at bit 40
@@ -42,6 +44,7 @@ impl BinaryAck {
         }
         Some(Self {
             msg_type,
+            repeat_indicator,
             mmsi,
             acks,
         })

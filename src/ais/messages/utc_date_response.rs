@@ -8,6 +8,7 @@ use crate::ais::armor::{extract_i32, extract_u32};
 /// Same bit layout as Type 4 (168 bits). Sent by mobile stations in response to Type 10 interrogation.
 #[derive(Debug, Clone, PartialEq)]
 pub struct UtcDateResponse {
+    pub repeat_indicator: u8,
     pub mmsi: u32,
     pub year: Option<u16>,  // 0 = not available
     pub month: Option<u8>,  // 0 = not available; 13-15 reserved
@@ -19,6 +20,9 @@ pub struct UtcDateResponse {
     pub longitude: Option<f64>,
     pub latitude: Option<f64>,
     pub type_of_epfd: u8,
+    pub transmission_control: bool,
+    pub raim: bool,
+    pub communication_state: u32,
 }
 
 impl UtcDateResponse {
@@ -26,6 +30,7 @@ impl UtcDateResponse {
         if bits.len() < 168 {
             return None;
         }
+        let repeat_indicator = extract_u32(bits, 6, 2)? as u8;
         let mmsi = extract_u32(bits, 8, 30)?;
         let year_raw = extract_u32(bits, 38, 14)?;
         let month_raw = extract_u32(bits, 52, 4)? as u8;
@@ -37,7 +42,11 @@ impl UtcDateResponse {
         let lon_raw = extract_i32(bits, 79, 28)?;
         let lat_raw = extract_i32(bits, 107, 27)?;
         let epfd = extract_u32(bits, 134, 4)? as u8;
+        let transmission_control = extract_u32(bits, 138, 1)? == 1;
+        let raim = extract_u32(bits, 148, 1)? == 1;
+        let communication_state = extract_u32(bits, 149, 19)?;
         Some(Self {
+            repeat_indicator,
             mmsi,
             year: if year_raw == 0 {
                 None
@@ -65,6 +74,9 @@ impl UtcDateResponse {
             longitude: decode_longitude(lon_raw),
             latitude: decode_latitude(lat_raw),
             type_of_epfd: epfd,
+            transmission_control,
+            raim,
+            communication_state,
         })
     }
 }

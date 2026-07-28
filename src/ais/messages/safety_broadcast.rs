@@ -15,6 +15,7 @@ use crate::ais::armor::{extract_string, extract_u32};
 /// - bits 40+:   safety text (6-bit ASCII, up to 161 chars / 968 bits)
 #[derive(Debug, Clone, PartialEq)]
 pub struct SafetyBroadcast {
+    pub repeat_indicator: u8,
     /// MMSI of the transmitting station.
     pub mmsi: u32,
     /// Safety-related text message, trimmed of trailing padding.
@@ -26,6 +27,7 @@ impl SafetyBroadcast {
         if bits.len() < 40 {
             return None;
         }
+        let repeat_indicator = extract_u32(bits, 6, 2)? as u8;
         let mmsi = extract_u32(bits, 8, 30)?;
         let char_count = bits.len().saturating_sub(40) / 6;
         let text = if char_count > 0 {
@@ -33,7 +35,11 @@ impl SafetyBroadcast {
         } else {
             String::new()
         };
-        Some(Self { mmsi, text })
+        Some(Self {
+            repeat_indicator,
+            mmsi,
+            text,
+        })
     }
 }
 

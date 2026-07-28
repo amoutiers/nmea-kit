@@ -124,22 +124,22 @@ impl AisEncodable for ClassAStaticVoyage {
             "position_fixing_device",
         )?;
         writer.push_u32(
-            u32::from(encode_eta_part(self.eta_month, 1, 12, "eta_month")?),
+            u32::from(encode_eta_part(self.eta_month, 1, 12, 0, "eta_month")?),
             4,
             "eta_month",
         )?;
         writer.push_u32(
-            u32::from(encode_eta_part(self.eta_day, 1, 31, "eta_day")?),
+            u32::from(encode_eta_part(self.eta_day, 1, 31, 0, "eta_day")?),
             5,
             "eta_day",
         )?;
         writer.push_u32(
-            u32::from(encode_eta_part(self.eta_hour, 0, 23, "eta_hour")?),
+            u32::from(encode_eta_part(self.eta_hour, 0, 23, 24, "eta_hour")?),
             5,
             "eta_hour",
         )?;
         writer.push_u32(
-            u32::from(encode_eta_part(self.eta_minute, 0, 59, "eta_minute")?),
+            u32::from(encode_eta_part(self.eta_minute, 0, 59, 60, "eta_minute")?),
             6,
             "eta_minute",
         )?;
@@ -155,10 +155,11 @@ fn encode_eta_part(
     value: Option<u8>,
     minimum: u8,
     maximum: u8,
+    not_available: u8,
     field: &'static str,
 ) -> Result<u8, EncodeError> {
     match value {
-        None => Ok(0),
+        None => Ok(not_available),
         Some(value) if (minimum..=maximum).contains(&value) => Ok(value),
         Some(_) => Err(EncodeError::InvalidAisField(field)),
     }

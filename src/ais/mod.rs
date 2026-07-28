@@ -68,6 +68,8 @@ pub enum AisMessage {
     BinaryBroadcast(BinaryBroadcast),
     /// Type 9: standard SAR aircraft position report.
     SarAircraft(SarAircraftReport),
+    /// Type 10: UTC and date inquiry.
+    UtcDateInquiry(UtcDateInquiry),
     /// Type 11: UTC/date response (mobile station reply to interrogation).
     UtcDateResponse(UtcDateResponse),
     /// Type 12: addressed safety-related message (text to specific MMSI).
@@ -76,10 +78,24 @@ pub enum AisMessage {
     Safety(SafetyBroadcast),
     /// Type 15: interrogation (request data from other vessel).
     Interrogation(Interrogation),
+    /// Type 16: assigned mode command.
+    AssignmentMode(AssignmentModeCommand),
+    /// Type 17: DGNSS correction broadcast.
+    DgnssBroadcast(DgnssBroadcast),
     /// Type 21: aid-to-navigation report (buoy, beacon, lighthouse).
     AidToNavigation(AidToNavigation),
+    /// Type 20: data link management.
+    DataLinkManagement(DataLinkManagement),
+    /// Type 22: channel management.
+    ChannelManagement(ChannelManagement),
+    /// Type 23: group assignment command.
+    GroupAssignment(GroupAssignment),
     /// Type 24: static data report (Class B), Part A or Part B.
     StaticReport(StaticDataReport),
+    /// Type 25: single-slot binary message.
+    BinarySingleSlot(BinarySingleSlot),
+    /// Type 26: multiple-slot binary message with communication state.
+    BinaryMultiSlot(BinaryMultiSlot),
     /// Type 27: long-range position report (satellite AIS / Class D).
     LongRangePosition(LongRangePosition),
     /// Unsupported message type.
@@ -136,14 +152,22 @@ impl AisParser {
             7 | 13 => BinaryAck::decode(&bits).map(AisMessage::BinaryAck),
             8 => BinaryBroadcast::decode(&bits).map(AisMessage::BinaryBroadcast),
             9 => SarAircraftReport::decode(&bits).map(AisMessage::SarAircraft),
+            10 => UtcDateInquiry::decode(&bits).map(AisMessage::UtcDateInquiry),
             11 => UtcDateResponse::decode(&bits).map(AisMessage::UtcDateResponse),
             12 => SafetyAddressed::decode(&bits).map(AisMessage::SafetyAddressed),
             14 => SafetyBroadcast::decode(&bits).map(AisMessage::Safety),
             15 => Interrogation::decode(&bits).map(AisMessage::Interrogation),
+            16 => AssignmentModeCommand::decode(&bits).map(AisMessage::AssignmentMode),
+            17 => DgnssBroadcast::decode(&bits).map(AisMessage::DgnssBroadcast),
             18 => PositionReport::decode_class_b(&bits).map(AisMessage::Position),
             19 => PositionReport::decode_class_b_extended(&bits).map(AisMessage::Position),
             21 => AidToNavigation::decode(&bits).map(AisMessage::AidToNavigation),
+            20 => DataLinkManagement::decode(&bits).map(AisMessage::DataLinkManagement),
+            22 => ChannelManagement::decode(&bits).map(AisMessage::ChannelManagement),
+            23 => GroupAssignment::decode(&bits).map(AisMessage::GroupAssignment),
             24 => StaticDataReport::decode(&bits).map(AisMessage::StaticReport),
+            25 => BinarySingleSlot::decode(&bits).map(AisMessage::BinarySingleSlot),
+            26 => BinaryMultiSlot::decode(&bits).map(AisMessage::BinaryMultiSlot),
             27 => LongRangePosition::decode(&bits).map(AisMessage::LongRangePosition),
             _ => Some(AisMessage::Unknown { msg_type }),
         }
@@ -161,7 +185,51 @@ impl Default for AisParser {
 #[cfg(feature = "ais")]
 mod tests {
     use super::*;
-    use crate::parse_frame;
+    use crate::ais::armor::encode_armor;
+    use crate::ais::messages::test_helpers::set_bits;
+    use crate::{encode_frame, parse_frame};
+
+    fn decode_bits(bits: &mut [u8]) -> AisMessage {
+        let (payload, fill_bits) = encode_armor(bits);
+        let fill_bits = fill_bits.to_string();
+        let frame = encode_frame('!', "AI", "VDM", &["1", "1", "", "A", &payload, &fill_bits])
+            .expect("frame");
+        AisParser::new()
+            .decode(&parse_frame(&frame).expect("parse"))
+            .expect("decode")
+    }
+
+    #[test]
+    fn dispatches_newly_supported_types() {
+        for (message_type, bit_len) in [
+            (10, 72),
+            (16, 96),
+            (17, 80),
+            (20, 72),
+            (22, 168),
+            (23, 160),
+            (25, 40),
+            (26, 64),
+        ] {
+            let mut bits = vec![0; bit_len];
+            set_bits(&mut bits, 0, 6, message_type);
+            let message = decode_bits(&mut bits);
+            assert!(
+                matches!(
+                    (message_type, message),
+                    (10, AisMessage::UtcDateInquiry(_))
+                        | (16, AisMessage::AssignmentMode(_))
+                        | (17, AisMessage::DgnssBroadcast(_))
+                        | (20, AisMessage::DataLinkManagement(_))
+                        | (22, AisMessage::ChannelManagement(_))
+                        | (23, AisMessage::GroupAssignment(_))
+                        | (25, AisMessage::BinarySingleSlot(_))
+                        | (26, AisMessage::BinaryMultiSlot(_))
+                ),
+                "type {message_type} did not dispatch to its typed variant"
+            );
+        }
+    }
 
     #[test]
     fn ignores_nmea_sentences() {
@@ -243,7 +311,9 @@ mod tests {
         let msg = parser.decode(&frame).expect("decode type 24");
         if let AisMessage::StaticReport(report) = msg {
             match report {
-                StaticDataReport::PartA { mmsi, vessel_name } => {
+                StaticDataReport::PartA {
+                    mmsi, vessel_name, ..
+                } => {
                     assert!(mmsi > 0);
                     // Vessel name may be all padding (@) — trimmed to empty
                     let _ = vessel_name;

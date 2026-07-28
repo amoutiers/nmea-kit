@@ -12,7 +12,7 @@ Bidirectional NMEA 0183 parser/encoder with AIS decoding and transponder-message
 | **License** | MIT OR Apache-2.0 |
 | **NMEA sentences** | 64 (bidirectional: parse + encode) |
 | **AIS application sentences** | 2 (bidirectional: parse + encode) |
-| **AIS message types** | 16 decoded; Types 1/2/3, 5, 18 and 24 also encoded |
+| **AIS message types** | 24 decoded; Types 1/2/3, 5, 18 and 24 also encoded |
 
 - **Shared frame layer** — handles `$` (NMEA) and `!` (AIS) framing, IEC 61162-450 tag blocks
 - **No `nom`, no proc-macro** — `FieldReader`/`FieldWriter` helpers for clean sequential parsing
@@ -134,7 +134,7 @@ flowchart TD
     frame --> ais_sentence["! AIS app sentence"]
     known --> typed["Typed struct\nMwd, Rmc…"]
     unknown --> raw_fields["Raw fields\npass-through"]
-    ais_in --> ais_msg["AisMessage enum\nTypes 1-9, 11-15, 18-19, 21, 24, 27"]
+    ais_in --> ais_msg["AisMessage enum\nAll numeric Types 1-27"]
     ais_sentence --> ais_typed["AIS sentence struct\nAbm, Bbm"]
 ```
 
@@ -174,7 +174,7 @@ flowchart TD
 | --------- |
 | ABM, BBM  |
 
-### AIS messages — [full type list](SENTENCES.md#message-types-decoded-from-aivdmaivdo)
+### AIS messages — [full type list](SENTENCES.md#ais)
 
 | Type(s) | Decoded struct      | Encoded model | Description                                          |
 | ------- | ------------------- | ------------- | ---------------------------------------------------- |
@@ -185,14 +185,22 @@ flowchart TD
 | 7, 13   | `BinaryAck`         |               | Binary / safety acknowledge                          |
 | 8       | `BinaryBroadcast`   |               | Binary broadcast message (DAC/FID + data)            |
 | 9       | `SarAircraftReport` |               | Standard SAR aircraft position                       |
+| 10      | `UtcDateInquiry`    |               | UTC/date inquiry                                     |
 | 11      | `UtcDateResponse`   |               | UTC/date response (mobile station)                   |
 | 12      | `SafetyAddressed`   |               | Addressed safety-related message                     |
 | 14      | `SafetyBroadcast`   |               | Safety-related broadcast message                     |
 | 15      | `Interrogation`     |               | Interrogation (request data from vessel)             |
+| 16      | `AssignmentModeCommand` |            | Assigned mode command                                |
+| 17      | `DgnssBroadcast`    |               | DGNSS correction broadcast                           |
 | 18      | `PositionReport`    | `ClassBPosition` | Class B standard position                         |
 | 19      | `PositionReport`    |               | Class B+ extended position                           |
+| 20      | `DataLinkManagement` |              | FATDMA slot reservations                             |
 | 21      | `AidToNavigation`   |               | Aid-to-navigation report (buoys, beacons)            |
+| 22      | `ChannelManagement` |               | Channel management                                   |
+| 23      | `GroupAssignment`   |               | Group assignment command                             |
 | 24      | `StaticDataReport`  | `ClassBStaticPartA`, `ClassBStaticPartB` | Static data report (Class B) |
+| 25      | `BinarySingleSlot`  |               | Single-slot binary message                           |
+| 26      | `BinaryMultiSlot`   |               | Multiple-slot binary message                         |
 | 27      | `LongRangePosition` |               | Long range position (satellite AIS, 1/10 minute precision) |
 
 ### Key improvements over existing crates
@@ -200,7 +208,7 @@ flowchart TD
 | Issue                  | `nmea` 0.7 / `ais` 0.12             | `nmea-kit`                               |
 | ---------------------- | ----------------------------------- | ---------------------------------------- |
 | NMEA sentence coverage | ~10 types, rest manual              | 64 NMEA types + 2 AIS application sentences |
-| AIS message coverage   | ~5 types                            | 16 types (1-9, 11-15, 18-19, 21, 24, 27) |
+| AIS message coverage   | ~5 types                            | 24 decoder families covering all numeric Types 1-27 |
 | Encoding               | Read-only                           | All NMEA + Types 1/2/3, 5, 18, 24         |
 | Error distinction      | Can't tell unsupported vs malformed | Frame errors vs content errors           |
 | AIS lat/lon precision  | `f32` (11m error)                   | `f64`                                    |
@@ -218,7 +226,7 @@ nmea-kit = "0.7"
 | Feature                                                                                                                                                                                                                                | Default    | Enables                    |
 | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- | -------------------------- |
 | `nmea`                                                                                                                                                                                                         | yes        | All 64 NMEA sentence types |
-| `ais`                                                                                                                                                                                                                                  | yes        | AIS decoding, transponder encoding, and ABM/BBM application sentences |
+| `ais`                                                                                                                                                                                                                                  | yes        | 24 AIS message decoders, transponder encoding, and ABM/BBM application sentences |
 | `positioning`                                                                                                                                                                                                                          | via `nmea` | GGA, GLL, RMC, GNS         |
 | `speed`                                                                                                                                                                                                                                | via `nmea` | VTG, VHW, VBW, RMC         |
 | `heading`                                                                                                                                                                                                                              | via `nmea` | HDG, HDM, HDT, THS         |

@@ -11,7 +11,9 @@ fn type_24_class_b_static_gpsd() {
     let frame_a = parse_frame("!AIVDM,1,1,,A,H42O55i18tMET00000000000000,2*6D")
         .expect("valid Type 24 Part A");
     match parser.decode(&frame_a).expect("Part A should decode") {
-        AisMessage::StaticReport(StaticDataReport::PartA { mmsi, vessel_name }) => {
+        AisMessage::StaticReport(StaticDataReport::PartA {
+            mmsi, vessel_name, ..
+        }) => {
             assert!(mmsi > 0, "MMSI should be non-zero");
             assert!(!vessel_name.is_empty(), "vessel_name should not be empty");
         }
@@ -38,6 +40,7 @@ fn type_24_part_b_values_gpsd() {
             mmsi,
             callsign,
             ship_type,
+            ..
         }) => {
             assert_eq!(mmsi, 271041815);
             assert_eq!(ship_type, 60, "ship_type @40");

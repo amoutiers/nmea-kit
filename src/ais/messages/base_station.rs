@@ -26,6 +26,7 @@ use super::utils::{decode_latitude, decode_longitude};
 /// - bits 134–137: type of EPFD (4 bits)
 #[derive(Debug, Clone, PartialEq)]
 pub struct BaseStationReport {
+    pub repeat_indicator: u8,
     pub mmsi: u32,
     /// UTC year (e.g. 2024). `None` if not available (raw = 0).
     pub year: Option<u16>,
@@ -47,6 +48,11 @@ pub struct BaseStationReport {
     pub latitude: Option<f64>,
     /// Type of EPFD (electronic position fixing device). 0 = undefined.
     pub type_of_epfd: u8,
+    /// UTC transmission-control flag.
+    pub transmission_control: bool,
+    pub raim: bool,
+    /// Raw 19-bit SOTDMA radio status.
+    pub communication_state: u32,
 }
 
 impl BaseStationReport {
@@ -56,6 +62,7 @@ impl BaseStationReport {
             return None;
         }
 
+        let repeat_indicator = extract_u32(bits, 6, 2)? as u8;
         let mmsi = extract_u32(bits, 8, 30)?;
         let year_raw = extract_u32(bits, 38, 14)?;
         let month_raw = extract_u32(bits, 52, 4)? as u8;
@@ -67,8 +74,12 @@ impl BaseStationReport {
         let lon_raw = extract_i32(bits, 79, 28)?;
         let lat_raw = extract_i32(bits, 107, 27)?;
         let epfd = extract_u32(bits, 134, 4)? as u8;
+        let transmission_control = extract_u32(bits, 138, 1)? == 1;
+        let raim = extract_u32(bits, 148, 1)? == 1;
+        let communication_state = extract_u32(bits, 149, 19)?;
 
         Some(Self {
+            repeat_indicator,
             mmsi,
             year: if year_raw == 0 {
                 None
@@ -96,6 +107,9 @@ impl BaseStationReport {
             longitude: decode_longitude(lon_raw),
             latitude: decode_latitude(lat_raw),
             type_of_epfd: epfd,
+            transmission_control,
+            raim,
+            communication_state,
         })
     }
 }

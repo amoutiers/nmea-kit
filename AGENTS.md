@@ -9,8 +9,8 @@ Bidirectional NMEA 0183 parser/encoder + AIS decoder and transponder-message enc
 | Dependencies | 0 |
 | NMEA sentences | 64 (bidirectional) |
 | AIS application sentences | 2 (bidirectional) |
-| AIS message types | 16 decoded; Types 1/2/3, 5, 18 and 24 also encoded |
-| Tests | 735, 0 failures |
+| AIS message types | 24 decoded; Types 1/2/3, 5, 18 and 24 also encoded |
+| Tests | 747, 0 failures |
 | Unsafe blocks | 0 |
 
 For contribution workflow, test rules, and the sentence-type checklist see [CONTRIBUTING.md](CONTRIBUTING.md).
@@ -135,12 +135,20 @@ pub enum AisMessage {
     BinaryAck(BinaryAck),                // Types 7/13
     BinaryBroadcast(BinaryBroadcast),    // Type 8
     SarAircraft(SarAircraftReport),      // Type 9
+    UtcDateInquiry(UtcDateInquiry),      // Type 10
     UtcDateResponse(UtcDateResponse),    // Type 11
     SafetyAddressed(SafetyAddressed),    // Type 12
     Safety(SafetyBroadcast),             // Type 14
     Interrogation(Interrogation),        // Type 15
+    AssignmentMode(AssignmentModeCommand),// Type 16
+    DgnssBroadcast(DgnssBroadcast),      // Type 17
+    DataLinkManagement(DataLinkManagement), // Type 20
     AidToNavigation(AidToNavigation),    // Type 21
+    ChannelManagement(ChannelManagement),// Type 22
+    GroupAssignment(GroupAssignment),    // Type 23
     StaticReport(StaticDataReport),      // Type 24
+    BinarySingleSlot(BinarySingleSlot),  // Type 25
+    BinaryMultiSlot(BinaryMultiSlot),    // Type 26
     LongRangePosition(LongRangePosition),// Type 27
     Unknown { msg_type: u8 },              // unsupported message type
 }
@@ -236,7 +244,7 @@ cargo fmt                                                # format
 
 - No `nom`, no proc-macro, no `syn`/`quote` — keep compile times minimal
 - Zero dependencies (serde was removed as unused)
-- AIS AIVDM/AIVDO Types 1/2/3, 5, 18 and 24 are bidirectional; the remaining supported AIS message types are decode-only. ABM/BBM and NMEA VSD are bidirectional
+- AIS AIVDM/AIVDO Types 1/2/3, 5, 18 and 24 are bidirectional; all other supported AIS Types 1-27 are decode-only. ABM/BBM and NMEA VSD are bidirectional
 - No `unwrap()` in library code — `expect("description")` in tests only
 - No `panic!`, `todo!`, or `#[allow(dead_code)]` in `src/`
 - Edition 2024, MSRV 1.85.0
