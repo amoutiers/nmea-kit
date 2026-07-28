@@ -42,6 +42,11 @@ pub struct NmeaFrame<'a> {
 /// automatically: `talker` will be `""` and `sentence_type` will
 /// contain the full address (e.g. `"PASHR"`, `"PSKPDPT"`).
 ///
+/// Note: a `*` anywhere in the line is treated as the checksum delimiter (the
+/// last one wins). Free text containing `*` (e.g. TXT payloads) therefore
+/// requires a valid trailing checksum; without one the frame is rejected with
+/// [`FrameError::MalformedChecksum`].
+///
 /// # Examples
 ///
 /// ```
@@ -63,7 +68,7 @@ pub fn parse_frame(line: &str) -> Result<NmeaFrame<'_>, FrameError> {
     let (tag_block, line) = strip_tag_block(line)?;
 
     // Extract prefix
-    let prefix = line.chars().next().ok_or(FrameError::Empty)?;
+    let prefix = line.chars().next().ok_or(FrameError::TooShort)?;
     if prefix != '$' && prefix != '!' {
         return Err(FrameError::InvalidPrefix(prefix));
     }
@@ -94,16 +99,11 @@ pub fn parse_frame(line: &str) -> Result<NmeaFrame<'_>, FrameError> {
         }
     }
 
-    // Extract talker (2 chars) + sentence type (3 chars)
-    if body.len() < 5 {
-        return Err(FrameError::TooShort);
-    }
-
     // Find the first comma to determine where the address field ends
     let addr_end = body.find(',').unwrap_or(body.len());
     let addr = &body[..addr_end];
 
-    if addr.len() < 3 {
+    if addr.len() < 3 || (addr.starts_with('P') && addr.len() < 4) {
         return Err(FrameError::TooShort);
     }
 
@@ -198,13 +198,34 @@ pub fn encode_frame(
 
 /// Strip an optional IEC 61162-450 tag block from the beginning of the line.
 /// Returns `(Option<tag_block_content>, remaining_line)`.
+///
+/// When the tag block carries a checksum (`\tags*hh\`), it is validated (XOR
+/// over the content before `*`, same algorithm as the sentence checksum) and
+/// the exposed content excludes the `*hh` suffix. A tag block without a
+/// checksum is accepted as-is (the checksum is optional per IEC 61162-450).
 fn strip_tag_block(line: &str) -> Result<(Option<&str>, &str), FrameError> {
     if let Some(rest) = line.strip_prefix('\\') {
         match rest.find('\\') {
             Some(close) => {
                 let tag = &rest[..close];
                 let remaining = &rest[close + 1..];
-                Ok((Some(tag), remaining))
+                let (content, checksum) = match tag.find('*') {
+                    Some(pos) => (&tag[..pos], Some(&tag[pos + 1..])),
+                    None => (tag, None),
+                };
+                if let Some(checksum) = checksum {
+                    if checksum.len() != 2 || !checksum.bytes().all(|byte| byte.is_ascii_hexdigit())
+                    {
+                        return Err(FrameError::MalformedTagBlock);
+                    }
+                    let expected = u8::from_str_radix(checksum, 16)
+                        .map_err(|_| FrameError::MalformedTagBlock)?;
+                    let computed = content.bytes().fold(0u8, |acc, byte| acc ^ byte);
+                    if expected != computed {
+                        return Err(FrameError::BadTagChecksum { expected, computed });
+                    }
+                }
+                Ok((Some(content), remaining))
             }
             None => Err(FrameError::MalformedTagBlock),
         }
@@ -387,6 +408,21 @@ mod tests {
     }
 
     #[test]
+    fn fieldless_proprietary_address_accepted() {
+        let frame = parse_frame("$PABC*10").expect("valid field-less proprietary");
+        assert_eq!(frame.talker, "");
+        assert_eq!(frame.sentence_type, "PABC");
+        assert!(frame.fields.is_empty());
+    }
+
+    #[test]
+    fn fieldless_talkerless_standard_accepted() {
+        let frame = parse_frame("$RMC*5C").expect("valid field-less talkerless");
+        assert_eq!(frame.talker, "");
+        assert_eq!(frame.sentence_type, "RMC");
+    }
+
+    #[test]
     fn non_ascii_address_returns_err_not_panic() {
         // Multi-byte UTF-8 in the address field must not panic the byte-index slice.
         assert_eq!(parse_frame("$é12,foo"), Err(FrameError::NonAsciiAddress));
@@ -496,8 +532,13 @@ mod tests {
 
     #[test]
     fn parse_with_tag_block() {
-        let frame = parse_frame("\\s:FooBar,c:1234567890*xx\\$GPRMC,175957.917,A,3857.1234,N,07705.1234,W,0.0,0.0,010100,,,A*77").expect("valid frame");
-        assert!(frame.tag_block.is_some());
+        let content = "s:FooBar,c:1234567890";
+        let checksum = content.bytes().fold(0u8, |acc, byte| acc ^ byte);
+        let line = format!(
+            "\\{content}*{checksum:02X}\\$GPRMC,175957.917,A,3857.1234,N,07705.1234,W,0.0,0.0,010100,,,A*77"
+        );
+        let frame = parse_frame(&line).expect("valid frame");
+        assert_eq!(frame.tag_block, Some(content));
         assert_eq!(frame.prefix, '$');
         assert_eq!(frame.sentence_type, "RMC");
     }
@@ -507,6 +548,58 @@ mod tests {
         // "$GPABC," (address + one trailing comma) is ONE empty field, not zero.
         let f = parse_frame("$GPABC,*7B").expect("valid");
         assert_eq!(f.fields, vec![""]);
+    }
+
+    #[test]
+    fn short_proprietary_address_rejected() {
+        assert_eq!(parse_frame("$PAB*53"), Err(FrameError::TooShort));
+    }
+
+    #[test]
+    fn tag_block_bad_checksum_rejected() {
+        let content = "s:FooBar";
+        let checksum = content.bytes().fold(0u8, |acc, b| acc ^ b) ^ 0xFF;
+        let line = format!("\\{content}*{checksum:02X}\\$GPRMC,175957.917,A");
+        assert!(matches!(
+            parse_frame(&line),
+            Err(FrameError::BadTagChecksum { .. })
+        ));
+    }
+
+    #[test]
+    fn tag_block_malformed_checksum_rejected() {
+        assert_eq!(
+            parse_frame("\\s:FooBar*xx\\$GPRMC,175957.917,A"),
+            Err(FrameError::MalformedTagBlock)
+        );
+        assert_eq!(
+            parse_frame("\\s:FooBar*1\\$GPRMC,175957.917,A"),
+            Err(FrameError::MalformedTagBlock)
+        );
+    }
+
+    #[test]
+    fn tag_block_valid_checksum_accepted_and_stripped() {
+        let content = "s:FooBar,c:1234567890";
+        let checksum = content.bytes().fold(0u8, |acc, b| acc ^ b);
+        let line = format!(
+            "\\{content}*{checksum:02X}\\$GPRMC,175957.917,A,3857.1234,N,07705.1234,W,0.0,0.0,010100,,,A*77"
+        );
+        let frame = parse_frame(&line).expect("valid tag block checksum");
+        assert_eq!(frame.tag_block, Some(content));
+    }
+
+    #[test]
+    fn tag_block_without_checksum_accepted() {
+        let frame = parse_frame("\\s:FooBar\\$GPRMC,175957.917,A").expect("no tag checksum");
+        assert_eq!(frame.tag_block, Some("s:FooBar"));
+    }
+
+    #[test]
+    fn tag_block_without_sentence_is_too_short() {
+        assert_eq!(parse_frame("\\s:foo\\"), Err(FrameError::TooShort));
+        assert_eq!(parse_frame(""), Err(FrameError::Empty));
+        assert_eq!(parse_frame("   "), Err(FrameError::Empty));
     }
 
     #[test]

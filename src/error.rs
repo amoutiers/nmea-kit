@@ -12,7 +12,10 @@ pub enum FrameError {
     BadChecksum { expected: u8, computed: u8 },
     /// Tag block opened with `\` but not properly closed.
     MalformedTagBlock,
-    /// Sentence too short to contain talker + type (minimum 5 chars: e.g. "GPRMC").
+    /// Tag block checksum mismatch.
+    BadTagChecksum { expected: u8, computed: u8 },
+    /// Sentence too short to contain a valid address (minimum 3 chars, 4 for
+    /// proprietary `P` addresses).
     TooShort,
     /// Address (talker + type) contains non-ASCII bytes (NMEA addresses are ASCII).
     NonAsciiAddress,
@@ -31,6 +34,12 @@ impl core::fmt::Display for FrameError {
                 )
             }
             Self::MalformedTagBlock => write!(f, "malformed IEC 61162-450 tag block"),
+            Self::BadTagChecksum { expected, computed } => {
+                write!(
+                    f,
+                    "tag block checksum mismatch: expected {expected:02X}, computed {computed:02X}"
+                )
+            }
             Self::TooShort => write!(f, "sentence too short"),
             Self::NonAsciiAddress => write!(f, "address field contains non-ASCII bytes"),
         }

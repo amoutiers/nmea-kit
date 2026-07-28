@@ -148,13 +148,16 @@ fn parse_valid_nmea_sentence() {
 
 #[test]
 fn parse_with_tag_block() {
-    let frame = parse_frame(
-        "\\s:FooBar,c:1234567890*xx\\$GPRMC,175957.917,A,3857.1234,N,07705.1234,W,0.0,0.0,010100,,,A*77",
-    )
-    .expect("sentence with tag block");
+    let content = "s:FooBar,c:1234567890";
+    let checksum = content.bytes().fold(0u8, |acc, byte| acc ^ byte);
+    let line = format!(
+        "\\{content}*{checksum:02X}\\$GPRMC,175957.917,A,3857.1234,N,07705.1234,W,0.0,0.0,010100,,,A*77"
+    );
+    let frame = parse_frame(&line).expect("sentence with tag block");
     assert!(frame.tag_block.is_some());
     let tag = frame.tag_block.expect("tag_block present");
     assert!(tag.contains("FooBar"));
+    assert!(!tag.contains('*'));
     assert_eq!(frame.prefix, '$');
     assert_eq!(frame.sentence_type, "RMC");
 }
