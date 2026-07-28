@@ -51,8 +51,8 @@ impl Bbm {
         })
     }
 
-    pub fn encode(&self) -> Vec<String> {
-        vec![
+    pub fn encode(&self) -> Result<Vec<String>, crate::EncodeError> {
+        let fields = vec![
             encode_u8(self.num_frags),
             encode_u8(self.frag_num),
             encode_u8(self.msg_id),
@@ -60,11 +60,15 @@ impl Bbm {
             encode_u8(self.vdl_msg_num),
             self.payload.clone().unwrap_or_default(),
             encode_u8(self.fill_bits),
-        ]
+        ];
+        for field in &fields {
+            crate::frame::validate_field(field)?;
+        }
+        Ok(fields)
     }
 
     pub fn to_sentence(&self, talker: &str) -> Result<String, crate::EncodeError> {
-        let fields = self.encode();
+        let fields = self.encode()?;
         let field_refs: Vec<&str> = fields.iter().map(|s| s.as_str()).collect();
         crate::encode_frame('!', talker, Self::SENTENCE_TYPE, &field_refs)
     }
@@ -110,6 +114,24 @@ mod tests {
         let frame = parse_frame(sentence.trim()).expect("re-parse");
         let parsed = Bbm::parse(&frame.fields).expect("parse");
         assert_eq!(original, parsed);
+    }
+
+    #[test]
+    fn bbm_encode_rejects_invalid_payload() {
+        let bbm = Bbm {
+            num_frags: Some(1),
+            frag_num: Some(1),
+            msg_id: Some(0),
+            channel: Some('A'),
+            vdl_msg_num: Some(6),
+            payload: Some("invalid*payload".to_string()),
+            fill_bits: Some(0),
+        };
+
+        assert_eq!(
+            bbm.encode(),
+            Err(crate::EncodeError::InvalidFieldCharacter('*'))
+        );
     }
 
     #[test]

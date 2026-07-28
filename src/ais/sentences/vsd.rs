@@ -56,8 +56,8 @@ impl Vsd {
         })
     }
 
-    pub fn encode(&self) -> Vec<String> {
-        vec![
+    pub fn encode(&self) -> Result<Vec<String>, crate::EncodeError> {
+        let fields = vec![
             encode_u8(self.type_of_ship),
             encode_f32(self.draught),
             encode_u8(self.persons),
@@ -67,11 +67,15 @@ impl Vsd {
             encode_u8(self.arrival_month),
             encode_u8(self.nav_status),
             encode_u8(self.regional),
-        ]
+        ];
+        for field in &fields {
+            crate::frame::validate_field(field)?;
+        }
+        Ok(fields)
     }
 
     pub fn to_sentence(&self, talker: &str) -> Result<String, crate::EncodeError> {
-        let fields = self.encode();
+        let fields = self.encode()?;
         let field_refs: Vec<&str> = fields.iter().map(|s| s.as_str()).collect();
         crate::encode_frame('$', talker, Self::SENTENCE_TYPE, &field_refs)
     }
@@ -120,6 +124,26 @@ mod tests {
         let frame = parse_frame(sentence.trim()).expect("re-parse");
         let parsed = Vsd::parse(&frame.fields).expect("parse");
         assert_eq!(original, parsed);
+    }
+
+    #[test]
+    fn vsd_encode_rejects_non_ascii_destination() {
+        let vsd = Vsd {
+            type_of_ship: Some(0),
+            draught: Some(4.5),
+            persons: Some(6),
+            destination: Some("Port de Saint-Maloé".to_string()),
+            arrival_time: Some("220516".to_string()),
+            arrival_day: Some(1),
+            arrival_month: Some(2),
+            nav_status: Some(8),
+            regional: None,
+        };
+
+        assert_eq!(
+            vsd.encode(),
+            Err(crate::EncodeError::InvalidFieldCharacter('é'))
+        );
     }
 
     #[test]

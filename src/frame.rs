@@ -178,12 +178,7 @@ pub fn encode_frame(
         return Err(crate::EncodeError::EmptySentenceType);
     }
     for field in fields {
-        if let Some(c) = field
-            .chars()
-            .find(|&c| !c.is_ascii() || matches!(c, ',' | '*' | '\r' | '\n'))
-        {
-            return Err(crate::EncodeError::InvalidFieldCharacter(c));
-        }
+        validate_field(field)?;
     }
 
     let body = if fields.is_empty() {
@@ -194,6 +189,17 @@ pub fn encode_frame(
 
     let checksum = body.bytes().fold(0u8, |acc, b| acc ^ b);
     Ok(format!("{prefix}{body}*{checksum:02X}\r\n"))
+}
+
+/// Validate a single NMEA field before it is placed on the wire.
+pub(crate) fn validate_field(field: &str) -> Result<(), crate::EncodeError> {
+    if let Some(c) = field
+        .chars()
+        .find(|&c| !c.is_ascii() || matches!(c, ',' | '*' | '\r' | '\n'))
+    {
+        return Err(crate::EncodeError::InvalidFieldCharacter(c));
+    }
+    Ok(())
 }
 
 /// Strip an optional IEC 61162-450 tag block from the beginning of the line.
