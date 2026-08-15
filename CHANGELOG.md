@@ -4,10 +4,16 @@ All notable changes to nmea-kit are documented here.
 
 ## [Unreleased]
 
+## [0.8.1] — 2026-08-15
+
 ### Added
 - AIS transponder-message encoding for `!AIVDM` and `!AIVDO`: Types 1/2/3, 5, 18, and 24. The encoder validates bit-field values and AIS text, adds the checksum, and fragments payloads at 60 armor characters.
 - AIS transponder-message encoding for Types 4, 9, 11, 12, 14, 19, 21, and 27, including Type 12/14 safety-text fragmentation and explicit manual, dead-reckoning, and inoperative position-timestamp states.
 - Typed AIS decoding for Types 10, 16, 17, 20, 22, 23, 25, and 26. Existing decoders now preserve the non-reserved protocol metadata that was previously discarded.
+- ALF (Alert) sentence type — alert fragments, message identifier, category, priority, state, alert metadata, and text.
+- DOR (Door Status Detection) sentence type — door type, identifiers, status, switch setting, and message text.
+
+NMEA sentence coverage: 64 → 66 types.
 
 ## [0.8.0] — 2026-07-27
 
@@ -357,6 +363,7 @@ AIS coverage expanded from 9 to 16 message types.
 - Zero external dependencies
 - CI: tests, clippy, rustfmt, doc checks on stable + MSRV 1.85.0
 
+[0.8.1]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.8.1
 [0.8.0]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.8.0
 [0.7.6]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.7.6
 [0.7.5]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.7.5

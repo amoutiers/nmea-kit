@@ -10,6 +10,8 @@ mod acn;
 mod ala;
 #[cfg(feature = "alc")]
 mod alc;
+#[cfg(feature = "alf")]
+mod alf;
 #[cfg(feature = "alr")]
 mod alr;
 #[cfg(feature = "arc")]
@@ -32,6 +34,8 @@ mod dbk;
 mod dbs;
 #[cfg(feature = "dbt")]
 mod dbt;
+#[cfg(feature = "dor")]
+mod dor;
 #[cfg(feature = "dpt")]
 mod dpt;
 #[cfg(feature = "dtm")]
@@ -139,6 +143,8 @@ pub use acn::*;
 pub use ala::*;
 #[cfg(feature = "alc")]
 pub use alc::*;
+#[cfg(feature = "alf")]
+pub use alf::*;
 #[cfg(feature = "alr")]
 pub use alr::*;
 #[cfg(feature = "arc")]
@@ -161,6 +167,8 @@ pub use dbk::*;
 pub use dbs::*;
 #[cfg(feature = "dbt")]
 pub use dbt::*;
+#[cfg(feature = "dor")]
+pub use dor::*;
 #[cfg(feature = "dpt")]
 pub use dpt::*;
 #[cfg(feature = "dtm")]

@@ -171,8 +171,10 @@ nmea_sentences![
         ["acn", Acn, "ACN"],
         ["ala", Ala, "ALA"],
         ["alc", Alc, "ALC"],
+        ["alf", Alf, "ALF"],
         ["alr", Alr, "ALR"],
         ["arc", Arc, "ARC"],
+        ["dor", Dor, "DOR"],
         // Communication
         ["txt", Txt, "TXT"],
         // Heartbeat

@@ -8,6 +8,8 @@ mod acn;
 mod ala;
 #[path = "nmea/alc.rs"]
 mod alc;
+#[path = "nmea/alf.rs"]
+mod alf;
 #[path = "nmea/alr.rs"]
 mod alr;
 #[path = "nmea/apb.rs"]
@@ -30,6 +32,8 @@ mod dbk;
 mod dbs;
 #[path = "nmea/dbt.rs"]
 mod dbt;
+#[path = "nmea/dor.rs"]
+mod dor;
 #[path = "nmea/dpt.rs"]
 mod dpt;
 #[path = "nmea/dtm.rs"]

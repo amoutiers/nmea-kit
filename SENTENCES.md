@@ -109,10 +109,10 @@ Sources : go-nmea, gpsd.
 - [x] ACN — Alert Command
 - [x] ALA — Alert
 - [x] ALC — Cyclic Alert List
-- [ ] ALF — Alert
+- [x] ALF — Alert
 - [x] ALR — Alert Response
 - [x] ARC — Alert Response Command
-- [ ] DOR — Door Status
+- [x] DOR — Door Status
 - [ ] DSC — Digital Selective Calling Information
 - [ ] DSE — DSC Extended
 - [ ] EVE — Event
