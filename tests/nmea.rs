@@ -36,6 +36,10 @@ mod dbt;
 mod dor;
 #[path = "nmea/dpt.rs"]
 mod dpt;
+#[path = "nmea/dsc.rs"]
+mod dsc;
+#[path = "nmea/dse.rs"]
+mod dse;
 #[path = "nmea/dtm.rs"]
 mod dtm;
 #[path = "nmea/gbs.rs"]

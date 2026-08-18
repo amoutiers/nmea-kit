@@ -38,6 +38,10 @@ mod dbt;
 mod dor;
 #[cfg(feature = "dpt")]
 mod dpt;
+#[cfg(feature = "dsc")]
+mod dsc;
+#[cfg(feature = "dse")]
+mod dse;
 #[cfg(feature = "dtm")]
 mod dtm;
 #[cfg(feature = "gbs")]
@@ -171,6 +175,10 @@ pub use dbt::*;
 pub use dor::*;
 #[cfg(feature = "dpt")]
 pub use dpt::*;
+#[cfg(feature = "dsc")]
+pub use dsc::*;
+#[cfg(feature = "dse")]
+pub use dse::*;
 #[cfg(feature = "dtm")]
 pub use dtm::*;
 #[cfg(feature = "gbs")]

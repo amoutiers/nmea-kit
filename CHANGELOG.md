@@ -4,6 +4,14 @@ All notable changes to nmea-kit are documented here.
 
 ## [Unreleased]
 
+## [0.8.2] — 2026-08-19
+
+### Added
+- DSC (Digital Selective Calling) sentence type — format, address, category, command, position, MMSI, distress, acknowledgement, and expansion fields.
+- DSE (DSC Extended) sentence type — sentence sequence, acknowledgement, MMSI, and variable code/data pairs.
+
+NMEA sentence coverage: 66 → 68 types.
+
 ## [0.8.1] — 2026-08-15
 
 ### Added
@@ -363,6 +371,7 @@ AIS coverage expanded from 9 to 16 message types.
 - Zero external dependencies
 - CI: tests, clippy, rustfmt, doc checks on stable + MSRV 1.85.0
 
+[0.8.2]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.8.2
 [0.8.1]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.8.1
 [0.8.0]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.8.0
 [0.7.6]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.7.6

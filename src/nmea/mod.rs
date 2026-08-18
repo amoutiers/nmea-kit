@@ -176,6 +176,8 @@ nmea_sentences![
         ["arc", Arc, "ARC"],
         ["dor", Dor, "DOR"],
         // Communication
+        ["dsc", Dsc, "DSC"],
+        ["dse", Dse, "DSE"],
         ["txt", Txt, "TXT"],
         // Heartbeat
         ["hbt", Hbt, "HBT"],

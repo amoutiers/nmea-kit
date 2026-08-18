@@ -113,8 +113,8 @@ Sources : go-nmea, gpsd.
 - [x] ALR — Alert Response
 - [x] ARC — Alert Response Command
 - [x] DOR — Door Status
-- [ ] DSC — Digital Selective Calling Information
-- [ ] DSE — DSC Extended
+- [x] DSC — Digital Selective Calling Information
+- [x] DSE — DSC Extended
 - [ ] EVE — Event
 - [ ] FIR — Fire Detection
 - [x] HBT — Heartbeat Supervision
