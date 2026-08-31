@@ -1,0 +1,7 @@
+interface:
+  display_name: "Add NMEA sentence"
+  short_description: "Wire drafted NMEA sentences into nmea-kit"
+  default_prompt: "Use $add-sentence to wire the requested drafted NMEA sentence into nmea-kit."
+
+policy:
+  allow_implicit_invocation: true
