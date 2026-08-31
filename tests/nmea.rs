@@ -42,6 +42,10 @@ mod dsc;
 mod dse;
 #[path = "nmea/dtm.rs"]
 mod dtm;
+#[path = "nmea/eve.rs"]
+mod eve;
+#[path = "nmea/fir.rs"]
+mod fir;
 #[path = "nmea/gbs.rs"]
 mod gbs;
 #[path = "nmea/gga.rs"]

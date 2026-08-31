@@ -69,6 +69,8 @@ macro_rules! nmea_item {
             feature = "dsc",
             feature = "dse",
             feature = "dtm",
+            feature = "eve",
+            feature = "fir",
             feature = "gbs",
             feature = "gga",
             feature = "gll",

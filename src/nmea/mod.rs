@@ -175,6 +175,8 @@ nmea_sentences![
         ["alr", Alr, "ALR"],
         ["arc", Arc, "ARC"],
         ["dor", Dor, "DOR"],
+        ["eve", Eve, "EVE"],
+        ["fir", Fir, "FIR"],
         // Communication
         ["dsc", Dsc, "DSC"],
         ["dse", Dse, "DSE"],

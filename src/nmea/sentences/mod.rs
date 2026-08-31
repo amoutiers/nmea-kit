@@ -44,6 +44,10 @@ mod dsc;
 mod dse;
 #[cfg(feature = "dtm")]
 mod dtm;
+#[cfg(feature = "eve")]
+mod eve;
+#[cfg(feature = "fir")]
+mod fir;
 #[cfg(feature = "gbs")]
 mod gbs;
 #[cfg(feature = "gga")]
@@ -181,6 +185,10 @@ pub use dsc::*;
 pub use dse::*;
 #[cfg(feature = "dtm")]
 pub use dtm::*;
+#[cfg(feature = "eve")]
+pub use eve::*;
+#[cfg(feature = "fir")]
+pub use fir::*;
 #[cfg(feature = "gbs")]
 pub use gbs::*;
 #[cfg(feature = "gga")]
