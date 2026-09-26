@@ -4,7 +4,7 @@ Bidirectional NMEA 0183 parser/encoder + AIS decoder and transponder-message enc
 
 | Key | Value |
 |---|---|
-| Crate | `nmea-kit` v0.8.8 |
+| Crate | `nmea-kit` v0.8.9 |
 | Edition | 2024, MSRV 1.85.0 |
 | Dependencies | 0 |
 | NMEA sentences | 85 (bidirectional) |

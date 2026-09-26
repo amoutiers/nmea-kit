@@ -2,6 +2,11 @@
 
 All notable changes to nmea-kit are documented here.
 
+## [0.8.9] - 2026-09-26
+
+### Changed
+- Release the master branch state with the nmea-0183-rs migration warning. No API changes since 0.8.8.
+
 ## [0.8.8] - 2026-09-26
 
 ### Added
@@ -425,6 +430,7 @@ AIS coverage expanded from 9 to 16 message types.
 - Zero external dependencies
 - CI: tests, clippy, rustfmt, doc checks on stable + MSRV 1.85.0
 
+[0.8.9]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.8.9
 [0.8.8]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.8.8
 [0.8.7]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.8.7
 [0.8.6]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.8.6
