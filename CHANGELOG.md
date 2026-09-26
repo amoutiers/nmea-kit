@@ -2,6 +2,17 @@
 
 All notable changes to nmea-kit are documented here.
 
+## [0.8.8] - 2026-09-26
+
+### Added
+- PKNID, PKNSH, PKWDWPL, PMTK, and PSONCMS proprietary sentence types.
+
+### Changed
+- Cargo emits a warning that `nmea-kit` is deprecated and directs users to `nmea-0183-rs`.
+- Clarify standard version and sentence coverage in the reference tables.
+
+NMEA sentence coverage: 80 -> 85 types.
+
 ## [0.8.7] — 2026-09-20
 
 ### Added
@@ -414,6 +425,7 @@ AIS coverage expanded from 9 to 16 message types.
 - Zero external dependencies
 - CI: tests, clippy, rustfmt, doc checks on stable + MSRV 1.85.0
 
+[0.8.8]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.8.8
 [0.8.7]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.8.7
 [0.8.6]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.8.6
 [0.8.5]: https://github.com/amoutiers/nmea-kit/releases/tag/v0.8.5

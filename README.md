@@ -5,7 +5,7 @@ Bidirectional NMEA 0183 parser/encoder with AIS decoding and transponder-message
 | | |
 | --- | --- |
 | **Crate** | `nmea-kit` |
-| **Version** | 0.8.7 |
+| **Version** | 0.8.8 |
 | **MSRV** | 1.85.0 |
 | **Edition** | 2024 |
 | **Dependencies** | 0 |
